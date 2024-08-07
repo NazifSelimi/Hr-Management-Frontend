@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { Layout } from "antd"; // Import only the necessary components
+import Sidebar from "./components/Sidebar/Sidebar";
+import HeaderComponent from "./components/Header/Header";
+import AppRoutes from "./AppRoutes"; // Ensure AppRoutes is imported correctly
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Sidebar /> {/* Sidebar is outside of the content layout */}
+      <Layout className="site-layout" style={{ marginLeft: 200 }}>
+        <HeaderComponent />
+        <Layout.Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
+          <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
+            <AppRoutes />{" "}
+            {/* Place AppRoutes here to render routed components */}
+          </div>
+        </Layout.Content>
+      </Layout>
+    </Layout>
   );
-}
+};
 
 export default App;

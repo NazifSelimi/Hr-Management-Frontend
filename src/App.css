@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+/* App.css */
+.site-layout .site-layout-background {
+  background: #1f1f1f;
+}
+.logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+}
