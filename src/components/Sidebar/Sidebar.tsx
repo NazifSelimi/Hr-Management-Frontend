@@ -57,6 +57,18 @@ const Sidebar: React.FC = () => {
         },
       ],
     },
+    {
+      key: "sub5",
+      icon: <NotificationOutlined />,
+      label: "Employees",
+      children: [
+        { key: "8", label: <Link to="/employees">Employees</Link> },
+        {
+          key: "9",
+          label: <Link to="/create-projects">Create a Project</Link>,
+        },
+      ],
+    },
   ];
 
   return (
