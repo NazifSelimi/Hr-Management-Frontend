@@ -1,17 +1,14 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Select } from "antd";
-
-interface Department {
-  id: number;
-  name: string;
-}
+import React, { useEffect } from "react";
+import { Form, Input, Button } from "antd";
+import DepartmentSelector from "../Departments/DepartmentSelector";
+import { Department } from "../types";
 
 interface CreateProjectFormProps {
   departments: Department[];
   onSubmit: (values: {
     name: string;
     description: string;
-    department_id: number;
+    department_ids: string[];
   }) => void;
 }
 
@@ -21,8 +18,21 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
 }) => {
   const [form] = Form.useForm();
 
+  const handleFinish = (values: any) => {
+    console.log("Form values on submit:", values);
+    onSubmit({
+      ...values,
+      department_ids: values.department_ids.map((id: string) => id),
+    });
+  };
+
   return (
-    <Form form={form} onFinish={onSubmit}>
+    <Form
+      form={form}
+      onFinish={handleFinish}
+      initialValues={{ department_ids: [] }}
+      layout="vertical"
+    >
       <Form.Item
         name="name"
         label="Project Name"
@@ -40,17 +50,19 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
         <Input.TextArea />
       </Form.Item>
       <Form.Item
-        name="department_id"
-        label="Department"
-        rules={[{ required: true, message: "Please select a department" }]}
+        name="department_ids"
+        label="Select"
+        rules={[
+          { required: true, message: "Please select at least one department" },
+        ]}
       >
-        <Select placeholder="Select a department">
-          {departments.map((dept) => (
-            <Select.Option key={dept.id} value={dept.id}>
-              {dept.name}
-            </Select.Option>
-          ))}
-        </Select>
+        <DepartmentSelector
+          departments={departments}
+          selectedDepartmentIds={form.getFieldValue("department_ids") || []}
+          onChange={(selectedIds: string[]) =>
+            form.setFieldsValue({ department_ids: selectedIds })
+          }
+        />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">

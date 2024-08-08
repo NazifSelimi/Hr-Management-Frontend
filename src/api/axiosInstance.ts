@@ -1,10 +1,9 @@
-// src/api/axiosInstance.ts
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost", // Adjust this URL to match your API endpoint
+  baseURL: "http://localhost/api", // Default base URL for all requests
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json", // Default content type
   },
   withCredentials: true, // Ensure this is false if you are not using cookies or session-based requests
   withXSRFToken: true,
