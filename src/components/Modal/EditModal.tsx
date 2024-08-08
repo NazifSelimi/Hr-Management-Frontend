@@ -25,7 +25,13 @@ const EditModal: React.FC<EditModalProps> = ({
   fields,
 }) => {
   return (
-    <Modal title={title} visible={visible} onCancel={onCancel} footer={null}>
+    <Modal
+      getContainer={false}
+      title={title}
+      visible={visible}
+      onCancel={onCancel}
+      footer={null}
+    >
       <Form initialValues={initialValues} onFinish={onSubmit}>
         {fields.map((field) => (
           <Form.Item

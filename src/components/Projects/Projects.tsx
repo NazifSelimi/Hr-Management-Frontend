@@ -1,20 +1,19 @@
-// src/components/Projects/Projects.tsx
 import React, { useEffect, useState } from "react";
 import { Table, Button, Space, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axiosInstance from "../../api/axiosInstance";
 import EditModal from "../Modal/EditModal";
 
+interface Department {
+  id: string;
+  name: string;
+}
+
 interface Project {
   id: string;
   name: string;
   description: string;
-  department: Department[];
-}
-
-interface Department {
-  id: string;
-  name: string;
+  departments: Department[];
 }
 
 const Projects: React.FC = () => {
@@ -26,23 +25,21 @@ const Projects: React.FC = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axiosInstance.get<Project[]>("/api/projects");
+        const response = await axiosInstance.get<Project[]>("/projects");
         setProjects(response.data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        message.error("Failed to fetch projects.");
+      } catch (error: any) {
+        console.error("Error fetching projects:", error?.response || error);
+        message.error("Failed to fetch projects: " + error.message);
       }
     };
 
     const fetchDepartments = async () => {
       try {
-        const response = await axiosInstance.get<Department[]>(
-          "/api/departments"
-        );
+        const response = await axiosInstance.get<Department[]>("/departments");
         setDepartments(response.data);
-      } catch (error) {
-        console.error("Error fetching departments:", error);
-        message.error("Failed to fetch departments.");
+      } catch (error: any) {
+        console.error("Error fetching departments:", error?.response || error);
+        message.error("Failed to fetch departments: " + error.message);
       }
     };
 
@@ -63,9 +60,9 @@ const Projects: React.FC = () => {
     },
     {
       title: "Departments",
-      key: "department",
+      key: "departments",
       render: (_, record) => (
-        <span>{record.department.map((dept) => dept.name).join(", ")}</span>
+        <span>{record.departments.map((dept) => dept.name).join(", ")}</span>
       ),
     },
     {
@@ -90,18 +87,18 @@ const Projects: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      if (!window.confirm("Are you sure you want to delete this project?"))
-        return;
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
 
-      await axiosInstance.delete(`/api/projects/${id}`);
+    try {
+      await axiosInstance.delete(`/projects/${id}`);
       setProjects((prevProjects) =>
         prevProjects.filter((project) => project.id !== id)
       );
       message.success("Project deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting project:", error);
-      message.error("Failed to delete project.");
+    } catch (error: any) {
+      console.error("Error deleting project:", error?.response || error);
+      message.error("Failed to delete project: " + error.message);
     }
   };
 
@@ -114,7 +111,7 @@ const Projects: React.FC = () => {
     if (!selectedProject) return;
 
     try {
-      await axiosInstance.put(`/api/projects/${selectedProject.id}`, values);
+      await axiosInstance.put(`/projects/${selectedProject.id}`, values);
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
           project.id === selectedProject.id
@@ -124,9 +121,9 @@ const Projects: React.FC = () => {
       );
       message.success("Project updated successfully.");
       handleCancel();
-    } catch (error) {
-      console.error("Error updating project:", error);
-      message.error("Failed to update project.");
+    } catch (error: any) {
+      console.error("Error updating project:", error?.response || error);
+      message.error("Failed to update project: " + error.message);
     }
   };
 
@@ -144,9 +141,9 @@ const Projects: React.FC = () => {
       ],
     },
     {
-      name: "department",
-      label: "Department",
-      rules: [{ required: true, message: "Please select a department!" }],
+      name: "departments",
+      label: "Departments",
+      rules: [{ required: true, message: "Please select departments!" }],
       options: departments.map((dept) => ({
         value: dept.id,
         label: dept.name,
@@ -159,16 +156,20 @@ const Projects: React.FC = () => {
       <h2>Projects</h2>
       <Table dataSource={projects} columns={columns} rowKey="id" />
 
-      <EditModal
-        visible={isModalVisible}
-        title="Edit Project"
-        initialValues={
-          selectedProject || { name: "", description: "", department: "" }
-        }
-        onCancel={handleCancel}
-        onSubmit={handleEditSubmit}
-        fields={editFields}
-      />
+      {selectedProject && (
+        <EditModal
+          visible={isModalVisible}
+          title="Edit Project"
+          initialValues={{
+            name: selectedProject.name,
+            description: selectedProject.description,
+            departments: selectedProject.departments.map((dept) => dept.id),
+          }}
+          onCancel={handleCancel}
+          onSubmit={handleEditSubmit}
+          fields={editFields}
+        />
+      )}
     </div>
   );
 };
