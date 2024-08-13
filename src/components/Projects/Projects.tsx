@@ -8,7 +8,6 @@ import { Department, Project } from "../types";
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const fetchData = useCallback(
@@ -69,11 +68,9 @@ const Projects: React.FC = () => {
 
   const showEditModal = (project: Project) => {
     setSelectedProject(project);
-    setIsModalVisible(true);
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
     setSelectedProject(null);
   };
 
@@ -141,7 +138,7 @@ const Projects: React.FC = () => {
       <Table dataSource={projects} columns={columns} rowKey="id" />
       {selectedProject && (
         <EditModal
-          visible={isModalVisible}
+          open={!!selectedProject} // Open modal if selectedProject is not null
           title="Edit Project"
           initialValues={{
             name: selectedProject.name,

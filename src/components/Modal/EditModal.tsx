@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Modal, Form, Input, Select } from "antd";
 
 interface EditModalProps {
-  visible: boolean;
+  open: boolean; // Updated from visible to open
   title: string;
   initialValues: any;
   onCancel: () => void;
@@ -16,7 +16,7 @@ interface EditModalProps {
 }
 
 const EditModal: React.FC<EditModalProps> = ({
-  visible,
+  open, // Updated from visible to open
   title,
   initialValues,
   onCancel,
@@ -26,16 +26,15 @@ const EditModal: React.FC<EditModalProps> = ({
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       form.setFieldsValue(initialValues);
     }
-  }, [visible, initialValues, form]);
+  }, [open, initialValues, form]);
 
   const handleOk = () => {
     form
       .validateFields()
       .then((values) => {
-        // Compare the current form values with the initial values
         const hasChanges = fields.some((field) => {
           if (field.name === "departments") {
             return (
@@ -49,7 +48,7 @@ const EditModal: React.FC<EditModalProps> = ({
         if (hasChanges) {
           onSubmit(values);
         } else {
-          onCancel(); // Close the modal without making any API call if there are no changes
+          onCancel();
         }
       })
       .catch((info) => {
@@ -58,7 +57,9 @@ const EditModal: React.FC<EditModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} title={title} onCancel={onCancel} onOk={handleOk}>
+    <Modal open={open} title={title} onCancel={onCancel} onOk={handleOk}>
+      {" "}
+      {/* Updated prop */}
       <Form form={form} layout="vertical">
         {fields.map((field) => (
           <Form.Item
