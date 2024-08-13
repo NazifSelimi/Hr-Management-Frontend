@@ -1,19 +1,18 @@
-// src/components/EditModal/EditModal.tsx
-import React from "react";
-import { Modal, Form, Input, Button, Select } from "antd";
+import React, { useEffect } from "react";
+import { Modal, Form, Input, Select } from "antd";
 
 interface EditModalProps {
   visible: boolean;
   title: string;
-  initialValues: Record<string, any>;
+  initialValues: any;
   onCancel: () => void;
-  onSubmit: (values: Record<string, any>) => void;
-  fields: Array<{
+  onSubmit: (values: any) => void;
+  fields: {
     name: string;
     label: string;
-    rules?: any[];
-    options?: Array<{ value: string; label: string }>; // Add options for dropdowns
-  }>;
+    rules: { required: boolean; message: string }[];
+    options?: { value: string; label: string }[];
+  }[];
 }
 
 const EditModal: React.FC<EditModalProps> = ({
@@ -24,34 +23,65 @@ const EditModal: React.FC<EditModalProps> = ({
   onSubmit,
   fields,
 }) => {
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (visible) {
+      form.setFieldsValue(initialValues);
+    }
+  }, [visible, initialValues, form]);
+
+  const handleOk = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        // Compare the current form values with the initial values
+        const hasChanges = fields.some((field) => {
+          if (field.name === "departments") {
+            return (
+              values[field.name].sort().toString() !==
+              initialValues[field.name].sort().toString()
+            );
+          }
+          return values[field.name] !== initialValues[field.name];
+        });
+
+        if (hasChanges) {
+          onSubmit(values);
+        } else {
+          onCancel(); // Close the modal without making any API call if there are no changes
+        }
+      })
+      .catch((info) => {
+        console.log("Validate Failed:", info);
+      });
+  };
+
   return (
-    <Modal
-      getContainer={false}
-      title={title}
-      visible={visible}
-      onCancel={onCancel}
-      footer={null}
-    >
-      <Form initialValues={initialValues} onFinish={onSubmit}>
+    <Modal visible={visible} title={title} onCancel={onCancel} onOk={handleOk}>
+      <Form form={form} layout="vertical">
         {fields.map((field) => (
           <Form.Item
             key={field.name}
-            label={field.label}
             name={field.name}
+            label={field.label}
             rules={field.rules}
           >
-            {field.options ? (
-              <Select options={field.options} /> // Use Select when options are provided
+            {field.name === "description" ? (
+              <Input.TextArea rows={6} />
+            ) : field.options ? (
+              <Select mode="multiple">
+                {field.options.map((option) => (
+                  <Select.Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
             ) : (
               <Input />
             )}
           </Form.Item>
         ))}
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Save
-          </Button>
-        </Form.Item>
       </Form>
     </Modal>
   );

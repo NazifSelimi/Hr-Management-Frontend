@@ -1,20 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Table, Button, Space, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axiosInstance from "../../api/axiosInstance";
 import EditModal from "../Modal/EditModal";
-
-interface Department {
-  id: string;
-  name: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  departments: Department[];
-}
+import { Department, Project } from "../types";
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -22,30 +11,71 @@ const Projects: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  const fetchData = useCallback(
+    async (
+      endpoint: string,
+      setter: React.Dispatch<React.SetStateAction<any>>
+    ) => {
+      try {
+        const response = await axiosInstance.get(endpoint);
+        setter(response.data);
+      } catch (error: any) {
+        console.error(`Error fetching ${endpoint}:`, error?.response || error);
+        message.error(`Failed to fetch ${endpoint}: ${error.message}`);
+      }
+    },
+    []
+  );
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await axiosInstance.get<Project[]>("/projects");
-        setProjects(response.data);
-      } catch (error: any) {
-        console.error("Error fetching projects:", error?.response || error);
-        message.error("Failed to fetch projects: " + error.message);
-      }
-    };
+    fetchData("/projects", setProjects);
+    fetchData("/departments", setDepartments);
+  }, [fetchData]);
 
-    const fetchDepartments = async () => {
-      try {
-        const response = await axiosInstance.get<Department[]>("/departments");
-        setDepartments(response.data);
-      } catch (error: any) {
-        console.error("Error fetching departments:", error?.response || error);
-        message.error("Failed to fetch departments: " + error.message);
-      }
-    };
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
 
-    fetchProjects();
-    fetchDepartments();
-  }, []);
+    try {
+      await axiosInstance.delete(`/projects/${id}`);
+      setProjects((prevProjects) =>
+        prevProjects.filter((project) => project.id !== id)
+      );
+      message.success("Project deleted successfully.");
+    } catch (error: any) {
+      console.error("Error deleting project:", error?.response || error);
+      message.error("Failed to delete project: " + error.message);
+    }
+  };
+
+  const handleEditSubmit = async (values: Record<string, any>) => {
+    if (!selectedProject) return;
+
+    try {
+      await axiosInstance.put(`/projects/${selectedProject.id}`, {
+        name: values.name,
+        description: values.description,
+        department_ids: values.departments,
+      });
+
+      message.success("Project updated successfully.");
+      handleCancel();
+      await fetchData("/projects", setProjects);
+    } catch (error: any) {
+      console.error("Error updating project:", error?.response || error);
+      message.error("Failed to update project: " + error.message);
+    }
+  };
+
+  const showEditModal = (project: Project) => {
+    setSelectedProject(project);
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedProject(null);
+  };
 
   const columns: ColumnsType<Project> = [
     {
@@ -81,52 +111,6 @@ const Projects: React.FC = () => {
     },
   ];
 
-  const showEditModal = (project: Project) => {
-    setSelectedProject(project);
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
-
-    try {
-      await axiosInstance.delete(`/projects/${id}`);
-      setProjects((prevProjects) =>
-        prevProjects.filter((project) => project.id !== id)
-      );
-      message.success("Project deleted successfully.");
-    } catch (error: any) {
-      console.error("Error deleting project:", error?.response || error);
-      message.error("Failed to delete project: " + error.message);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setSelectedProject(null);
-  };
-
-  const handleEditSubmit = async (values: Record<string, any>) => {
-    if (!selectedProject) return;
-
-    try {
-      await axiosInstance.put(`/projects/${selectedProject.id}`, values);
-      setProjects((prevProjects) =>
-        prevProjects.map((project) =>
-          project.id === selectedProject.id
-            ? { ...project, ...values }
-            : project
-        )
-      );
-      message.success("Project updated successfully.");
-      handleCancel();
-    } catch (error: any) {
-      console.error("Error updating project:", error?.response || error);
-      message.error("Failed to update project: " + error.message);
-    }
-  };
-
   const editFields = [
     {
       name: "name",
@@ -155,7 +139,6 @@ const Projects: React.FC = () => {
     <div>
       <h2>Projects</h2>
       <Table dataSource={projects} columns={columns} rowKey="id" />
-
       {selectedProject && (
         <EditModal
           visible={isModalVisible}
