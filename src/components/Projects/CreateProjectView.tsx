@@ -22,7 +22,7 @@ const CreateProjectView: React.FC = () => {
     };
 
     fetchDepartments();
-  }, []); // Empty dependency array ensures this effect runs only once
+  }, []);
 
   const handleSubmit = async (values: {
     name: string;
@@ -35,8 +35,8 @@ const CreateProjectView: React.FC = () => {
       if (response.status === 201) {
         alert("Project created successfully!");
       } else {
-        alert("Failed to create project.");
         console.error("Unexpected response:", response);
+        alert("Failed to create project.");
       }
     } catch (error: any) {
       console.error("Error creating project:", error);
@@ -47,18 +47,12 @@ const CreateProjectView: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <p>Loading departments...</p>;
-  }
+  if (loading) return <p>Loading departments...</p>;
 
-  if (error) {
-    return <p>{error}</p>;
-  }
+  if (error) return <p>{error}</p>;
 
   return (
-    <>
-      <CreateProjectForm departments={departments} onSubmit={handleSubmit} />
-    </>
+    <CreateProjectForm departments={departments} onSubmit={handleSubmit} />
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Form, Input, Button } from "antd";
 import DepartmentSelector from "../Departments/DepartmentSelector";
 import { Department } from "../types";
@@ -19,7 +19,6 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
   const [form] = Form.useForm();
 
   const handleFinish = (values: any) => {
-    console.log("Form values on submit:", values);
     onSubmit({
       ...values,
       department_ids: values.department_ids.map((id: string) => id),
@@ -51,7 +50,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
       </Form.Item>
       <Form.Item
         name="department_ids"
-        label="Select"
+        label="Departments"
         rules={[
           { required: true, message: "Please select at least one department" },
         ]}

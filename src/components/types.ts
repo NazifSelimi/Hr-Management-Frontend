@@ -1,5 +1,11 @@
-// src/types.ts
 export interface Department {
-  id: string; // Change to 'string' if that's what your API expects
+  id: string;
   name: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  departments: Department[];
 }
