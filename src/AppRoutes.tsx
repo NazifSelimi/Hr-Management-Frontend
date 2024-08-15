@@ -8,6 +8,7 @@ import Employees from "./components/Employees/Employees";
 import Departments from "./components/Departments/Departments";
 import ProjectDetails from "./components/Projects/ProjectDetails";
 import UserDetails from "./components/User/UserDetails";
+// import CreateDepartmentForm from "./components/Departments/CreateDepartmentform";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes: React.FC = () => {
       <Route path="projects" element={<Projects />} />
       <Route path="/create-projects" element={<CreateProjectView />} />
       <Route path="/departments" element={<Departments />} />
+      {/* <Route path="/create-department" element={<CreateDepartmentForm />}/> */}
       <Route path="/project/:id" element={<ProjectDetails />} />
       <Route path="/users/:id" element={<UserDetails />} />
       <Route path="/employees" element={<Employees />} />

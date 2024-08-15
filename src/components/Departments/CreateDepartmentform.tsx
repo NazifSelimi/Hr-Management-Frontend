@@ -1,56 +1,58 @@
-// src/components/Departments/DepartmentForm.tsx
-import React, { useState } from "react";
+import React from "react";
 import { Form, Input, Button, message } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 
-interface DepartmentFormProps {
-  initialValues?: { id?: number; name: string };
-  onSuccess: () => void;
+interface DepartmentFormValues {
+  id: number;
+  name: string;
 }
 
-const CreateDepartmentForm: React.FC<DepartmentFormProps> = ({
-  initialValues,
-  onSuccess,
-}) => {
-  const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+interface CreateDepartmentFormProps {
+  onClose: () => void;
+}
 
-  const handleSubmit = async (values: { name: string }) => {
+const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onClose }) => {
+  const [form] = Form.useForm();
+
+  const handleSubmit = async (values: DepartmentFormValues) => {
     try {
-      setLoading(true);
-      if (initialValues?.id) {
-        // Update department
-        await axiosInstance.put(`/api/departments/${initialValues.id}`, values);
-        message.success("Department updated successfully.");
-      } else {
-        // Create new department
-        await axiosInstance.post("/api/departments", values);
-        message.success("Department created successfully.");
-      }
-      form.resetFields();
-      onSuccess();
+      await axiosInstance.post("/departments", values);
+      message.success("Department created successfully.");
+      form.resetFields(); // Reset form fields after successful submission
+      onClose(); // Call onClose to hide the form
     } catch (error) {
-      console.error("Error saving department:", error);
-      message.error("Failed to save department.");
-    } finally {
-      setLoading(false);
+      console.error("Error creating department:", error);
+      message.error("Failed to create department.");
     }
   };
 
   return (
-    <Form form={form} onFinish={handleSubmit} initialValues={initialValues}>
+    
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleSubmit}
+    >
       <Form.Item
-        name="name"
+        label="ID"
+        name="id"
+        rules={[{ required: true, message: "Please enter the department ID." }]}
+      >
+        <Input type="number" />
+      </Form.Item>
+      <Form.Item
         label="Name"
-        rules={[
-          { required: true, message: "Please enter the department name" },
-        ]}
+        name="name"
+        rules={[{ required: true, message: "Please enter the department name." }]}
       >
         <Input />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          {initialValues?.id ? "Update" : "Create"} Department
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+        <Button type="default" onClick={onClose} style={{ marginLeft: 8 }}>
+          Cancel
         </Button>
       </Form.Item>
     </Form>
