@@ -19,12 +19,4 @@ export const getEmployees = async () => {
   }
 };
 
-const getCsrfToken = async () => {
-  try {
-    await axios.get("/sanctum/csrf-cookie"); // Adjust the URL if needed
-  } catch (error) {
-    console.error("Error fetching CSRF token:", error);
-  }
-};
-
 export default axiosInstance;

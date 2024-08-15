@@ -22,50 +22,44 @@ const Sidebar: React.FC = () => {
       icon: <UserOutlined />,
       label: <Link to="/users">Users</Link>,
       children: [
-        { key: "1", label: "Tom" },
+        { key: "1", label: <Link to="/employees">Employees</Link> },
         { key: "2", label: "Bill" },
         { key: "3", label: "Alex" },
       ],
     },
     {
       key: "sub2",
-      icon: <LaptopOutlined />,
-      label: "Team",
+      icon: <NotificationOutlined />,
+      label: "Projects",
       children: [
-        { key: "4", label: "Team 1" },
-        { key: "5", label: "Team 2" },
+        { key: "4", label: <Link to="/projects">Projects</Link> },
+        {
+          key: "5",
+          label: <Link to="/create-projects">Create Project</Link>,
+        },
       ],
     },
     {
       key: "sub3",
       icon: <NotificationOutlined />,
-      label: "Files",
+      label: "Departments",
       children: [
-        { key: "6", label: "File 1" },
-        { key: "7", label: "File 2" },
+        { key: "6", label: <Link to="/">Departmetns</Link> },
+        {
+          key: "7",
+          label: <Link to="/">Create Department</Link>,
+        },
       ],
     },
     {
       key: "sub4",
       icon: <NotificationOutlined />,
-      label: "Projects",
+      label: "Vacations",
       children: [
-        { key: "8", label: <Link to="/projects">Projects</Link> },
+        { key: "8", label: <Link to="/">Vacations</Link> },
         {
           key: "9",
-          label: <Link to="/create-projects">Create a Project</Link>,
-        },
-      ],
-    },
-    {
-      key: "sub5",
-      icon: <NotificationOutlined />,
-      label: "Employees",
-      children: [
-        { key: "8", label: <Link to="/employees">Employees</Link> },
-        {
-          key: "9",
-          label: <Link to="/create-projects">Create a Project</Link>,
+          label: <Link to="/">Request Vacation</Link>,
         },
       ],
     },

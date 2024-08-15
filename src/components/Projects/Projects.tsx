@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, Space, message } from "antd";
+import { Table, Button, Space, message, Spin } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axiosInstance from "../../api/axiosInstance";
 import EditModal from "../Modal/EditModal";
 import { Department, Project } from "../types";
+import { useNavigate } from "react-router-dom";
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-
+  const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
   const fetchData = useCallback(
     async (
       endpoint: string,
@@ -18,6 +20,7 @@ const Projects: React.FC = () => {
       try {
         const response = await axiosInstance.get(endpoint);
         setter(response.data);
+        setLoading(false);
       } catch (error: any) {
         console.error(`Error fetching ${endpoint}:`, error?.response || error);
         message.error(`Failed to fetch ${endpoint}: ${error.message}`);
@@ -30,7 +33,9 @@ const Projects: React.FC = () => {
     fetchData("/projects", setProjects);
     fetchData("/departments", setDepartments);
   }, [fetchData]);
+  if (loading) return <Spin />; // Show loading spinner while fetching
 
+  if (!projects) return <p>Projects could not be loaded</p>; // Display message if project is not found
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this project?"))
       return;
@@ -97,6 +102,9 @@ const Projects: React.FC = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
+          <Button onClick={() => navigate(`/project/${record.id}`)}>
+            View
+          </Button>
           <Button type="link" onClick={() => showEditModal(record)}>
             Edit
           </Button>

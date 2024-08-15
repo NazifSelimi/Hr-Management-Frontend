@@ -1,8 +1,9 @@
 // src/components/Departments/DepartmentsList.tsx
 import React, { useEffect, useState } from "react";
-import { Table, Button, message } from "antd";
+import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
-import { getEmployees } from "../../api/axiosInstance"; // Assuming api.ts is in the same directory
+import { getEmployees } from "../../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 interface Employee {
   id: string;
@@ -18,9 +19,8 @@ interface Employee {
 
 const Employees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
-
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -28,15 +28,14 @@ const Employees = () => {
         const data = await getEmployees();
         setEmployees(data);
         setLoading(false);
-      } catch (err) {
-        setError("Failed to fetch employees");
-        setLoading(false);
-      }
+      } catch (err) {}
     };
 
     fetchEmployees();
   }, []); // Empty dependency array ensures this runs once on mount
+  if (loading) return <Spin />; // Show loading spinner while fetching
 
+  if (!employees) return <p>Employes could not be loaded</p>; // Display message if project is not found
   const handleDelete = async (id: string) => {
     try {
       await axiosInstance.delete(`/user-delete/${id}`).then((response) => {
@@ -73,22 +72,7 @@ const Employees = () => {
             key: "email",
           },
           {
-            title: "Phone",
-            dataIndex: "phone",
-            key: "phone",
-          },
-          {
-            title: "City",
-            dataIndex: "city",
-            key: "city",
-          },
-          {
-            title: "Address",
-            dataIndex: "address",
-            key: "address",
-          },
-          {
-            title: "Days Off",
+            title: "Days Left",
             dataIndex: "days_off",
             key: "address",
           },
@@ -96,13 +80,18 @@ const Employees = () => {
             title: "Actions",
             key: "actions",
             render: (_, record) => (
-              <Button
-                type="link"
-                danger
-                onClick={() => handleDelete(record.id)}
-              >
-                Delete
-              </Button>
+              <>
+                <Button onClick={() => navigate(`/users/${record.id}`)}>
+                  View
+                </Button>
+                <Button
+                  type="link"
+                  danger
+                  onClick={() => handleDelete(record.id)}
+                >
+                  Delete
+                </Button>
+              </>
             ),
           },
         ]}

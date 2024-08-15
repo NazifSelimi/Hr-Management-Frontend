@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import CreateProjectForm from "./CreateProjectForm";
 import { Department } from "../types";
+import { Spin } from "antd";
 
 const CreateProjectView: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -47,9 +48,9 @@ const CreateProjectView: React.FC = () => {
     }
   };
 
-  if (loading) return <p>Loading departments...</p>;
+  if (loading) return <Spin />; // Show loading spinner while fetching
 
-  if (error) return <p>{error}</p>;
+  if (error) return <p>There has been an error</p>; // Display message if project is not found
 
   return (
     <CreateProjectForm departments={departments} onSubmit={handleSubmit} />
