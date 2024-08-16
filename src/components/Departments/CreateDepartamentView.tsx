@@ -1,28 +1,41 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CreateDepartmentForm from "./CreateDepartmentform";
-import { Button } from "antd";
+const CreateDepartmentView: React.FC = () => {
+  const [isDepartmentCreated, setIsDepartmentCreated] = useState(false);
+  const navigate = useNavigate();
 
-function CreateDepartamentView() {
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const handleCreateClick = () => {
-    setShowForm(true); 
+  const handleDepartmentCreated = () => {
+    setIsDepartmentCreated(true);
   };
 
-  const handleFormClose = () => {
-    setShowForm(false); 
+  const handleViewDepartments = () => {
+    navigate("/departments");
   };
+
   return (
     <div>
-      <Button type="primary" onClick={handleCreateClick}>
-        Create Department
-      </Button>
-      {showForm && (
-        <div style={{ marginTop: 20 }}>
-          <CreateDepartmentForm onClose={handleFormClose} />
-        </div>
+      <h2>Create Department</h2>
+      <CreateDepartmentForm onDepartmentCreated={handleDepartmentCreated} />
+
+      {isDepartmentCreated && (
+        <button
+          style={{
+            backgroundColor: "#60993E",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            marginTop: "20px",
+          }}
+          onClick={handleViewDepartments}
+        >
+          View Departments
+        </button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CreateDepartamentView
+export default CreateDepartmentView;

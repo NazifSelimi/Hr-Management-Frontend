@@ -44,10 +44,10 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Departments",
       children: [
-        { key: "6", label: <Link to="/">Departmetns</Link> },
+        { key: "6", label: <Link to="/departments">View Departments</Link> },
         {
           key: "7",
-          label: <Link to="/">Create Department</Link>,
+          label: <Link to="/create-department">Create Department</Link>,
         },
       ],
     },

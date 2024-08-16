@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
-// import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 
 interface Department {
@@ -10,27 +9,28 @@ interface Department {
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
-  // const [loading, setLoading] = useState<boolean>(true);
-  // const navigate = useNavigate(); 
+  const [loading, setLoading] = useState<boolean>(true); // State to track loading
+  const [deleting, setDeleting] = useState<boolean>(false); // State to track deletion process
 
   useEffect(() => {
     const fetchDepartments = async () => {
+      setLoading(true);
       try {
         const response = await axiosInstance.get<Department[]>("/departments");
         setDepartments(response.data);
       } catch (error) {
         console.error("Error fetching departments:", error);
         message.error("Failed to fetch departments.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchDepartments();
   }, []);
-  // if (loading) return <Spin />; 
-
-  // if (!departments) return <p>Projects could not be loaded</p>;
 
   const handleDelete = async (id: number) => {
+    setDeleting(true);
     try {
       await axiosInstance.delete(`/departments/${id}`);
       setDepartments(departments.filter((dept) => dept.id !== id));
@@ -38,37 +38,43 @@ const DepartmentsList: React.FC = () => {
     } catch (error) {
       console.error("Error deleting department:", error);
       message.error("Failed to delete department.");
+    } finally {
+      setDeleting(false);
     }
   };
-
 
   return (
     <div>
       <h2>Departments</h2>
-      <Table
-        dataSource={departments}
-        columns={[
-          {
-            title: "Name",
-            dataIndex: "name",
-            key: "name",
-          },
-          {
-            title: "Actions",
-            key: "actions",
-            render: (_, record) => (
-              <Button
-                type="link"
-                danger
-                onClick={() => handleDelete(record.id)}
-              >
-                Delete
-              </Button>
-            ),
-          },
-        ]}
-        rowKey="id"
-      />
+      {loading ? (
+        <Spin tip="Loading departments..." />
+      ) : (
+        <Table
+          dataSource={departments}
+          columns={[
+            {
+              title: "Name",
+              dataIndex: "name",
+              key: "name",
+            },
+            {
+              title: "Actions",
+              key: "actions",
+              render: (_, record) => (
+                <Button
+                  type="link"
+                  danger
+                  onClick={() => handleDelete(record.id)}
+                  loading={deleting} // Spinner on delete button
+                >
+                  Delete
+                </Button>
+              ),
+            },
+          ]}
+          rowKey="id"
+        />
+      )}
     </div>
   );
 };
