@@ -5,6 +5,7 @@ import axiosInstance from "../../api/axiosInstance";
 interface Department {
   id: number;
   name: string;
+  description: string; 
 }
 
 const DepartmentsList: React.FC = () => {
@@ -56,6 +57,11 @@ const DepartmentsList: React.FC = () => {
               title: "Name",
               dataIndex: "name",
               key: "name",
+            },
+            {
+              title: "Description", 
+              dataIndex: "description",
+              key: "description",
             },
             {
               title: "Actions",

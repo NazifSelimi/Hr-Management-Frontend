@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Form, Input, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 
@@ -13,20 +13,20 @@ interface CreateDepartmentFormProps {
 
 const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onDepartmentCreated }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false); // State to track loading status
+  const [loading, setLoading] = React.useState<boolean>(false); // Track loading state
 
   const handleSubmit = async (values: DepartmentFormValues) => {
-    setLoading(true); // Start loading spinner
+    setLoading(true);
     try {
       await axiosInstance.post("/departments", values);
       message.success("Department created successfully.");
-      form.resetFields(); // Reset form fields after successful submission
-      onDepartmentCreated(); // Notify the parent component that the department was created
+      form.resetFields();
+      onDepartmentCreated();
     } catch (error) {
       console.error("Error creating department:", error);
       message.error("Failed to create department.");
     } finally {
-      setLoading(false); // Stop loading spinner
+      setLoading(false);
     }
   };
 
