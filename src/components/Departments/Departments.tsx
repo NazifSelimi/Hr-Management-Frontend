@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
 // import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
-import CreateDepartmentForm from "./CreateDepartmentform"; // Adjust the path if necessary
 
 interface Department {
   id: number;
@@ -11,7 +10,6 @@ interface Department {
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [showForm, setShowForm] = useState<boolean>(false);
   // const [loading, setLoading] = useState<boolean>(true);
   // const navigate = useNavigate(); 
 
@@ -43,25 +41,10 @@ const DepartmentsList: React.FC = () => {
     }
   };
 
-  const handleCreateClick = () => {
-    setShowForm(true); 
-  };
-
-  const handleFormClose = () => {
-    setShowForm(false); 
-  };
 
   return (
     <div>
       <h2>Departments</h2>
-      <Button type="primary" onClick={handleCreateClick}>
-        Create Department
-      </Button>
-      {showForm && (
-        <div style={{ marginTop: 20 }}>
-          <CreateDepartmentForm onClose={handleFormClose} />
-        </div>
-      )}
       <Table
         dataSource={departments}
         columns={[

@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Button, message } from "antd";
 import axiosInstance from "../../api/axiosInstance";
+import FormItem from "antd/es/form/FormItem";
 
 interface DepartmentFormValues {
   id: number;
@@ -13,6 +14,7 @@ interface CreateDepartmentFormProps {
 
 const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onClose }) => {
   const [form] = Form.useForm();
+  
 
   const handleSubmit = async (values: DepartmentFormValues) => {
     try {
@@ -27,19 +29,11 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onClose }) 
   };
 
   return (
-    
     <Form
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
     >
-      <Form.Item
-        label="ID"
-        name="id"
-        rules={[{ required: true, message: "Please enter the department ID." }]}
-      >
-        <Input type="number" />
-      </Form.Item>
       <Form.Item
         label="Name"
         name="name"
@@ -47,6 +41,13 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onClose }) 
       >
         <Input />
       </Form.Item>
+      <FormItem
+      label="Description"
+      name="description"
+      rules={[{ required: true, message: "Please enter the department description." }]}
+      >
+        <Input/>
+      </FormItem>
       <Form.Item>
         <Button type="primary" htmlType="submit">
           Submit
@@ -57,6 +58,7 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onClose }) 
       </Form.Item>
     </Form>
   );
+  
 };
 
 export default CreateDepartmentForm;
