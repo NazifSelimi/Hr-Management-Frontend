@@ -1,6 +1,7 @@
 export interface Department {
   id: string;
   name: string;
+  description: string; //added a description interface
 }
 
 export interface Project {

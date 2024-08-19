@@ -1,35 +1,31 @@
 import React, { useState } from "react";
-import { Button, message, Spin } from "antd";
+import { message, Spin } from "antd";
 import CreateDepartmentForm from "./CreateDepartmentform";
-
 const CreateDepartmentView: React.FC = () => {
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleCreateClick = () => {
-    setShowForm(true);
-  };
+  const handleDepartmentCreated = async () => {
+    setLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
-  const handleDepartmentCreated = () => {
-    setShowForm(false);
-    message.success("Department created successfully.");
+      message.success("Department created successfully.");
+    } catch (error) {
+      message.error("Failed to create department.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div>
       <h2>Create Department</h2>
       {loading ? (
-        <Spin tip="Creating department..." />
+        <Spin tip="Creating departments...">
+          <div style={{ minHeight: '100px' }} />
+        </Spin>
       ) : (
-        <div>
-          {showForm ? (
-            <CreateDepartmentForm onDepartmentCreated={handleDepartmentCreated} />
-          ) : (
-            <Button type="primary" onClick={handleCreateClick} style={{ backgroundColor: '#60993E', borderColor: '#60993E' }}>
-              Create New Department
-            </Button>
-          )}
-        </div>
+        <CreateDepartmentForm onDepartmentCreated={handleDepartmentCreated} />
       )}
     </div>
   );

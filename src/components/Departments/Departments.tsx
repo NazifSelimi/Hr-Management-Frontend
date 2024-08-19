@@ -5,7 +5,7 @@ import axiosInstance from "../../api/axiosInstance";
 interface Department {
   id: number;
   name: string;
-  description: string; 
+  description: string; //added the description in this interface too
 }
 
 const DepartmentsList: React.FC = () => {
@@ -48,7 +48,9 @@ const DepartmentsList: React.FC = () => {
     <div>
       <h2>Departments</h2>
       {loading ? (
-        <Spin tip="Loading departments..." />
+        <Spin tip="Loading departments...">
+          <div style={{ minHeight: '100px' }} />
+        </Spin>
       ) : (
         <Table
           dataSource={departments}
@@ -83,6 +85,7 @@ const DepartmentsList: React.FC = () => {
       )}
     </div>
   );
+  
 };
 
 export default DepartmentsList;

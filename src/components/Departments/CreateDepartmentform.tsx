@@ -34,7 +34,7 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onDepartmen
     <Spin spinning={loading}>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
-          label="Name"
+          label="Department Name"
           name="name"
           rules={[{ required: true, message: "Please enter the department name." }]}
         >
