@@ -10,19 +10,16 @@ interface DepartmentSelectorProps {
 
 const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({
   departments,
-  // selectedDepartmentIds,
+  selectedDepartmentIds,
   onChange,
 }) => {
-  const handleChange = (value: string[]) => {
-    onChange(value);
-  };
-
   return (
     <Select
       mode="multiple"
       style={{ width: "100%" }}
       placeholder="Select departments"
-      onChange={handleChange}
+      value={selectedDepartmentIds}
+      onChange={onChange}
     >
       {departments.map((department) => (
         <Select.Option key={department.id} value={department.id}>
@@ -33,7 +30,7 @@ const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({
           </div>
         </Select.Option>
       ))}
-    </Select>
+    </Select> 
   );
 };
 

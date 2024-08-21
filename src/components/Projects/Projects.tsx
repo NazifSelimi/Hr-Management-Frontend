@@ -12,6 +12,7 @@ const Projects: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  
   const fetchData = useCallback(
     async (
       endpoint: string,
@@ -20,6 +21,7 @@ const Projects: React.FC = () => {
       try {
         const response = await axiosInstance.get(endpoint);
         setter(response.data);
+        // console.log(response.data)
         setLoading(false);
       } catch (error: any) {
         console.error(`Error fetching ${endpoint}:`, error?.response || error);
@@ -61,6 +63,7 @@ const Projects: React.FC = () => {
         description: values.description,
         department_ids: values.departments,
       });
+      // console.log(values.description)
 
       message.success("Project updated successfully.");
       handleCancel();

@@ -13,7 +13,7 @@ interface CreateDepartmentFormProps {
 
 const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onDepartmentCreated }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = React.useState<boolean>(false); // Track loading state
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const handleSubmit = async (values: DepartmentFormValues) => {
     setLoading(true);
@@ -32,7 +32,7 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onDepartmen
 
   return (
     <Spin spinning={loading}>
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item
           label="Department Name"
           name="name"
@@ -45,7 +45,7 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onDepartmen
           name="description"
           rules={[{ required: true, message: "Please enter the department description." }]}
         >
-          <Input />
+          <Input.TextArea />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">

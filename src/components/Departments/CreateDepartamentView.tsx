@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { message, Spin } from "antd";
 import CreateDepartmentForm from "./CreateDepartmentform";
+
 const CreateDepartmentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -8,21 +9,19 @@ const CreateDepartmentView: React.FC = () => {
     setLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
-      message.success("Department created successfully.");
     } catch (error) {
-      message.error("Failed to create department.");
+      message.error("Failed to simulate API call."); // Error message for simulation
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Create Department</h2>
       {loading ? (
         <Spin tip="Creating departments...">
-          <div style={{ minHeight: '100px' }} />
+          <div style={{ minHeight: "100px" }} />
         </Spin>
       ) : (
         <CreateDepartmentForm onDepartmentCreated={handleDepartmentCreated} />

@@ -5,13 +5,13 @@ import axiosInstance from "../../api/axiosInstance";
 interface Department {
   id: number;
   name: string;
-  description: string; //added the description in this interface too
+  description: string;
 }
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // State to track loading
-  const [deleting, setDeleting] = useState<boolean>(false); // State to track deletion process
+  const [loading, setLoading] = useState<boolean>(true);
+  const [deleting, setDeleting] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -31,7 +31,7 @@ const DepartmentsList: React.FC = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    setDeleting(true);
+    setDeleting((prevState) => ({ ...prevState, [id]: true }));
     try {
       await axiosInstance.delete(`/departments/${id}`);
       setDepartments(departments.filter((dept) => dept.id !== id));
@@ -40,16 +40,16 @@ const DepartmentsList: React.FC = () => {
       console.error("Error deleting department:", error);
       message.error("Failed to delete department.");
     } finally {
-      setDeleting(false);
+      setDeleting((prevState) => ({ ...prevState, [id]: false }));
     }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Departments</h2>
       {loading ? (
         <Spin tip="Loading departments...">
-          <div style={{ minHeight: '100px' }} />
+          <div style={{ minHeight: "100px" }} />
         </Spin>
       ) : (
         <Table
@@ -61,7 +61,7 @@ const DepartmentsList: React.FC = () => {
               key: "name",
             },
             {
-              title: "Description", 
+              title: "Description",
               dataIndex: "description",
               key: "description",
             },
@@ -73,7 +73,7 @@ const DepartmentsList: React.FC = () => {
                   type="link"
                   danger
                   onClick={() => handleDelete(record.id)}
-                  loading={deleting} // Spinner on delete button
+                  loading={deleting[record.id]}
                 >
                   Delete
                 </Button>
@@ -85,7 +85,6 @@ const DepartmentsList: React.FC = () => {
       )}
     </div>
   );
-  
 };
 
 export default DepartmentsList;
