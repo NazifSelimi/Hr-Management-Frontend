@@ -1,33 +1,35 @@
 import React, { useState } from "react";
-import { message, Spin } from "antd";
+import axiosInstance from "../../api/axiosInstance";
 import CreateDepartmentForm from "./CreateDepartmentform";
+import { Spin, message } from "antd";
 
 const CreateDepartmentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleDepartmentCreated = async () => {
+  const handleSubmit = async (values: { name: string }) => {
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-    } catch (error) {
-      message.error("Failed to simulate API call."); // Error message for simulation
+      const response = await axiosInstance.post("/departments", values);
+      if (response.status === 201) {
+        message.success("Department created successfully!");
+      } else {
+        console.error("Unexpected response:", response);
+        message.error("Failed to create department.");
+      }
+    } catch (error: any) {
+      console.error("Error creating department:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "An error occurred while creating the department.";
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h2>Create Department</h2>
-      {loading ? (
-        <Spin tip="Creating departments...">
-          <div style={{ minHeight: "100px" }} />
-        </Spin>
-      ) : (
-        <CreateDepartmentForm onDepartmentCreated={handleDepartmentCreated} />
-      )}
-    </div>
-  );
+  if (loading) return <Spin />;
+
+  return <CreateDepartmentForm onSubmit={handleSubmit} />;
 };
 
 export default CreateDepartmentView;

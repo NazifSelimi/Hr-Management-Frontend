@@ -1,59 +1,40 @@
 import React from "react";
-import { Form, Input, Button, message, Spin } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-
-interface DepartmentFormValues {
-  name: string;
-  description: string;
-}
+import { Form, Input, Button } from "antd";
 
 interface CreateDepartmentFormProps {
-  onDepartmentCreated: () => void;
+  onSubmit: (values: { name: string; description: string }) => void;
 }
 
-const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onDepartmentCreated }) => {
-  const [form] = Form.useForm();
-  const [loading, setLoading] = React.useState<boolean>(false);
-
-  const handleSubmit = async (values: DepartmentFormValues) => {
-    setLoading(true);
-    try {
-      await axiosInstance.post("/departments", values);
-      message.success("Department created successfully.");
-      form.resetFields();
-      onDepartmentCreated();
-    } catch (error) {
-      console.error("Error creating department:", error);
-      message.error("Failed to create department.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onSubmit }) => {
   return (
-    <Spin spinning={loading}>
-      <Form form={form} onFinish={handleSubmit} layout="vertical">
+    <div>
+      <h2>Create Department</h2>
+      <Form
+        name="create_department"
+        onFinish={onSubmit}
+        initialValues={{ name: "", description: "" }}
+        layout="vertical"
+      >
         <Form.Item
-          label="Department Name"
           name="name"
-          rules={[{ required: true, message: "Please enter the department name." }]}
+          label="Department Name"
+          rules={[{ required: true, message: "Please input the department name!" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Description"
           name="description"
-          rules={[{ required: true, message: "Please enter the department description." }]}
+          label="Description"
         >
-          <Input.TextArea />
+          <Input.TextArea rows={4} />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            Submit
+            Create Department
           </Button>
         </Form.Item>
       </Form>
-    </Spin>
+    </div>
   );
 };
 

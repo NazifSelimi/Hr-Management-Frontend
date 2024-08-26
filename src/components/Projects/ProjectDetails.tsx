@@ -18,15 +18,15 @@ import { Project, User } from "../types";
 const { Title, Text } = Typography;
 
 const ProjectDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Get the project ID from the URL
-  const [project, setProject] = useState<Project | null>(null); // State for storing the project data
-  const [loading, setLoading] = useState<boolean>(true); // State for loading status
+  const { id } = useParams<{ id: string }>();
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await axiosInstance.get(`/projects/${id}`); // Fetch project by ID
+        const response = await axiosInstance.get(`/projects/${id}`);
         setProject(response.data);
         setLoading(false);
       } catch (error: any) {
@@ -38,14 +38,24 @@ const ProjectDetails: React.FC = () => {
     };
 
     fetchProject();
-  }, [id]); // Dependency array to refetch if the ID changes
+  }, [id]);
 
-  if (loading) return <Spin />; // Show loading spinner while fetching
+  if (loading) return <Spin />;
 
-  if (!project) return <p>Project not found</p>; // Display message if project is not found
+  if (!project) return <p>Project not found</p>;
 
-  const handleRemoveUser = async (id: string) => {
-    //
+  const handleRemoveUser = async (userId: string) => {
+    try {
+      await axiosInstance.delete(`/projects/${id}/users/${userId}`);
+      setProject(prevProject => ({
+        ...prevProject!,
+        users: prevProject!.users.filter(user => user.id !== userId),
+      }));
+      message.success("User removed from project successfully.");
+    } catch (error: any) {
+      console.error("Error removing user from project:", error?.response || error);
+      message.error("Failed to remove user from project.");
+    }
   };
 
   const userColumns = [
@@ -69,7 +79,7 @@ const ProjectDetails: React.FC = () => {
       key: "departments",
       render: (_: any, record: User) => (
         <span>
-          {record.departments.map((dept) => (
+          {record.departments.map(dept => (
             <Tag key={dept.id} color="blue" style={{ marginBottom: "5px" }}>
               {dept.name}
             </Tag>
@@ -123,27 +133,23 @@ const ProjectDetails: React.FC = () => {
             </Text>
           </Col>
           <Col span={18}>
-            {project.departments && project.departments.length > 0 ? (
-              project.departments.map((dept) => (
-                <Tag
-                  key={dept.id}
-                  color="blue"
-                  style={{ marginBottom: "5px", fontSize: "16px" }}
-                >
-                  {dept.name}
-                </Tag>
-              ))
-            ) : (
-              <Text style={{ fontSize: "18px" }}>No departments assigned</Text>
-            )}
+            <Text style={{ fontSize: "18px" }}>
+              {project.departments.map(dept => dept.name).join(", ")}
+            </Text>
           </Col>
         </Row>
-      </Card>
-      <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
-        Associated Users
-      </Title>
-      <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
-        <Table dataSource={project.users} columns={userColumns} rowKey="id" />
+        <Divider />
+        <Row>
+          <Col span={24}>
+            <Title level={4}>Users in this Project</Title>
+            <Table
+              dataSource={project.users}
+              columns={userColumns}
+              rowKey="id"
+              pagination={false}
+            />
+          </Col>
+        </Row>
       </Card>
     </>
   );

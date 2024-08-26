@@ -1,27 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
-
-interface Department {
-  id: number;
-  name: string;
-  description: string;
-}
+import { Department, User } from "../types";
+import AssignUsersModal from "./AssignUsersModal";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [deleting, setDeleting] = useState<{ [key: number]: boolean }>({});
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDepartments = async () => {
-      setLoading(true);
       try {
-        const response = await axiosInstance.get<Department[]>("/departments");
+        const response = await axiosInstance.get("/departments");
         setDepartments(response.data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching departments:", error);
-        message.error("Failed to fetch departments.");
+        message.error("Failed to load departments.");
       } finally {
         setLoading(false);
       }
@@ -30,57 +26,47 @@ const DepartmentsList: React.FC = () => {
     fetchDepartments();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    setDeleting((prevState) => ({ ...prevState, [id]: true }));
-    try {
-      await axiosInstance.delete(`/departments/${id}`);
-      setDepartments(departments.filter((dept) => dept.id !== id));
-      message.success("Department deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting department:", error);
-      message.error("Failed to delete department.");
-    } finally {
-      setDeleting((prevState) => ({ ...prevState, [id]: false }));
-    }
+  if (loading) return <Spin />;
+
+  const handleAssignUsersClick = (departmentId: string) => {
+    setSelectedDepartmentId(departmentId);
+    setModalVisible(true);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Departments</h2>
-      {loading ? (
-        <Spin tip="Loading departments...">
-          <div style={{ minHeight: "100px" }} />
-        </Spin>
-      ) : (
-        <Table
-          dataSource={departments}
-          columns={[
-            {
-              title: "Name",
-              dataIndex: "name",
-              key: "name",
-            },
-            {
-              title: "Description",
-              dataIndex: "description",
-              key: "description",
-            },
-            {
-              title: "Actions",
-              key: "actions",
-              render: (_, record) => (
-                <Button
-                  type="link"
-                  danger
-                  onClick={() => handleDelete(record.id)}
-                  loading={deleting[record.id]}
-                >
-                  Delete
+    <div>
+      <Table
+        dataSource={departments}
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+          },
+          {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+              <>
+                <Button onClick={() => handleAssignUsersClick(record.id)}>
+                  Assign Users
                 </Button>
-              ),
-            },
-          ]}
-          rowKey="id"
+              </>
+            ),
+          },
+        ]}
+        rowKey="id"
+      />
+      {selectedDepartmentId && (
+        <AssignUsersModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          departmentId={selectedDepartmentId}
         />
       )}
     </div>

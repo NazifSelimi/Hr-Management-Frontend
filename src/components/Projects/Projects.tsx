@@ -14,14 +14,10 @@ const Projects: React.FC = () => {
   const navigate = useNavigate();
   
   const fetchData = useCallback(
-    async (
-      endpoint: string,
-      setter: React.Dispatch<React.SetStateAction<any>>
-    ) => {
+    async (endpoint: string, setter: React.Dispatch<React.SetStateAction<any>>) => {
       try {
         const response = await axiosInstance.get(endpoint);
         setter(response.data);
-        // console.log(response.data)
         setLoading(false);
       } catch (error: any) {
         console.error(`Error fetching ${endpoint}:`, error?.response || error);
@@ -35,18 +31,17 @@ const Projects: React.FC = () => {
     fetchData("/projects", setProjects);
     fetchData("/departments", setDepartments);
   }, [fetchData]);
-  if (loading) return <Spin />; // Show loading spinner while fetching
 
-  if (!projects) return <p>Projects could not be loaded</p>; // Display message if project is not found
+  if (loading) return <Spin />;
+
+  if (!projects) return <p>Projects could not be loaded</p>;
+
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
 
     try {
       await axiosInstance.delete(`/projects/${id}`);
-      setProjects((prevProjects) =>
-        prevProjects.filter((project) => project.id !== id)
-      );
+      setProjects(prevProjects => prevProjects.filter(project => project.id !== id));
       message.success("Project deleted successfully.");
     } catch (error: any) {
       console.error("Error deleting project:", error?.response || error);
@@ -63,7 +58,6 @@ const Projects: React.FC = () => {
         description: values.description,
         department_ids: values.departments,
       });
-      // console.log(values.description)
 
       message.success("Project updated successfully.");
       handleCancel();
@@ -97,7 +91,7 @@ const Projects: React.FC = () => {
       title: "Departments",
       key: "departments",
       render: (_, record) => (
-        <span>{record.departments.map((dept) => dept.name).join(", ")}</span>
+        <span>{record.departments.map(dept => dept.name).join(", ")}</span>
       ),
     },
     {
@@ -136,7 +130,7 @@ const Projects: React.FC = () => {
       name: "departments",
       label: "Departments",
       rules: [{ required: true, message: "Please select departments!" }],
-      options: departments.map((dept) => ({
+      options: departments.map(dept => ({
         value: dept.id,
         label: dept.name,
       })),
@@ -149,12 +143,12 @@ const Projects: React.FC = () => {
       <Table dataSource={projects} columns={columns} rowKey="id" />
       {selectedProject && (
         <EditModal
-          open={!!selectedProject} // Open modal if selectedProject is not null
+          open={!!selectedProject}
           title="Edit Project"
           initialValues={{
             name: selectedProject.name,
             description: selectedProject.description,
-            departments: selectedProject.departments.map((dept) => dept.id),
+            departments: selectedProject.departments.map(dept => dept.id),
           }}
           onCancel={handleCancel}
           onSubmit={handleEditSubmit}
