@@ -49,7 +49,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({ visible, onClose, d
   return (
     <Modal
       title="Assign Users"
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>

@@ -9,6 +9,7 @@ const DepartmentsList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null); // Add a state for tracking deletion
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -25,6 +26,24 @@ const DepartmentsList: React.FC = () => {
 
     fetchDepartments();
   }, []);
+
+  const handleDeleteDepartment = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this department?")) return;
+
+    setDeleting(id); // Set the id of the department being deleted
+    try {
+      await axiosInstance.delete(`/departments/${id}`);
+      setDepartments((prevDepartments) =>
+        prevDepartments.filter((department) => department.id !== id)
+      );
+      message.success("Department deleted successfully.");
+    } catch (error: any) {
+      console.error("Error deleting department:", error);
+      message.error("Failed to delete department.");
+    } finally {
+      setDeleting(null); // Reset the deleting state
+    }
+  };
 
   if (loading) return <Spin />;
 
@@ -44,17 +63,20 @@ const DepartmentsList: React.FC = () => {
             key: "name",
           },
           {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-          },
-          {
             title: "Actions",
             key: "actions",
             render: (_, record) => (
               <>
                 <Button onClick={() => handleAssignUsersClick(record.id)}>
                   Assign Users
+                </Button>
+                <Button
+                  type="link"
+                  danger
+                  onClick={() => handleDeleteDepartment(record.id)}
+                  disabled={deleting === record.id} // Disable the button if deleting
+                >
+                  {deleting === record.id ? <Spin size="small" /> : "Delete"}
                 </Button>
               </>
             ),
