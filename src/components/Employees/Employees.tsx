@@ -1,51 +1,45 @@
-// src/components/Departments/DepartmentsList.tsx
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
-import { getEmployees } from "../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { User } from "../types";
 
-interface Employee {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  city: string;
-  address: string;
-  role: string;
-  days_off: number;
-}
-
-const Employees = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+const Employees: React.FC = () => {
+  const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const data = await getEmployees();
-        setEmployees(data);
+        const response = await axiosInstance.get<User[]>("/employees");
+        setEmployees(response.data);
+      } catch (error: any) {
+        console.error("Error fetching employees:", error?.response || error);
+        message.error("Failed to load employees.");
+      } finally {
         setLoading(false);
-      } catch (err) {}
+      }
     };
 
     fetchEmployees();
-  }, []); // Empty dependency array ensures this runs once on mount
-  if (loading) return <Spin />; // Show loading spinner while fetching
+  }, []);
 
-  if (!employees) return <p>Employes could not be loaded</p>; // Display message if project is not found
+  if (loading) return <Spin />;
+
+  if (employees.length === 0) return <p>No employees found.</p>;
+
   const handleDelete = async (id: string) => {
-    try {
-      await axiosInstance.delete(`/user-delete/${id}`).then((response) => {
-        console.log("Data successfully deleted");
-      });
-      setEmployees(employees.filter((emp) => emp.id !== id));
+    if (!window.confirm("Are you sure you want to delete this employee?")) return;
 
+    try {
+      await axiosInstance.delete(`/employees/${id}`);
+      setEmployees((prevEmployees) =>
+        prevEmployees.filter((employee) => employee.id !== id)
+      );
       message.success("Employee deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting employee:", error);
+    } catch (error: any) {
+      console.error("Error deleting employee:", error?.response || error);
       message.error("Failed to delete employee.");
     }
   };
@@ -57,14 +51,14 @@ const Employees = () => {
         dataSource={employees}
         columns={[
           {
-            title: "Name",
+            title: "First Name",
             dataIndex: "first_name",
             key: "first_name",
           },
           {
-            title: "Name",
+            title: "Last Name",
             dataIndex: "last_name",
-            key: "first_name",
+            key: "last_name",
           },
           {
             title: "E-mail",
@@ -74,7 +68,7 @@ const Employees = () => {
           {
             title: "Days Left",
             dataIndex: "days_off",
-            key: "address",
+            key: "days_off",
           },
           {
             title: "Actions",
@@ -84,11 +78,7 @@ const Employees = () => {
                 <Button onClick={() => navigate(`/users/${record.id}`)}>
                   View
                 </Button>
-                <Button
-                  type="link"
-                  danger
-                  onClick={() => handleDelete(record.id)}
-                >
+                <Button type="link" danger onClick={() => handleDelete(record.id)}>
                   Delete
                 </Button>
               </>

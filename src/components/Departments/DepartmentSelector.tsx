@@ -20,13 +20,14 @@ const DepartmentSelector: React.FC<DepartmentSelectorProps> = ({
   return (
     <Select
       mode="multiple"
-      style={{ width: "100%" }}
       placeholder="Select departments"
+      value={selectedDepartmentIds}
       onChange={handleChange}
+      style={{ width: "100%" }}
     >
-      {departments.map((department) => (
-        <Select.Option key={department.id} value={department.id}>
-          {department.name}
+      {departments.map((dept) => (
+        <Select.Option key={dept.id} value={dept.id}>
+          {dept.name}
         </Select.Option>
       ))}
     </Select>
