@@ -29,6 +29,9 @@ const Projects: React.FC = () => {
     []
   );
 
+  const isAuthenticated = !!localStorage.getItem("jwt"); // Replace with your authentication check
+  console.log(isAuthenticated);
+
   useEffect(() => {
     fetchData("/projects", setProjects);
     fetchData("/departments", setDepartments);
