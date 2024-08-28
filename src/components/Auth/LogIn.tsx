@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, message } from "antd";
 import axiosInstance from "../../api/axiosInstance"; // Pre-configured axios instance
 import axios from "axios"; // For CSRF token fetching
+import { useAuth } from "../../Context/AuthContext"; // Import useAuth hook
 import "./SignIn.css";
 
 const { Title } = Typography;
 
 const SignIn: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const { login } = useAuth(); // Access login function from AuthContext
   const navigate = useNavigate();
 
   const onFinish = async (values: { email: string; password: string }) => {
@@ -20,7 +22,7 @@ const SignIn: React.FC = () => {
         withCredentials: true, // Ensure the CSRF token is set in the cookies
       });
 
-      // Now perform the login request with the CSRF token included automatically
+      // Perform the login request with the CSRF token included automatically
       const response = await axiosInstance.post(
         "/login",
         {
@@ -31,12 +33,16 @@ const SignIn: React.FC = () => {
           withCredentials: true, // Ensure credentials are sent with the login request
         }
       );
+      const authToken = response.data.token;
+      localStorage.setItem("authToken", authToken);
 
       // Check for a successful response
       if (response.status === 200) {
         message.success("Login successful!");
 
-        // Fetch user data (optional)
+        // Update the AuthContext by calling login function
+
+        // Optionally, fetch user data (optional)
         const userResponse = await axiosInstance.get("/user", {
           withCredentials: true, // Ensure cookies are sent with this request too
         });
@@ -44,7 +50,7 @@ const SignIn: React.FC = () => {
         const userRole = userResponse.data.role;
         localStorage.setItem("userRole", userRole);
         console.log(userRole);
-
+        login(userRole, authToken);
         // Navigate to the desired page
         navigate("/projects");
       } else {

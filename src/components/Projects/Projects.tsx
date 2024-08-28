@@ -12,9 +12,12 @@ const Projects: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
-  
+
   const fetchData = useCallback(
-    async (endpoint: string, setter: React.Dispatch<React.SetStateAction<any>>) => {
+    async (
+      endpoint: string,
+      setter: React.Dispatch<React.SetStateAction<any>>
+    ) => {
       try {
         const response = await axiosInstance.get(endpoint);
         setter(response.data);
@@ -27,9 +30,6 @@ const Projects: React.FC = () => {
     []
   );
 
-  const isAuthenticated = !!localStorage.getItem("jwt"); // Replace with your authentication check
-  console.log(isAuthenticated);
-
   useEffect(() => {
     fetchData("/projects", setProjects);
     fetchData("/departments", setDepartments);
@@ -40,11 +40,14 @@ const Projects: React.FC = () => {
   if (!projects) return <p>Projects could not be loaded</p>;
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
 
     try {
       await axiosInstance.delete(`/projects/${id}`);
-      setProjects(prevProjects => prevProjects.filter(project => project.id !== id));
+      setProjects((prevProjects) =>
+        prevProjects.filter((project) => project.id !== id)
+      );
       message.success("Project deleted successfully.");
     } catch (error: any) {
       console.error("Error deleting project:", error?.response || error);
@@ -94,7 +97,7 @@ const Projects: React.FC = () => {
       title: "Departments",
       key: "departments",
       render: (_, record) => (
-        <span>{record.departments.map(dept => dept.name).join(", ")}</span>
+        <span>{record.departments.map((dept) => dept.name).join(", ")}</span>
       ),
     },
     {
@@ -133,7 +136,7 @@ const Projects: React.FC = () => {
       name: "departments",
       label: "Departments",
       rules: [{ required: true, message: "Please select departments!" }],
-      options: departments.map(dept => ({
+      options: departments.map((dept) => ({
         value: dept.id,
         label: dept.name,
       })),
@@ -151,7 +154,7 @@ const Projects: React.FC = () => {
           initialValues={{
             name: selectedProject.name,
             description: selectedProject.description,
-            departments: selectedProject.departments.map(dept => dept.id),
+            departments: selectedProject.departments.map((dept) => dept.id),
           }}
           onCancel={handleCancel}
           onSubmit={handleEditSubmit}

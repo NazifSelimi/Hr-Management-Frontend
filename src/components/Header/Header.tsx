@@ -1,25 +1,19 @@
 import React from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { useAuth } from "../../Context/AuthContext";
+import { useNavigate } from "react-router-dom"; // Move navigation to the component level
 
 const { Header } = Layout;
 
 const HeaderComponent: React.FC = () => {
-  const menuItems = [
-    {
-      key: "1",
-      icon: <UserOutlined />,
-      label: "Nav 1",
-    },
-    {
-      key: "2",
-      label: "Nav 2",
-    },
-    {
-      key: "3",
-      label: "Nav 3",
-    },
-  ];
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout(); // Ensure logout is completed
+    navigate("/login"); // Redirect to login after logging out
+  };
 
   return (
     <Header
@@ -36,11 +30,18 @@ const HeaderComponent: React.FC = () => {
       >
         <h1 style={{ margin: 0 }}>Admin Dashboard</h1>
       </div>
-      <Menu
-        mode="horizontal"
-        style={{ lineHeight: "64px" }}
-        items={menuItems}
-      />
+      <Menu mode="horizontal" style={{ lineHeight: "64px" }} />
+      <div style={{ paddingRight: "24px" }}>
+        {isLoggedIn ? (
+          <Button type="primary" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <Button type="primary" href="/login">
+            Login
+          </Button>
+        )}
+      </div>
     </Header>
   );
 };
