@@ -6,10 +6,11 @@ import AssignUsersModal from "./AssignUsersModal";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null); // Add a state for tracking deletion
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -24,13 +25,24 @@ const DepartmentsList: React.FC = () => {
       }
     };
 
+    const fetchUsers = async () => {
+      try {
+        const response = await axiosInstance.get("/users"); // Adjust endpoint if necessary
+        setUsers(response.data);
+      } catch (error: any) {
+        console.error("Error fetching users:", error);
+        message.error("Failed to load users.");
+      }
+    };
+
     fetchDepartments();
+    fetchUsers();
   }, []);
 
   const handleDeleteDepartment = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this department?")) return;
 
-    setDeleting(id); // Set the id of the department being deleted
+    setDeleting(id);
     try {
       await axiosInstance.delete(`/departments/${id}`);
       setDepartments((prevDepartments) =>
@@ -41,16 +53,27 @@ const DepartmentsList: React.FC = () => {
       console.error("Error deleting department:", error);
       message.error("Failed to delete department.");
     } finally {
-      setDeleting(null); // Reset the deleting state
+      setDeleting(null);
     }
   };
 
-  if (loading) return <Spin />;
-
-  const handleAssignUsersClick = (departmentId: string) => {
-    setSelectedDepartmentId(departmentId);
-    setModalVisible(true);
+  const handleModalOpen = (department: Department) => {
+    setSelectedDepartment(department);
+    setIsModalVisible(true);
   };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedDepartment(null);
+  };
+
+  const handleAssignUsers = (values: { departments: { id: string; position: string }[] }) => {
+    // Handle any additional logic after successful assignment
+    console.log("Users assigned:", values);
+    handleModalClose();
+  };
+
+  if (loading) return <Spin />;
 
   return (
     <div>
@@ -67,14 +90,17 @@ const DepartmentsList: React.FC = () => {
             key: "actions",
             render: (_, record) => (
               <>
-                <Button onClick={() => handleAssignUsersClick(record.id)}>
+                <Button
+                  type="link"
+                  onClick={() => handleModalOpen(record)}
+                >
                   Assign Users
                 </Button>
                 <Button
                   type="link"
                   danger
                   onClick={() => handleDeleteDepartment(record.id)}
-                  disabled={deleting === record.id} // Disable the button if deleting
+                  disabled={deleting === record.id}
                 >
                   {deleting === record.id ? <Spin size="small" /> : "Delete"}
                 </Button>
@@ -84,11 +110,13 @@ const DepartmentsList: React.FC = () => {
         ]}
         rowKey="id"
       />
-      {selectedDepartmentId && (
+      {selectedDepartment && (
         <AssignUsersModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          departmentId={selectedDepartmentId}
+          visible={isModalVisible}
+          onCancel={handleModalClose}
+          onSubmit={handleAssignUsers}
+          users={users}
+          department={selectedDepartment.id}
         />
       )}
     </div>

@@ -1,77 +1,105 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Select, Button, message, Spin } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-import { User, Department } from "../types";
+import React from 'react';
+import { Form, Input, Button, Modal, Row, Col, Spin } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import axiosInstance from '../../api/axiosInstance';
+import { User } from '../types';
 
 interface AssignUsersModalProps {
   visible: boolean;
-  onClose: () => void;
-  departmentId: string;
+  onCancel: () => void;
+  onSubmit: (values: any) => void;
+  department: string;
+  users: User[]; // Added users prop
 }
 
-const AssignUsersModal: React.FC<AssignUsersModalProps> = ({ visible, onClose, departmentId }) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const AssignUsersModal: React.FC<AssignUsersModalProps> = ({ visible, onCancel, onSubmit, department }) => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = React.useState(false);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axiosInstance.get("/users");
-        setUsers(response.data);
-      } catch (error: any) {
-        console.error("Error fetching users:", error);
-        message.error("Failed to load users.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  const handleAssign = async () => {
+  const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
-      await axiosInstance.post(`/departments/${departmentId}/assign-users`, { userIds: selectedUsers });
-      message.success("Users assigned successfully!");
-      onClose();
+      const response = await axiosInstance.post(`/assign-users/${department}`, {
+        departments: values.users.map((user: { id: string, position: string }) => ({
+          id: user.id,
+          position: user.position,
+        })),
+      });
+      onSubmit(response.data);
+      onCancel();
     } catch (error: any) {
       console.error("Error assigning users:", error);
-      message.error("Failed to assign users.");
+      alert("Failed to assign users. Please check the server response.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <Spin />;
-
   return (
     <Modal
       title="Assign Users"
       open={visible}
-      onCancel={onClose}
-      footer={[
-        <Button key="cancel" onClick={onClose}>
-          Cancel
-        </Button>,
-        <Button key="assign" type="primary" onClick={handleAssign}>
-          Assign
-        </Button>,
-      ]}
+      onCancel={onCancel}
+      footer={null}
     >
-      <Select
-        mode="multiple"
-        placeholder="Select users"
-        style={{ width: "100%" }}
-        onChange={(value) => setSelectedUsers(value as string[])}
+      <Form
+        form={form}
+        onFinish={handleSubmit}
+        name="assign-users-form"
+        initialValues={{ users: [] }}
       >
-        {users.map((user) => (
-          <Select.Option key={user.id} value={user.id}>
-            {user.first_name} {user.last_name}
-          </Select.Option>
-        ))}
-      </Select>
+        <Form.List name="users">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, fieldKey, ...restField }) => (
+                <Row key={key} gutter={16}>
+                  <Col span={10}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'id']}
+                      fieldKey={[fieldKey as React.Key, 'id']}
+                      label="User"
+                      rules={[{ required: true, message: 'Please select a user' }]}
+                    >
+                      <Input placeholder="User ID" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={10}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'position']}
+                      fieldKey={[fieldKey as React.Key, 'position']}
+                      label="Position"
+                      rules={[{ required: true, message: 'Please input the position' }]}
+                    >
+                      <Input placeholder="Position" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Button
+                      type="link"
+                      danger
+                      onClick={() => remove(name)}
+                    >
+                      Remove
+                    </Button>
+                  </Col>
+                </Row>
+              ))}
+              <Form.Item>
+                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                  Add User
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            {loading ? <Spin /> : 'Submit'}
+          </Button>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };

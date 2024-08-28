@@ -63,7 +63,7 @@ const Sidebar: React.FC = () => {
         },
         {
           key: "10",
-          label: <Link to="/login">login</Link>,
+          label: <Link to="/login">Log In</Link>,
         },
       ],
     },
