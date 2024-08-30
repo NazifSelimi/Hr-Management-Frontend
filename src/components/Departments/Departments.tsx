@@ -27,6 +27,17 @@ const Departments: React.FC = () => {
     fetchDepartments();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    try {
+      await axiosInstance.delete(`/api/departments/${id}`);
+      setDepartments(departments.filter((dept) => dept.id !== id));
+      message.success("Department deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting department:", error);
+      message.error("Failed to delete department.");
+    }
+  };
+
   return (
     <div>
       <h2>Departments</h2>
@@ -56,17 +67,6 @@ const Departments: React.FC = () => {
       />
     </div>
   );
-
-  const handleDelete = async (id: number) => {
-    try {
-      await axiosInstance.delete(`/api/departments/${id}`);
-      setDepartments(departments.filter((dept) => dept.id !== id));
-      message.success("Department deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting department:", error);
-      message.error("Failed to delete department.");
-    }
-  };
 };
 
 export default Departments;

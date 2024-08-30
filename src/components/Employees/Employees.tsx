@@ -1,9 +1,9 @@
-// src/components/Departments/DepartmentsList.tsx
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import { getEmployees } from "../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import AssignDepartmentsModal from "./AssignDepartmentModal";
 
 interface Employee {
   id: string;
@@ -20,6 +20,10 @@ interface Employee {
 const Employees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,22 +36,49 @@ const Employees = () => {
     };
 
     fetchEmployees();
-  }, []); // Empty dependency array ensures this runs once on mount
-  if (loading) return <Spin />; // Show loading spinner while fetching
+  }, []);
 
-  if (!employees) return <p>Employes could not be loaded</p>; // Display message if project is not found
+  if (loading) return <Spin />;
+
+  if (!employees) return <p>Employees could not be loaded</p>;
+
   const handleDelete = async (id: string) => {
     try {
       await axiosInstance.delete(`/user-delete/${id}`).then((response) => {
         console.log("Data successfully deleted");
       });
       setEmployees(employees.filter((emp) => emp.id !== id));
-
       message.success("Employee deleted successfully.");
     } catch (error) {
       console.error("Error deleting employee:", error);
       message.error("Failed to delete employee.");
     }
+  };
+
+  const handleAssignDepartments = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setIsModalVisible(true); // Show the modal
+  };
+
+  const handleModalSubmit = async (
+    assignedDepartments: { departmentId: number; position: string }[]
+  ) => {
+    try {
+      // Make a POST request to the Laravel endpoint to assign departments
+      await axiosInstance.post(`/assign-departments/${selectedEmployee?.id}`, {
+        departments: assignedDepartments,
+      });
+      message.success("Departments assigned successfully.");
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error("Error assigning departments:", error);
+      message.error("Failed to assign departments.");
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedEmployee(null); // Reset selected employee
   };
 
   return (
@@ -57,14 +88,14 @@ const Employees = () => {
         dataSource={employees}
         columns={[
           {
-            title: "Name",
+            title: "First Name",
             dataIndex: "first_name",
             key: "first_name",
           },
           {
-            title: "Name",
+            title: "Last Name",
             dataIndex: "last_name",
-            key: "first_name",
+            key: "last_name",
           },
           {
             title: "E-mail",
@@ -72,14 +103,14 @@ const Employees = () => {
             key: "email",
           },
           {
-            title: "Days Left",
+            title: "Days Off",
             dataIndex: "days_off",
-            key: "address",
+            key: "days_off",
           },
           {
             title: "Actions",
             key: "actions",
-            render: (_, record) => (
+            render: (_, record: Employee) => (
               <>
                 <Button onClick={() => navigate(`/users/${record.id}`)}>
                   View
@@ -91,12 +122,26 @@ const Employees = () => {
                 >
                   Delete
                 </Button>
+                <Button
+                  type="primary"
+                  onClick={() => handleAssignDepartments(record)}
+                >
+                  Assign Departments
+                </Button>
               </>
             ),
           },
         ]}
         rowKey="id"
       />
+
+      {selectedEmployee && (
+        <AssignDepartmentsModal
+          visible={isModalVisible}
+          onClose={handleModalClose}
+          onSubmit={handleModalSubmit}
+        />
+      )}
     </div>
   );
 };
