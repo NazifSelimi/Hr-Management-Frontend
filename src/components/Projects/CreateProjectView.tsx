@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import CreateProjectForm from "./CreateProjectForm";
 import { Department } from "../types";
-import { Spin, message } from "antd";
+import { Spin } from "antd";
 
 const CreateProjectView: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
