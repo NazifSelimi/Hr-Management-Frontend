@@ -1,31 +1,26 @@
 import React, { useState } from "react";
 import { Layout, Menu } from "antd";
-import {
-  UserOutlined,
-  LaptopOutlined,
-  NotificationOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 const { Sider } = Layout;
 
 const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { userRole } = useAuth(); // Get userRole from AuthContext
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
 
-  const menuItems = [
+  // Admin-specific menu items
+  const adminMenuItems = [
     {
       key: "sub1",
       icon: <UserOutlined />,
-      label: <Link to="/users">Users</Link>,
-      children: [
-        { key: "1", label: <Link to="/employees">Employees</Link> },
-        { key: "2", label: "Bill" },
-        { key: "3", label: "Alex" },
-      ],
+      label: "Users",
+      children: [{ key: "1", label: <Link to="/employees">Employees</Link> }],
     },
     {
       key: "sub2",
@@ -44,10 +39,10 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Departments",
       children: [
-        { key: "6", label: <Link to="/">Departmetns</Link> },
+        { key: "6", label: <Link to="/departments">View Departments</Link> },
         {
           key: "7",
-          label: <Link to="/">Create Department</Link>,
+          label: <Link to="/create-department">Create Department</Link>,
         },
       ],
     },
@@ -56,14 +51,37 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Vacations",
       children: [
-        { key: "8", label: <Link to="/">Vacations</Link> },
+        { key: "8", label: <Link to="/vacations">Vacations</Link> },
         {
           key: "9",
           label: <Link to="/">Request Vacation</Link>,
         },
+        {
+          key: "10",
+          label: <Link to="/login">Log In</Link>,
+        },
       ],
     },
   ];
+
+  // Employee-specific menu items
+  const employeeMenuItems = [
+    {
+      key: "sub5",
+      icon: <NotificationOutlined />,
+      label: "Employee sidebar elements",
+      children: [
+        { key: "8", label: <Link to="/employee">Vacations</Link> },
+        {
+          key: "9",
+          label: <Link to="/employee">Request Vacation</Link>,
+        },
+      ],
+    },
+  ];
+
+  // Render different menu items based on user role
+  const menuItems = userRole === "admin" ? adminMenuItems : employeeMenuItems;
 
   return (
     <Sider

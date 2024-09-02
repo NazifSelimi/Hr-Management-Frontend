@@ -1,21 +1,35 @@
 import axios from "axios";
 
+// Create an axios instance
 const axiosInstance = axios.create({
-  baseURL: "http://localhost/api", // Default base URL for all requests
-  headers: {
-    "Content-Type": "application/json", // Default content type
-  },
-  withCredentials: true, // Ensure this is false if you are not using cookies or session-based requests
-  withXSRFToken: true,
+  baseURL: "http://localhost/api",
+  withCredentials: true, // Include credentials (cookies) in requests
 });
 
+// Add a request interceptor to dynamically set CSRF and Auth tokens
+axiosInstance.interceptors.request.use((config) => {
+  const csrfToken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("XSRF-TOKEN="))
+    ?.split("=")[1];
+
+  const authToken = localStorage.getItem("authToken");
+
+  if (csrfToken) {
+    config.headers["X-XSRF-TOKEN"] = decodeURIComponent(csrfToken);
+  }
+  if (authToken) {
+    config.headers["Authorization"] = `Bearer ${authToken}`;
+  }
+  return config;
+});
 export const getEmployees = async () => {
   try {
     const response = await axiosInstance.get("/employees");
-    return response.data; // Handle the response data
+    return response.data;
   } catch (error) {
     console.error("Error fetching employees:", error);
-    throw error; // Handle the error
+    throw error;
   }
 };
 

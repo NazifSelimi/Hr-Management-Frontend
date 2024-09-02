@@ -62,12 +62,12 @@ const UserDetails: React.FC = () => {
       <Card style={{ maxWidth: 900, margin: "0 auto", padding: "20px" }}>
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               Name:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>
+            <Text style={{ fontSize: "16px" }}>
               {user.first_name} {user.last_name}
             </Text>
           </Col>
@@ -75,73 +75,73 @@ const UserDetails: React.FC = () => {
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               E-mail:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{user.email}</Text>
+            <Text style={{ fontSize: "16px" }}>{user.email}</Text>
           </Col>
         </Row>
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               Phone:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{user.phone}</Text>
+            <Text style={{ fontSize: "16px" }}>{user.phone}</Text>
           </Col>
         </Row>
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               City:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{user.city}</Text>
+            <Text style={{ fontSize: "16px" }}>{user.city}</Text>
           </Col>
         </Row>
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               Address:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{user.address}</Text>
+            <Text style={{ fontSize: "16px" }}>{user.address}</Text>
           </Col>
         </Row>
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               Role:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{user.role}</Text>
+            <Text style={{ fontSize: "16px" }}>{user.role}</Text>
           </Col>
         </Row>
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               Days Off:
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{user.days_off}</Text>
+            <Text style={{ fontSize: "16px" }}>{user.days_off}</Text>
           </Col>
         </Row>
         <Divider />
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
+            <Text strong style={{ fontSize: "16px" }}>
               Departments:
             </Text>
           </Col>
@@ -157,7 +157,7 @@ const UserDetails: React.FC = () => {
                 </Tag>
               ))
             ) : (
-              <Text style={{ fontSize: "18px" }}>No departments assigned</Text>
+              <Text style={{ fontSize: "16px" }}>No departments assigned</Text>
             )}
           </Col>
         </Row>

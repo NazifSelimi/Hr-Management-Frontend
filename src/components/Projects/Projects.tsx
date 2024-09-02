@@ -12,6 +12,7 @@ const Projects: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+
   const fetchData = useCallback(
     async (
       endpoint: string,
@@ -33,9 +34,11 @@ const Projects: React.FC = () => {
     fetchData("/projects", setProjects);
     fetchData("/departments", setDepartments);
   }, [fetchData]);
-  if (loading) return <Spin />; // Show loading spinner while fetching
 
-  if (!projects) return <p>Projects could not be loaded</p>; // Display message if project is not found
+  if (loading) return <Spin />;
+
+  if (!projects) return <p>Projects could not be loaded</p>;
+
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this project?"))
       return;
@@ -146,7 +149,7 @@ const Projects: React.FC = () => {
       <Table dataSource={projects} columns={columns} rowKey="id" />
       {selectedProject && (
         <EditModal
-          open={!!selectedProject} // Open modal if selectedProject is not null
+          open={!!selectedProject}
           title="Edit Project"
           initialValues={{
             name: selectedProject.name,

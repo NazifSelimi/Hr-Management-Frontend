@@ -1,24 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
-import { getEmployees } from "../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import AssignDepartmentsModal from "./AssignDepartmentModal";
+import { User } from "../types";
 
-interface Employee {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  city: string;
-  address: string;
-  role: string;
-  days_off: number;
-}
-
-const Employees = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+const Employees: React.FC = () => {
+  const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
@@ -29,10 +16,14 @@ const Employees = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const data = await getEmployees();
-        setEmployees(data);
+        const response = await axiosInstance.get<User[]>("/employees");
+        setEmployees(response.data);
+      } catch (error: any) {
+        console.error("Error fetching employees:", error?.response || error);
+        message.error("Failed to load employees.");
+      } finally {
         setLoading(false);
-      } catch (err) {}
+      }
     };
 
     fetchEmployees();
@@ -40,17 +31,20 @@ const Employees = () => {
 
   if (loading) return <Spin />;
 
-  if (!employees) return <p>Employees could not be loaded</p>;
+  if (employees.length === 0) return <p>No employees found.</p>;
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this employee?"))
+      return;
+
     try {
-      await axiosInstance.delete(`/user-delete/${id}`).then((response) => {
-        console.log("Data successfully deleted");
-      });
-      setEmployees(employees.filter((emp) => emp.id !== id));
+      await axiosInstance.delete(`/employees/${id}`);
+      setEmployees((prevEmployees) =>
+        prevEmployees.filter((employee) => employee.id !== id)
+      );
       message.success("Employee deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting employee:", error);
+    } catch (error: any) {
+      console.error("Error deleting employee:", error?.response || error);
       message.error("Failed to delete employee.");
     }
   };
@@ -121,12 +115,6 @@ const Employees = () => {
                   onClick={() => handleDelete(record.id)}
                 >
                   Delete
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() => handleAssignDepartments(record)}
-                >
-                  Assign Departments
                 </Button>
               </>
             ),

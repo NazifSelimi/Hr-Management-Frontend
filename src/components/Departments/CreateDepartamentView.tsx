@@ -1,14 +1,10 @@
-// src/components/Departments/CreateDepartmentView.tsx
-
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
-import CreateDepartmentForm from "../Departments/CreateDepartmentForm";
+import CreateDepartmentForm from "./CreateDepartmentForm";
 import { Spin, message } from "antd";
 
 const CreateDepartmentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate(); // Hook for navigation
 
   const handleSubmit = async (values: { name: string; description: string }) => {
     setLoading(true);
@@ -16,8 +12,6 @@ const CreateDepartmentView: React.FC = () => {
       const response = await axiosInstance.post("/departments", values);
       if (response.status === 201) {
         message.success("Department created successfully!");
-        // Redirect to AssignUserToDepartment page
-        navigate(`/department/${response.data.id}/assign`);
       } else {
         console.error("Unexpected response:", response);
         message.error("Failed to create department.");
