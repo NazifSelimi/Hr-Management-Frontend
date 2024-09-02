@@ -1,41 +1,60 @@
-// src/components/Departments/CreateDepartmentView.tsx
-
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
-import CreateDepartmentForm from "../Departments/CreateDepartmentForm";
+import CreateProjectForm from "./CreateProjectForm";
+import { Department } from "../types";
 import { Spin, message } from "antd";
 
-const CreateDepartmentView: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate(); // Hook for navigation
+const CreateProjectView: React.FC = () => {
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: { name: string; description: string }) => {
-    setLoading(true);
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await axiosInstance.get<Department[]>("/departments");
+        setDepartments(response.data);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+        setError("Failed to load departments.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  const handleSubmit = async (values: {
+    name: string;
+    description: string;
+    department_ids: string[];
+  }) => {
     try {
-      const response = await axiosInstance.post("/departments", values);
+      const response = await axiosInstance.post("/projects", values);
+
       if (response.status === 201) {
-        message.success("Department created successfully!");
-        // Redirect to AssignUserToDepartment page
-        navigate(`/department/${response.data.id}/assign`);
+        alert("Project created successfully!");
       } else {
         console.error("Unexpected response:", response);
-        message.error("Failed to create department.");
+        alert("Failed to create project.");
       }
     } catch (error: any) {
-      console.error("Error creating department:", error);
-      const errorMessage =
+      console.error("Error creating project:", error);
+      const message =
         error.response?.data?.message ||
-        "An error occurred while creating the department.";
-      message.error(errorMessage);
-    } finally {
-      setLoading(false);
+        "An error occurred while creating the project.";
+      alert(message);
     }
   };
 
-  if (loading) return <Spin />;
+  if (loading) return <Spin/>;
 
-  return <CreateDepartmentForm onSubmit={handleSubmit} />;
+  if (error) return <p>{error}</p>;
+
+  return (
+    <CreateProjectForm departments={departments} onSubmit={handleSubmit} />
+  );
 };
 
-export default CreateDepartmentView;
+export default CreateProjectView;

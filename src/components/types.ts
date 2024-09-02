@@ -22,4 +22,4 @@ export interface User {
   days_off: number;
   departments: Department[];
   projects: Project[];
-}
+} 
