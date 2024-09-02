@@ -35,11 +35,11 @@ const UserDetails: React.FC = () => {
     };
 
     fetchUser();
-  }, [id]); // Dependency array to refetch if the ID changes
+  }, [id]);
 
-  if (loading) return <Spin />; // Show loading spinner while fetching
+  if (loading) return <Spin />;
 
-  if (!user) return <p>User not found</p>; // Display message if user is not found
+  if (!user) return <p>User not found</p>;
 
   const projectColumns = [
     {

@@ -6,11 +6,16 @@ import EditModal from "../Modal/EditModal";
 import { Department, Project } from "../types";
 import { useNavigate } from "react-router-dom";
 
-const Projects: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
+interface ProjectsProps {
+  data?: Project[];
+  onClose?: () => void;
+}
+
+const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
+  const [projects, setProjects] = useState<Project[]>(data || []);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(!data);
   const navigate = useNavigate();
 
   const fetchData = useCallback(
@@ -19,25 +24,26 @@ const Projects: React.FC = () => {
       setter: React.Dispatch<React.SetStateAction<any>>
     ) => {
       try {
-        const response = await axiosInstance.get(endpoint);
-        setter(response.data);
-        setLoading(false);
+        const { data } = await axiosInstance.get(endpoint);
+        setter(data);
       } catch (error: any) {
-        console.error(`Error fetching ${endpoint}:`, error?.response || error);
+        console.error(`Error fetching ${endpoint}:`, error);
         message.error(`Failed to fetch ${endpoint}: ${error.message}`);
+      } finally {
+        setLoading(false);
       }
     },
     []
   );
 
   useEffect(() => {
-    fetchData("/projects", setProjects);
-    fetchData("/departments", setDepartments);
-  }, [fetchData]);
-
-  if (loading) return <Spin />;
-
-  if (!projects) return <p>Projects could not be loaded</p>;
+    if (!data) {
+      fetchData("/projects", setProjects);
+      fetchData("/departments", setDepartments);
+    } else {
+      setLoading(false);
+    }
+  }, [data, fetchData]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this project?"))
@@ -45,13 +51,11 @@ const Projects: React.FC = () => {
 
     try {
       await axiosInstance.delete(`/projects/${id}`);
-      setProjects((prevProjects) =>
-        prevProjects.filter((project) => project.id !== id)
-      );
+      setProjects((prev) => prev.filter((project) => project.id !== id));
       message.success("Project deleted successfully.");
     } catch (error: any) {
-      console.error("Error deleting project:", error?.response || error);
-      message.error("Failed to delete project: " + error.message);
+      console.error("Error deleting project:", error);
+      message.error("Failed to delete project.");
     }
   };
 
@@ -67,19 +71,18 @@ const Projects: React.FC = () => {
 
       message.success("Project updated successfully.");
       handleCancel();
-      await fetchData("/projects", setProjects);
+      fetchData("/projects", setProjects);
     } catch (error: any) {
-      console.error("Error updating project:", error?.response || error);
-      message.error("Failed to update project: " + error.message);
+      console.error("Error updating project:", error);
+      message.error("Failed to update project.");
     }
   };
 
-  const showEditModal = (project: Project) => {
-    setSelectedProject(project);
-  };
+  const handleCancel = () => setSelectedProject(null);
 
-  const handleCancel = () => {
-    setSelectedProject(null);
+  const handleView = (id: string) => {
+    navigate(`/project/${id}`);
+    if (onClose) onClose();
   };
 
   const columns: ColumnsType<Project> = [
@@ -97,7 +100,10 @@ const Projects: React.FC = () => {
       title: "Departments",
       key: "departments",
       render: (_, record) => (
-        <span>{record.departments.map((dept) => dept.name).join(", ")}</span>
+        <span>
+          {record.departments?.map((dept) => dept.name).join(", ") ||
+            "No departments"}
+        </span>
       ),
     },
     {
@@ -105,10 +111,8 @@ const Projects: React.FC = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          <Button onClick={() => navigate(`/project/${record.id}`)}>
-            View
-          </Button>
-          <Button type="link" onClick={() => showEditModal(record)}>
+          <Button onClick={() => handleView(record.id)}>View</Button>
+          <Button type="link" onClick={() => setSelectedProject(record)}>
             Edit
           </Button>
           <Button type="link" danger onClick={() => handleDelete(record.id)}>
@@ -119,34 +123,14 @@ const Projects: React.FC = () => {
     },
   ];
 
-  const editFields = [
-    {
-      name: "name",
-      label: "Name",
-      rules: [{ required: true, message: "Please input the project name!" }],
-    },
-    {
-      name: "description",
-      label: "Description",
-      rules: [
-        { required: true, message: "Please input the project description!" },
-      ],
-    },
-    {
-      name: "departments",
-      label: "Departments",
-      rules: [{ required: true, message: "Please select departments!" }],
-      options: departments.map((dept) => ({
-        value: dept.id,
-        label: dept.name,
-      })),
-    },
-  ];
-
   return (
     <div>
       <h2>Projects</h2>
-      <Table dataSource={projects} columns={columns} rowKey="id" />
+      {loading ? (
+        <Spin />
+      ) : (
+        <Table dataSource={projects} columns={columns} rowKey="id" />
+      )}
       {selectedProject && (
         <EditModal
           open={!!selectedProject}
@@ -154,11 +138,41 @@ const Projects: React.FC = () => {
           initialValues={{
             name: selectedProject.name,
             description: selectedProject.description,
-            departments: selectedProject.departments.map((dept) => dept.id),
+            departments:
+              selectedProject.departments?.map((dept) => dept.id) || [],
           }}
           onCancel={handleCancel}
           onSubmit={handleEditSubmit}
-          fields={editFields}
+          fields={[
+            {
+              name: "name",
+              label: "Name",
+              rules: [
+                { required: true, message: "Please input the project name!" },
+              ],
+            },
+            {
+              name: "description",
+              label: "Description",
+              rules: [
+                {
+                  required: true,
+                  message: "Please input the project description!",
+                },
+              ],
+            },
+            {
+              name: "departments",
+              label: "Departments",
+              rules: [
+                { required: true, message: "Please select departments!" },
+              ],
+              options: selectedProject.departments.map((dept) => ({
+                value: dept.id,
+                label: dept.name,
+              })),
+            },
+          ]}
         />
       )}
     </div>

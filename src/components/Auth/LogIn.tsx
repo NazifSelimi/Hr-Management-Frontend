@@ -4,11 +4,11 @@ import { Form, Input, Button, Typography, message } from "antd";
 import axiosInstance from "../../api/axiosInstance"; // Pre-configured axios instance
 import axios from "axios"; // For CSRF token fetching
 import { useAuth } from "../../Context/AuthContext"; // Import useAuth hook
-import "./SignIn.css";
+import "./LogIn.css";
 
 const { Title } = Typography;
 
-const SignIn: React.FC = () => {
+const Login: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { login } = useAuth(); // Access login function from AuthContext
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const SignIn: React.FC = () => {
     try {
       // Fetch the CSRF token before attempting to log in
       await axios.get("http://localhost/sanctum/csrf-cookie", {
-        withCredentials: true, // Ensure the CSRF token is set in the cookies
+        withCredentials: true, //CSRF token is set in the cookies
       });
 
       // Perform the login request with the CSRF token included automatically
@@ -35,14 +35,11 @@ const SignIn: React.FC = () => {
       );
       const authToken = response.data.token;
       localStorage.setItem("authToken", authToken);
+      //seting the authToken in the LocalStorage
 
-      // Check for a successful response
       if (response.status === 200) {
         message.success("Login successful!");
 
-        // Update the AuthContext by calling login function
-
-        // Optionally, fetch user data (optional)
         const userResponse = await axiosInstance.get("/user", {
           withCredentials: true, // Ensure cookies are sent with this request too
         });
@@ -50,9 +47,15 @@ const SignIn: React.FC = () => {
         const userRole = userResponse.data.role;
         localStorage.setItem("userRole", userRole);
         console.log(userRole);
+        //saving role in local storage
         login(userRole, authToken);
-        // Navigate to the desired page
-        navigate("/projects");
+        // Navigate to a page based on userRole
+        if (userRole === "admin") {
+          navigate("/projects");
+        }
+        if (userRole === "employee") {
+          navigate("/employee");
+        }
       } else {
         message.error("Invalid email or password");
       }
@@ -127,4 +130,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default Login;
