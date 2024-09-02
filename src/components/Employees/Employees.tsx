@@ -3,14 +3,13 @@ import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { User } from "../types";
+import AssignDepartmentsModal from "./AssignDepartmentModal";
 
 const Employees: React.FC = () => {
   const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null
-  );
+  const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +48,7 @@ const Employees: React.FC = () => {
     }
   };
 
-  const handleAssignDepartments = (employee: Employee) => {
+  const handleAssignDepartments = (employee: User) => {
     setSelectedEmployee(employee);
     setIsModalVisible(true); // Show the modal
   };
@@ -104,7 +103,7 @@ const Employees: React.FC = () => {
           {
             title: "Actions",
             key: "actions",
-            render: (_, record: Employee) => (
+            render: (_, record: User) => (
               <>
                 <Button onClick={() => navigate(`/users/${record.id}`)}>
                   View
