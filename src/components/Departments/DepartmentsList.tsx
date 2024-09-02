@@ -9,7 +9,8 @@ const DepartmentsList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(null);
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -28,7 +29,8 @@ const DepartmentsList: React.FC = () => {
   }, []);
 
   const handleDeleteDepartment = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this department?")) return;
+    if (!window.confirm("Are you sure you want to delete this department?"))
+      return;
 
     setDeleting(id);
     try {
@@ -55,7 +57,9 @@ const DepartmentsList: React.FC = () => {
     setSelectedDepartment(null);
   };
 
-  const handleAssignUsers = (values: { users: { id: string; position: string }[] }) => {
+  const handleAssignUsers = (values: {
+    users: { id: string; position: string }[];
+  }) => {
     console.log("Users assigned:", values);
     handleModalClose();
   };
@@ -77,10 +81,7 @@ const DepartmentsList: React.FC = () => {
             key: "actions",
             render: (_, record) => (
               <>
-                <Button
-                  type="link"
-                  onClick={() => handleModalOpen(record)}
-                >
+                <Button type="link" onClick={() => handleModalOpen(record)}>
                   Assign Users
                 </Button>
                 <Button

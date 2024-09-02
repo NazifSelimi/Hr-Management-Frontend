@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Modal, Form, Input, Select } from "antd";
 
 interface EditModalProps {
-  open: boolean; // Updated from visible to open
+  open: boolean; // Updated from visible to open bacause of new antd update!
   title: string;
   initialValues: any;
   onCancel: () => void;
@@ -16,7 +16,7 @@ interface EditModalProps {
 }
 
 const EditModal: React.FC<EditModalProps> = ({
-  open, // Updated from visible to open
+  open,
   title,
   initialValues,
   onCancel,

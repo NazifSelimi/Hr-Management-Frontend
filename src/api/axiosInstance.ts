@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   withCredentials: true, // Include credentials (cookies) in requests
 });
 
-// Add a request interceptor to dynamically set CSRF and Auth tokens
+// Add a request interceptor to dynamically set CSRF and Auth tokens (idk if this is even needed?)
 axiosInstance.interceptors.request.use((config) => {
   const csrfToken = document.cookie
     .split("; ")
