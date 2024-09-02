@@ -54,7 +54,11 @@ const Sidebar: React.FC = () => {
         { key: "8", label: <Link to="/vacations">Vacations</Link> },
         {
           key: "9",
-          label: <Link to="/request-vacation">Request Vacation</Link>,
+          label: <Link to="/">Request Vacation</Link>,
+        },
+        {
+          key: "10",
+          label: <Link to="/login">Log In</Link>,
         },
       ],
     },

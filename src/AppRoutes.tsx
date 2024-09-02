@@ -3,12 +3,12 @@ import { Routes, Route } from "react-router-dom";
 import CreateProjectView from "./components/Projects/CreateProjectView";
 import Projects from "./components/Projects/Projects";
 import Employees from "./components/Employees/Employees";
-import Departments from "./components/Departments/Departments";
-import ProjectDetails from "./components/Projects/ProjectDetails";
+import DepartmentsList from "./components/Departments/DepartmentsList";
+import ProjectDetails from "./components/Projects/ProjetcDetails";
 import UserDetails from "./components/User/UserDetails";
 import LogIn from "./components/Auth/LogIn";
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute component
-import CreateDepartmentView from "./components/Departments/CreateDepartamentView";
+import CreateDepartmentView from "./components/Departments/CreateDepartmentView";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -29,7 +29,7 @@ const AppRoutes: React.FC = () => {
       />
       <Route
         path="/departments"
-        element={<ProtectedRoute element={Departments} requiredRole="admin" />}
+        element={<ProtectedRoute element={DepartmentsList} requiredRole="admin" />}
       />
       <Route
         path="/create-department"
