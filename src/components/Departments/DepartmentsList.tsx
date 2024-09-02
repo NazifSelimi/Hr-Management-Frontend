@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
-import { Department, User } from "../types";
-import AssignUsersModal from "./AssignUsersModal";
+import { Department } from "../types";
+import AssignUsersModal from "./AssignUserModal";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -26,18 +25,7 @@ const DepartmentsList: React.FC = () => {
       }
     };
 
-    const fetchUsers = async () => {
-      try {
-        const response = await axiosInstance.get("/users"); // Adjust endpoint if necessary
-        setUsers(response.data);
-      } catch (error: any) {
-        console.error("Error fetching users:", error);
-        message.error("Failed to load users.");
-      }
-    };
-
     fetchDepartments();
-    fetchUsers();
   }, []);
 
   const handleDeleteDepartment = async (id: string) => {
@@ -70,9 +58,8 @@ const DepartmentsList: React.FC = () => {
   };
 
   const handleAssignUsers = (values: {
-    departments: { id: string; position: string }[];
+    users: { id: string; position: string }[];
   }) => {
-    // Handle any additional logic after successful assignment
     console.log("Users assigned:", values);
     handleModalClose();
   };
@@ -114,10 +101,9 @@ const DepartmentsList: React.FC = () => {
       {selectedDepartment && (
         <AssignUsersModal
           visible={isModalVisible}
-          onCancel={handleModalClose}
+          onClose={handleModalClose}
+          departmentId={selectedDepartment.id}
           onSubmit={handleAssignUsers}
-          users={users}
-          department={selectedDepartment.id}
         />
       )}
     </div>
