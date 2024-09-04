@@ -71,10 +71,10 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Employee sidebar elements",
       children: [
-        { key: "8", label: <Link to="/employee">Vacations</Link> },
+        { key: "8", label: <Link to="/">Vacations</Link> },
         {
           key: "9",
-          label: <Link to="/employee">Request Vacation</Link>,
+          label: <Link to="/vacation">Request Vacation</Link>,
         },
       ],
     },

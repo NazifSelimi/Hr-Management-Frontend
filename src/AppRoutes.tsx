@@ -9,6 +9,7 @@ import UserDetails from "./components/User/UserDetails";
 import LogIn from "./components/Auth/LogIn";
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute component
 import CreateDepartmentView from "./components/Departments/CreateDepartmentView";
+import VacationView from "./components/Vacation/VacationView";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -29,7 +30,9 @@ const AppRoutes: React.FC = () => {
       />
       <Route
         path="/departments"
-        element={<ProtectedRoute element={DepartmentsList} requiredRole="admin" />}
+        element={
+          <ProtectedRoute element={DepartmentsList} requiredRole="admin" />
+        }
       />
       <Route
         path="/create-department"
@@ -51,6 +54,13 @@ const AppRoutes: React.FC = () => {
       <Route
         path="/employees"
         element={<ProtectedRoute element={Employees} requiredRole="admin" />}
+      />
+
+      <Route
+        path="/vacation"
+        element={
+          <ProtectedRoute element={VacationView} requiredRole="employee" />
+        }
       />
     </Routes>
     /* Protected Employee Routes */
