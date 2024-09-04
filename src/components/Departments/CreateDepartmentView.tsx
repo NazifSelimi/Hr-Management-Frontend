@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
-import CreateDepartmentForm from "./CreateDepartmentForm";
+import CreateDepartmentForm from "./CreateDepartmentform";
 import { Spin, message } from "antd";
 
 const CreateDepartmentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = async (values: { name: string; description: string }) => {
+  const handleSubmit = async (values: {
+    name: string;
+    description: string;
+  }) => {
     setLoading(true);
     try {
       const response = await axiosInstance.post("/departments", values);

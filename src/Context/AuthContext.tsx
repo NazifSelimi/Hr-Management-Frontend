@@ -50,14 +50,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = () => {
     try {
-      await axiosInstance.post("/logout");
       setIsLoggedIn(false);
       setUserRole(null);
       localStorage.removeItem("userRole");
       localStorage.removeItem("authToken");
-      Cookies.remove("jwt");
     } catch (error) {
       console.error("Error during logout:", error);
     }
