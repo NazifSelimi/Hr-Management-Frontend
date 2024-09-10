@@ -8,9 +8,6 @@ import { User } from "../types";
 const VacationReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [vacations, setVacations] = useState<Vacation[]>([]);
-  const [selectedVacation, setSelectedVacation] = useState<Vacation | null>(
-    null
-  );
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(
@@ -59,11 +56,6 @@ const VacationReview: React.FC = () => {
       message.error("Failed to update project.");
     }
   };
-
-  // const handleClick = async (status: string, record: Vacation) => {
-  //   handleReview(status);
-  //   setSelectedVacation(record);
-  // };
 
   if (error) return <p>{error}</p>;
 
