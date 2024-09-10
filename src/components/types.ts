@@ -22,4 +22,14 @@ export interface User {
   days_off: number;
   departments: Department[];
   projects: Project[];
-} 
+}
+
+export interface Vacation {
+  id: string;
+  formatted_start_date: Date;
+  formatted_end_date: Date;
+  reason: string;
+  type: string;
+  status: string;
+  user: User;
+}

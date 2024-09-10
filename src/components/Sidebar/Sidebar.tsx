@@ -51,11 +51,7 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Vacations",
       children: [
-        { key: "8", label: <Link to="/vacations">Vacations</Link> },
-        {
-          key: "9",
-          label: <Link to="/">Request Vacation</Link>,
-        },
+        { key: "8", label: <Link to="/review-vacations">Vacations</Link> },
         {
           key: "10",
           label: <Link to="/login">Log In</Link>,
@@ -71,10 +67,10 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Employee sidebar elements",
       children: [
-        { key: "8", label: <Link to="/">Vacations</Link> },
+        { key: "8", label: <Link to="/vacations">My Vacations</Link> },
         {
           key: "9",
-          label: <Link to="/vacation">Request Vacation</Link>,
+          label: <Link to="/request-vacation">Request Vacation</Link>,
         },
       ],
     },

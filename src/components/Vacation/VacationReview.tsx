@@ -5,9 +5,12 @@ import { Table, Button, Space, message, Spin } from "antd";
 import { Vacation } from "../types";
 import { User } from "../types";
 
-const VacationView: React.FC = () => {
+const VacationReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [vacations, setVacations] = useState<Vacation[]>([]);
+  const [selectedVacation, setSelectedVacation] = useState<Vacation | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(
@@ -31,7 +34,7 @@ const VacationView: React.FC = () => {
   useEffect(() => {
     const fetchVacations = async () => {
       try {
-        await fetchData("/employee-vacation", setVacations);
+        await fetchData("/vacation", setVacations);
       } catch (error: any) {
         console.error("Error fetching vacations:", error);
         setError(error.response.data.message);
@@ -43,9 +46,34 @@ const VacationView: React.FC = () => {
     fetchVacations();
   }, []);
 
+  const handleReview = async (status: string, record: Vacation) => {
+    try {
+      const response = await axiosInstance.patch(`/vacation/${record.id}`, {
+        status: status,
+      });
+
+      message.success(response.data.message);
+      fetchData("/vacation", setVacations);
+    } catch (error: any) {
+      console.error("Error updating project:", error);
+      message.error("Failed to update project.");
+    }
+  };
+
+  // const handleClick = async (status: string, record: Vacation) => {
+  //   handleReview(status);
+  //   setSelectedVacation(record);
+  // };
+
   if (error) return <p>{error}</p>;
 
   const columns: ColumnsType<Vacation> = [
+    {
+      title: "Employee",
+      dataIndex: "user",
+      key: "user",
+      render: (employee: User) => employee.first_name,
+    },
     {
       title: "Start Date",
       dataIndex: "formatted_start_date",
@@ -71,15 +99,29 @@ const VacationView: React.FC = () => {
       dataIndex: "status",
       key: "status",
     },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space size="middle">
+          {record.status == "pending" && (
+            <>
+              <Button onClick={() => handleReview("accept", record)}>
+                Accept
+              </Button>
+              <Button onClick={() => handleReview("reject", record)}>
+                Reject
+              </Button>
+            </>
+          )}
+        </Space>
+      ),
+    },
   ];
 
   return (
     <div>
       <h2>Vacations</h2>
-      <h3>
-        Available days off:{" "}
-        {vacations.length > 0 ? vacations[0]?.user?.days_off : "N/A"}
-      </h3>
       {loading ? (
         <Spin />
       ) : (
@@ -89,4 +131,4 @@ const VacationView: React.FC = () => {
   );
 };
 
-export default VacationView;
+export default VacationReview;

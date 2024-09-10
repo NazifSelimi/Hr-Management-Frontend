@@ -9,6 +9,8 @@ import UserDetails from "./components/User/UserDetails";
 import LogIn from "./components/Auth/LogIn";
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute component
 import CreateDepartmentView from "./components/Departments/CreateDepartmentView";
+import RequestVacationView from "./components/Vacation/RequestVacationView";
+import VacationReview from "./components/Vacation/VacationReview";
 import VacationView from "./components/Vacation/VacationView";
 
 const AppRoutes: React.FC = () => {
@@ -16,7 +18,6 @@ const AppRoutes: React.FC = () => {
     <Routes>
       {/* Public Route */}
       <Route path="/login" element={<LogIn />} />
-
       {/* Protected Admin Routes */}
       <Route
         path="/projects"
@@ -50,20 +51,33 @@ const AppRoutes: React.FC = () => {
         path="/users/:id"
         element={<ProtectedRoute element={UserDetails} requiredRole="admin" />}
       />
-
       <Route
         path="/employees"
         element={<ProtectedRoute element={Employees} requiredRole="admin" />}
       />
-
+      {/* Protected Employee Routes */}
       <Route
-        path="/vacation"
+        path="/request-vacation"
+        element={
+          <ProtectedRoute
+            element={RequestVacationView}
+            requiredRole="employee"
+          />
+        }
+      />
+      <Route
+        path="/vacations"
         element={
           <ProtectedRoute element={VacationView} requiredRole="employee" />
         }
       />
+      <Route
+        path="/review-vacations"
+        element={
+          <ProtectedRoute element={VacationReview} requiredRole="admin" />
+        }
+      />
     </Routes>
-    /* Protected Employee Routes */
   );
 };
 
