@@ -20,23 +20,26 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   const [selectedUsers, setSelectedUsers] = useState<
     { id: string; position: string }[]
   >([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true); 
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axiosInstance.get("/users");
-        setUsers(response.data);
-      } catch (error: any) {
-        console.error("Error fetching users:", error);
-        message.error("Failed to load users.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (visible) {
+      const fetchUsers = async () => {
+        try {
+          setLoading(true); 
+          const response = await axiosInstance.get("/users");
+          setUsers(response.data);
+        } catch (error: any) {
+          console.error("Error fetching users:", error);
+          message.error("Failed to load users.");
+        } finally {
+          setLoading(false); 
+        }
+      };
 
-    fetchUsers();
-  }, []);
+      fetchUsers();
+    }
+  }, [visible]);
 
   const handleUserSelect = (selectedValues: string[]) => {
     const updatedSelectedUsers = selectedValues.map((value) => {
@@ -53,7 +56,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   };
 
   const handleAssign = async () => {
-    setLoading(true);
+    setLoading(true); 
     try {
       await axiosInstance.post(`/assign-users/${departmentId}`, {
         users: selectedUsers,
@@ -65,11 +68,9 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       console.error("Error assigning users:", error);
       message.error("Failed to assign users.");
     } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
-
-  if (loading) return <Spin />;
 
   return (
     <Modal
@@ -77,47 +78,62 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       open={visible}
       onCancel={onClose}
       footer={[
-        <Button key="cancel" onClick={onClose}>
+        <Button key="cancel" onClick={onClose} disabled={loading}>
           Cancel
         </Button>,
         <Button
           key="assign"
           type="primary"
           onClick={handleAssign}
-          disabled={selectedUsers.some((user) => !user.position)}
+          disabled={selectedUsers.some((user) => !user.position) || loading}
         >
           Assign
         </Button>,
       ]}
     >
-      <Select
-        mode="multiple"
-        placeholder="Select users"
-        style={{ width: "100%" }}
-        onChange={handleUserSelect}
-        value={selectedUsers.map((user) => user.id)}
-      >
-        {users.map((user) => (
-          <Select.Option key={user.id} value={user.id}>
-            {user.first_name} {user.last_name}
-          </Select.Option>
-        ))}
-      </Select>
-
-      {selectedUsers.map((user) => (
-        <div key={user.id} style={{ marginTop: 10 }}>
-          <span>
-            {users.find((u) => u.id === user.id)?.first_name}{" "}
-            {users.find((u) => u.id === user.id)?.last_name}
-          </span>
-          <Input
-            placeholder="Enter position"
-            value={user.position}
-            onChange={(e) => handlePositionChange(user.id, e.target.value)}
-            style={{ marginLeft: 10, width: "60%" }}
-          />
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+          <Spin size="large" />
         </div>
-      ))}
+      ) : (
+        <>
+          <Select
+            mode="multiple"
+            placeholder="Select users"
+            style={{ width: "100%" }}
+            showSearch
+            onChange={handleUserSelect}
+            filterOption={(input, option) =>
+              option?.children
+                ?.toString()
+                .toLowerCase()
+                .includes(input.toLowerCase()) ?? false
+            }
+            value={selectedUsers.map((user) => user.id)}
+          >
+            {users.map((user) => (
+              <Select.Option key={user.id} value={user.id}>
+                {user.first_name} {user.last_name}
+              </Select.Option>
+            ))}
+          </Select>
+
+          {selectedUsers.map((user) => (
+            <div key={user.id} style={{ marginTop: 10 }}>
+              <span>
+                {users.find((u) => u.id === user.id)?.first_name}{" "}
+                {users.find((u) => u.id === user.id)?.last_name}
+              </span>
+              <Input
+                placeholder="Enter position"
+                value={user.position}
+                onChange={(e) => handlePositionChange(user.id, e.target.value)}
+                style={{ marginLeft: 10, width: "60%" }}
+              />
+            </div>
+          ))}
+        </>
+      )}
     </Modal>
   );
 };

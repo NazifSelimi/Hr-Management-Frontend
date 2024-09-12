@@ -160,7 +160,7 @@ const EmployeeDetails: React.FC = () => {
 
       <Modal
         title="Assign Projects"
-        visible={assignModalVisible}
+        open={assignModalVisible}
         onCancel={() => setAssignModalVisible(false)}
         onOk={() => form.submit()}
         confirmLoading={loading}
@@ -192,7 +192,7 @@ const EmployeeDetails: React.FC = () => {
       </Modal>
 
       <Title level={3}>Assigned Projects</Title>
-      <Table
+      <Table virtual scroll={{ x: 2000, y: 500 }}
         dataSource={employee.projects}
         columns={projectColumns}
         rowKey="id"

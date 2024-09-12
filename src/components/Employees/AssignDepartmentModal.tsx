@@ -67,7 +67,7 @@ const AssignDepartmentsModal: React.FC<AssignDepartmentsModalProps> = ({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Assign Departments"
       onCancel={onClose}
       footer={[

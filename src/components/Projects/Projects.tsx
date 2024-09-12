@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, Space, message, Spin } from "antd";
+import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axiosInstance from "../../api/axiosInstance";
 import EditModal from "../Modal/EditModal";
 import { Department, Project } from "../types";
 import { useNavigate } from "react-router-dom";
+import { EllipsisOutlined, EditOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
 
 interface ProjectsProps {
   data?: Project[];
@@ -46,17 +47,21 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
   }, [data, fetchData]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
-
-    try {
-      await axiosInstance.delete(`/projects/${id}`);
-      setProjects((prev) => prev.filter((project) => project.id !== id));
-      message.success("Project deleted successfully.");
-    } catch (error: any) {
-      console.error("Error deleting project:", error);
-      message.error("Failed to delete project.");
-    }
+    Modal.confirm({
+      title: "Are you sure you want to delete this project?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await axiosInstance.delete(`/projects/${id}`);
+          setProjects((prev) => prev.filter((project) => project.id !== id));
+          message.success("Project deleted successfully.");
+        } catch (error: any) {
+          console.error("Error deleting project:", error);
+          message.error("Failed to delete project.");
+        }
+      },
+    });
   };
 
   const handleEditSubmit = async (values: Record<string, any>) => {
@@ -110,15 +115,22 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <Space size="middle">
-          <Button onClick={() => handleView(record.id)}>View</Button>
-          <Button type="link" onClick={() => setSelectedProject(record)}>
-            Edit
-          </Button>
-          <Button type="link" danger onClick={() => handleDelete(record.id)}>
-            Delete
-          </Button>
-        </Space>
+        <Dropdown
+          menu={{
+            items: [
+              { key: 'view', label: <><EyeOutlined /> View</>, onClick: () => handleView(record.id) },
+              { key: 'edit', label: <><EditOutlined /> Edit</>, onClick: () => setSelectedProject(record) },
+              { key: 'delete', label: <><DeleteOutlined /> Delete</>, onClick: () => handleDelete(record.id), danger: true },
+            ],
+          }}
+          trigger={['click']}
+        >
+          <Button
+            type="link"
+            icon={<EllipsisOutlined style={{ fontSize: '35px' }} />}
+            style={{ padding: '0', height: 'auto' }}
+          />
+        </Dropdown>
       ),
     },
   ];
@@ -129,7 +141,7 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       {loading ? (
         <Spin />
       ) : (
-        <Table dataSource={projects} columns={columns} rowKey="id" />
+        <Table virtual scroll={{ x: 2000, y: 500 }} dataSource={projects} columns={columns} rowKey="id" />
       )}
       {selectedProject && (
         <EditModal
@@ -155,19 +167,9 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
               name: "description",
               label: "Description",
               rules: [
-                {
-                  required: true,
-                  message: "Please input the project description!",
-                },
-              ],
-            },
-            {
-              name: "departments",
-              label: "Departments",
-              rules: [
                 { required: true, message: "Please select departments!" },
               ],
-              options: selectedProject.departments.map((dept) => ({
+              options: departments.map((dept) => ({
                 value: dept.id,
                 label: dept.name,
               })),
