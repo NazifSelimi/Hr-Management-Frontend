@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import CreateProjectView from "./components/Projects/CreateProjectView";
 import Projects from "./components/Projects/Projects";
 import Employees from "./components/Employees/Employees";
-import DepartmentsList from "./components/Departments/DepartmentsList";
+import DepartmentsList from "./components/Departments/DepartmentsList"
 import ProjectDetails from "./components/Projects/ProjetcDetails";
 import UserDetails from "./components/User/UserDetails";
 import LogIn from "./components/Auth/LogIn";

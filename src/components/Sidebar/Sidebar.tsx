@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Layout, Menu } from "antd";
-import { UserOutlined, NotificationOutlined } from "@ant-design/icons";
+import { UserOutlined, ApartmentOutlined, ProjectOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 
@@ -24,7 +24,7 @@ const Sidebar: React.FC = () => {
     },
     {
       key: "sub2",
-      icon: <NotificationOutlined />,
+      icon: <ProjectOutlined />,
       label: "Projects",
       children: [
         { key: "4", label: <Link to="/projects">View Projects</Link> },
@@ -36,7 +36,7 @@ const Sidebar: React.FC = () => {
     },
     {
       key: "sub3",
-      icon: <NotificationOutlined />,
+      icon: <ApartmentOutlined />,
       label: "Departments",
       children: [
         { key: "6", label: <Link to="/departments">View Departments</Link> },
@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
     },
     {
       key: "sub4",
-      icon: <NotificationOutlined />,
+      icon: <ThunderboltOutlined />,
       label: "Vacations",
       children: [
         { key: "8", label: <Link to="/vacations">Vacations</Link> },
@@ -68,7 +68,7 @@ const Sidebar: React.FC = () => {
   const employeeMenuItems = [
     {
       key: "sub5",
-      icon: <NotificationOutlined />,
+      icon: <ApartmentOutlined />,
       label: "Employee sidebar elements",
       children: [
         { key: "8", label: <Link to="/employee">Vacations</Link> },

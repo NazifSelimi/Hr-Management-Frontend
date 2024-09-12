@@ -11,7 +11,10 @@ import {
   Table,
   Button,
   message,
+  Dropdown,
+  Modal,
 } from "antd";
+import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
 import { Project, User } from "../types";
 
@@ -28,12 +31,12 @@ const ProjectDetails: React.FC = () => {
       try {
         const response = await axiosInstance.get(`/projects/${id}`);
         setProject(response.data);
-        setLoading(false);
       } catch (error: any) {
         console.error("Error fetching project details:", error);
         message.error("Failed to fetch project details.");
-        setLoading(false);
         setError("Failed to fetch project details");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -42,20 +45,29 @@ const ProjectDetails: React.FC = () => {
 
   if (loading) return <Spin />;
 
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
   if (!project) return <p>Project not found</p>;
 
   const handleRemoveUser = async (userId: string) => {
-    try {
-      await axiosInstance.delete(`/projects/${id}/users/${userId}`);
-      setProject(prevProject => ({
-        ...prevProject!,
-        users: prevProject!.users.filter(user => user.id !== userId),
-      }));
-      message.success("User removed from project successfully.");
-    } catch (error: any) {
-      console.error("Error removing user from project:", error?.response || error);
-      message.error("Failed to remove user from project.");
-    }
+    Modal.confirm({
+      title: "Are you sure you want to remove this user from the project?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await axiosInstance.delete(`/projects/${id}/users/${userId}`);
+          setProject(prevProject => ({
+            ...prevProject!,
+            users: prevProject!.users.filter(user => user.id !== userId),
+          }));
+          message.success("User removed from project successfully.");
+        } catch (error: any) {
+          console.error("Error removing user from project:", error?.response || error);
+          message.error("Failed to remove user from project.");
+        }
+      },
+    });
   };
 
   const userColumns = [
@@ -91,9 +103,20 @@ const ProjectDetails: React.FC = () => {
       title: "Actions",
       key: "actions",
       render: (_: any, record: User) => (
-        <Button type="link" danger onClick={() => handleRemoveUser(record.id)}>
-          Remove From Project
-        </Button>
+        <Dropdown
+          menu={{
+            items: [
+              { key: 'delete', label: <><DeleteOutlined/> Delete </>, onClick: () => handleRemoveUser(record.id), danger: true },
+            ],
+          }}
+          trigger={['click']}
+        >
+          <Button
+            type="link"
+            icon={<EllipsisOutlined style={{ fontSize: '35px' }} />}
+            style={{ padding: '0', height: 'auto' }}
+          />
+        </Dropdown>
       ),
     },
   ];
@@ -142,7 +165,7 @@ const ProjectDetails: React.FC = () => {
         <Row>
           <Col span={24}>
             <Title level={4}>Users in this Project</Title>
-            <Table
+            <Table virtual scroll={{ x: 2000, y: 500 }}
               dataSource={project.users}
               columns={userColumns}
               rowKey="id"

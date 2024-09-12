@@ -166,7 +166,7 @@ const UserDetails: React.FC = () => {
         Associated Projects
       </Title>
       <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
-        <Table
+        <Table virtual scroll={{ x: 2000, y: 500 }}
           dataSource={user.projects}
           columns={projectColumns}
           rowKey="id"
