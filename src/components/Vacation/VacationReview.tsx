@@ -41,7 +41,7 @@ const VacationReview: React.FC = () => {
     };
 
     fetchVacations();
-  }, []);
+  }, [fetchData]);
 
   const handleReview = async (status: string, record: Vacation) => {
     try {
@@ -64,7 +64,8 @@ const VacationReview: React.FC = () => {
       title: "Employee",
       dataIndex: "user",
       key: "user",
-      render: (employee: User) => employee.first_name,
+      render: (employee: User) =>
+        employee.first_name + " " + employee.last_name,
     },
     {
       title: "Start Date",
@@ -96,16 +97,18 @@ const VacationReview: React.FC = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          {record.status == "pending" && (
-            <>
-              <Button onClick={() => handleReview("accept", record)}>
-                Accept
-              </Button>
-              <Button onClick={() => handleReview("reject", record)}>
-                Reject
-              </Button>
-            </>
-          )}
+          <Button
+            onClick={() => handleReview("accept", record)}
+            disabled={record.status !== "pending"}
+          >
+            Accept
+          </Button>
+          <Button
+            onClick={() => handleReview("reject", record)}
+            disabled={record.status !== "pending"}
+          >
+            Reject
+          </Button>
         </Space>
       ),
     },
