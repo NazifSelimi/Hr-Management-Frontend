@@ -27,7 +27,7 @@ const Sidebar: React.FC = () => {
       icon: <NotificationOutlined />,
       label: "Projects",
       children: [
-        { key: "4", label: <Link to="/projects">Projects</Link> },
+        { key: "4", label: <Link to="/projects">View Projects</Link> },
         {
           key: "5",
           label: <Link to="/create-projects">Create Project</Link>,
