@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
-import CreateDepartmentForm from "./CreateDepartmentform";
+import CreateDepartmentForm from "./CreateDepartmentForm";
 import { Spin, message } from "antd";
 
 const CreateDepartmentView: React.FC = () => {
