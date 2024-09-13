@@ -1,86 +1,116 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Select, Input, Button, Form } from "antd";
+import { Modal, Select, Button, message, Spin, Input } from "antd";
 import axiosInstance from "../../api/axiosInstance";
+import { Department } from "../types";
 
-interface Department {
-  id: number;
-  name: string;
-}
-
-interface SelectedDepartment {
-  departmentId: number;
-  position: string;
-}
-
-interface AssignDepartmentsModalProps {
+interface AssignDepartmentModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (departments: SelectedDepartment[]) => void;
+  userId: string;
+  onSubmit: (values: {
+    departments: { id: string; position: string }[];
+  }) => void;
 }
 
-const AssignDepartmentsModal: React.FC<AssignDepartmentsModalProps> = ({
+const AssignDepartmentModal: React.FC<AssignDepartmentModalProps> = ({
   visible,
   onClose,
+  userId,
   onSubmit,
 }) => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<
-    SelectedDepartment[]
+    { id: string; name: string; position: string }[]
   >([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const { data } = await axiosInstance.get("/departments"); // Fetch departments from backend
-        setDepartments(data);
-      } catch (error) {
-        console.error("Failed to fetch departments", error);
+        const response = await axiosInstance.get("/departments");
+        setDepartments(response.data);
+      } catch (error: any) {
+        message.error("Failed to load departments");
+      } finally {
+        setLoading(false);
       }
     };
-
     if (visible) {
-      fetchDepartments(); // Fetch departments when the modal becomes visible
+      fetchDepartments();
     }
   }, [visible]);
 
-  const handleSelectDepartment = (departmentId: number) => {
-    if (!selectedDepartments.find((dep) => dep.departmentId === departmentId)) {
-      setSelectedDepartments([
-        ...selectedDepartments,
-        { departmentId, position: "" },
-      ]);
-    }
+  const handleDepartmentSelect = (selectedValues: string[]) => {
+    const updatedSelectedDepartments = selectedValues.map((value) => {
+      const existingDepartment = selectedDepartments.find(
+        (department) => department.id === value
+      );
+      return existingDepartment || { id: value, name: "", position: "" };
+    });
+    setSelectedDepartments(updatedSelectedDepartments);
   };
 
-  const handlePositionChange = (departmentId: number, value: string) => {
-    setSelectedDepartments(
-      selectedDepartments.map((dep) =>
-        dep.departmentId === departmentId ? { ...dep, position: value } : dep
-      )
+  const handlePositionChange = (id: string, position: string) => {
+    setSelectedDepartments((prev) =>
+      prev.map((dep) => (dep.id === id ? { ...dep, position } : dep))
     );
   };
 
-  const handleSubmit = () => {
-    onSubmit(selectedDepartments);
-    onClose();
+  const handleAssign = async () => {
+    if (selectedDepartments.some((dep) => !dep.position)) {
+      message.error("Please provide a position for all selected departments");
+      return;
+    }
+
+    try {
+      await axiosInstance.post(`/assign-departments/${userId}`, {
+        departments: selectedDepartments.map(({ id, position }) => ({
+          id,
+          position,
+        })),
+      });
+      message.success("Departments assigned successfully");
+      onSubmit({
+        departments: selectedDepartments.map(({ id, position }) => ({
+          id,
+          position,
+        })),
+      });
+      onClose();
+    } catch (error) {
+      message.error("Failed to assign departments");
+    }
   };
 
   return (
     <Modal
-      visible={visible}
       title="Assign Departments"
+      visible={visible}
       onCancel={onClose}
       footer={[
-        <Button key="submit" type="primary" onClick={handleSubmit}>
-          Submit
+        <Button key="cancel" onClick={onClose}>
+          Cancel
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          onClick={handleAssign}
+          disabled={loading}
+        >
+          Assign
         </Button>,
       ]}
     >
-      <Form layout="vertical">
-        <Form.Item label="Select Department">
+      {loading ? (
+        <Spin />
+      ) : (
+        <>
           <Select
-            placeholder="Select a department"
-            onSelect={(value) => handleSelectDepartment(value as number)}
+            mode="multiple"
+            style={{ width: "100%", marginBottom: 16 }}
+            placeholder="Select Departments"
+            onChange={handleDepartmentSelect}
+            value={selectedDepartments.map((dep) => dep.id)}
           >
             {departments.map((department) => (
               <Select.Option key={department.id} value={department.id}>
@@ -88,27 +118,23 @@ const AssignDepartmentsModal: React.FC<AssignDepartmentsModalProps> = ({
               </Select.Option>
             ))}
           </Select>
-        </Form.Item>
-
-        {selectedDepartments.map((dep, index) => (
-          <Form.Item
-            key={index}
-            label={`Position for ${
-              departments.find((d) => d.id === dep.departmentId)?.name
-            }`}
-          >
-            <Input
-              value={dep.position}
-              onChange={(e) =>
-                handlePositionChange(dep.departmentId, e.target.value)
-              }
-              placeholder="Enter position"
-            />
-          </Form.Item>
-        ))}
-      </Form>
+          {selectedDepartments.map((dep) => (
+            <div key={dep.id} style={{ marginBottom: 8 }}>
+              <span>
+                {dep.name || departments.find((d) => d.id === dep.id)?.name}:
+              </span>
+              <Input
+                placeholder="Position"
+                value={dep.position}
+                onChange={(e) => handlePositionChange(dep.id, e.target.value)}
+                style={{ width: "100%", marginTop: 8 }}
+              />
+            </div>
+          ))}
+        </>
+      )}
     </Modal>
   );
 };
 
-export default AssignDepartmentsModal;
+export default AssignDepartmentModal;
