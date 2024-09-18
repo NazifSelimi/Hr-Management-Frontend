@@ -96,6 +96,14 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
             <DeleteOutlined />
             Delete{" "}
           </>
+          {deleting === record.id ? (
+            <Spin size="small" />
+          ) : (
+            <>
+              <DeleteOutlined />
+              Delete{" "}
+            </>
+          )}
         </span>
       ),
       danger: true,
