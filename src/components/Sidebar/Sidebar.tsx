@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Layout, Menu } from "antd";
-import { UserOutlined, ApartmentOutlined, ProjectOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  ApartmentOutlined,
+  ProjectOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 
@@ -71,6 +76,10 @@ const Sidebar: React.FC = () => {
         {
           key: "9",
           label: <Link to="/request-vacation">Request Vacation</Link>,
+        },
+        {
+          key: "10",
+          label: <Link to="/my-projects">View my Projects</Link>,
         },
       ],
     },

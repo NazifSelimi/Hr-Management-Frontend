@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
-import { EllipsisOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  EllipsisOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../types";
@@ -14,7 +18,9 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
   const [employees, setEmployees] = useState<User[]>(data || []);
   const [loading, setLoading] = useState<boolean>(!data);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [visibleActions, setVisibleActions] = useState<{ [key: string]: boolean }>({});
+  const [visibleActions, setVisibleActions] = useState<{
+    [key: string]: boolean;
+  }>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,13 +79,26 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
   const menuItems = (record: User) => [
     {
       key: "1",
-      label: <span onClick={() => handleView(record.id)}><><EyeOutlined/> View </></span>,
+      label: (
+        <span onClick={() => handleView(record.id)}>
+          <>
+            <EyeOutlined /> View{" "}
+          </>
+        </span>
+      ),
     },
     {
       key: "2",
       label: (
         <span onClick={() => handleDelete(record.id)}>
-          {deleting === record.id ? <Spin size="small" /> : <><DeleteOutlined/>Delete </>}
+          {deleting === record.id ? (
+            <Spin size="small" />
+          ) : (
+            <>
+              <DeleteOutlined />
+              Delete{" "}
+            </>
+          )}
         </span>
       ),
       danger: true,
@@ -95,7 +114,7 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
       ) : (
         <Table
           virtual
-          scroll={{ x: 2000, y: 500 }}
+          scroll={{ x: 500, y: 500 }}
           dataSource={employees}
           columns={[
             { title: "First Name", dataIndex: "first_name", key: "first_name" },
