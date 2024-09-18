@@ -1,11 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
+import { Table, Button, message, Dropdown, Modal } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axiosInstance from "../../api/axiosInstance";
 import EditModal from "../Modal/EditModal";
 import { Department, Project } from "../types";
 import { useNavigate } from "react-router-dom";
-import { EllipsisOutlined, EditOutlined, EyeOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EllipsisOutlined,
+  EditOutlined,
+  EyeOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import Spinner from "../Spinner";
 
 interface ProjectsProps {
   data?: Project[];
@@ -118,17 +124,42 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
         <Dropdown
           menu={{
             items: [
-              { key: 'view', label: <><EyeOutlined /> View</>, onClick: () => handleView(record.id) },
-              { key: 'edit', label: <><EditOutlined /> Edit</>, onClick: () => setSelectedProject(record) },
-              { key: 'delete', label: <><DeleteOutlined /> Delete</>, onClick: () => handleDelete(record.id), danger: true },
+              {
+                key: "view",
+                label: (
+                  <>
+                    <EyeOutlined /> View
+                  </>
+                ),
+                onClick: () => handleView(record.id),
+              },
+              {
+                key: "edit",
+                label: (
+                  <>
+                    <EditOutlined /> Edit
+                  </>
+                ),
+                onClick: () => setSelectedProject(record),
+              },
+              {
+                key: "delete",
+                label: (
+                  <>
+                    <DeleteOutlined /> Delete
+                  </>
+                ),
+                onClick: () => handleDelete(record.id),
+                danger: true,
+              },
             ],
           }}
-          trigger={['click']}
+          trigger={["click"]}
         >
           <Button
             type="link"
-            icon={<EllipsisOutlined style={{ fontSize: '35px' }} />}
-            style={{ padding: '0', height: 'auto' }}
+            icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+            style={{ padding: "0", height: "auto" }}
           />
         </Dropdown>
       ),
@@ -139,9 +170,15 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
     <div>
       <h2>Projects</h2>
       {loading ? (
-        <Spin />
+        <Spinner />
       ) : (
-        <Table virtual scroll={{ x: 1000, y: 300 }} dataSource={projects} columns={columns} rowKey="id" />
+        <Table
+          virtual
+          scroll={{ x: 2000, y: 500 }}
+          dataSource={projects}
+          columns={columns}
+          rowKey="id"
+        />
       )}
       {selectedProject && (
         <EditModal

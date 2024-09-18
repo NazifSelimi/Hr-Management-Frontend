@@ -13,6 +13,7 @@ import {
 } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import { User } from "../types";
+import Spinner from "../Spinner";
 
 const { Title, Text } = Typography;
 
@@ -37,7 +38,7 @@ const UserDetails: React.FC = () => {
     fetchUser();
   }, [id]);
 
-  if (loading) return <Spin />;
+  if (loading) return <Spinner />;
 
   if (!user) return <p>User not found</p>;
 
@@ -154,6 +155,7 @@ const UserDetails: React.FC = () => {
                   style={{ marginBottom: "5px", fontSize: "16px" }}
                 >
                   {dept.name}
+                  {dept.pivot.position}
                 </Tag>
               ))
             ) : (
@@ -166,7 +168,9 @@ const UserDetails: React.FC = () => {
         Associated Projects
       </Title>
       <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
-        <Table virtual scroll={{ x: 1000, y: 300 }}
+        <Table
+          virtual
+          scroll={{ x: 600, y: 500 }}
           dataSource={user.projects}
           columns={projectColumns}
           rowKey="id"

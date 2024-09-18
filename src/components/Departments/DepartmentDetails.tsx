@@ -1,21 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  Spin,
-  Typography,
-  Divider,
-  Row,
-  Col,
-  Table,
-  Tag,
-  Button,
-  message,
-  Dropdown,
-  Modal,
-  Form,
-  Select
-} from "antd";
+import { Card, Spin, Typography, Divider, Row, Col, Table, Button, message, Dropdown, Modal, Form, Select } from "antd";
 import { EllipsisOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
 import { Department, User } from "../types";
@@ -24,18 +9,20 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const DepartmentDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Get the department ID from the URL
-  const [department, setDepartment] = useState<Department | null>(null); // State for storing department data
-  const [loading, setLoading] = useState<boolean>(true); // State for loading status
-  const [error, setError] = useState<string | null>(null); // State for error handling
-  const [isEditingRole, setIsEditingRole] = useState<boolean>(false); // State to handle the role editing modal visibility
-  const [selectedUser, setSelectedUser] = useState<User | null>(null); // State to store the user being edited
-  const [roles, setRoles] = useState<string[]>([]); // State for storing role options
+  const { id } = useParams<{ id: string }>();
+  const [department, setDepartment] = useState<Department | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditingRole, setIsEditingRole] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [roles, setRoles] = useState<string[]>([]); // State to store roles
+  const [updatedUsers, setUpdatedUsers] = useState<{ id: string; position: string }[]>([]);
 
   useEffect(() => {
+    // Fetch the department details
     const fetchDepartment = async () => {
       try {
-        const response = await axiosInstance.get(`/departments/${id}`); // Fetch department by ID
+        const response = await axiosInstance.get(`/departments/${id}`);
         setDepartment(response.data);
       } catch (error: any) {
         console.error("Error fetching department details:", error);
@@ -49,44 +36,52 @@ const DepartmentDetails: React.FC = () => {
     fetchDepartment();
   }, [id]);
 
+  // Fetch available roles
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axiosInstance.get('/endpoint'); // Assuming you have an endpoint to fetch roles
-        setRoles(response.data);
-      } catch (error: any) {
+        const response = await axiosInstance.get(`/roles`); // Adjust endpoint based on your API
+        setRoles(response.data); // Assuming the API response returns a list of roles
+      } catch (error) {
         console.error("Error fetching roles:", error);
         message.error("Failed to fetch roles.");
       }
     };
 
     fetchRoles();
-  }, []);
+  }, []); // Fetch roles once on component mount
 
   const handleRemoveUser = async (userId: string) => {
-    Modal.confirm({
-      title: "Are you sure you want to remove this user from the department?",
-      okText: "Yes",
-      cancelText: "No",
-      onOk: async () => {
-        try {
-          await axiosInstance.delete(`/user-delete/${userId}`);
-          setDepartment(prevDepartment => {
-            if (prevDepartment) {
-              return {
-                ...prevDepartment,
-                users: prevDepartment.users.filter(user => user.id !== userId),
-              };
-            }
-            return prevDepartment;
-          });
-          message.success("User removed from department successfully.");
-        } catch (error: any) {
-          console.error("Error removing user from department:", error);
-          message.error("Failed to remove user from department.");
-        }
-      },
-    });
+    try {
+      await axiosInstance.delete(`/departments/${id}/remove-user`, {
+        data: { userId }
+      });
+      message.success("User removed successfully.");
+      setDepartment(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          users: prev.users.filter(user => user.id !== userId)
+        };
+      });
+    } catch (error: any) {
+      console.error("Error removing user:", error);
+      message.error("Failed to remove user.");
+    }
+  };
+
+  const handleRoleUpdate = async () => {
+    try {
+      const response = await axiosInstance.put(`/departments/${id}/update-user-position`, {
+        users: updatedUsers
+      });
+      setDepartment(response.data);
+      message.success("User positions updated successfully.");
+      setIsEditingRole(false);
+    } catch (error: any) {
+      console.error("Error updating user positions:", error);
+      message.error("Failed to update user positions.");
+    }
   };
 
   const handleEditRole = (user: User) => {
@@ -94,28 +89,11 @@ const DepartmentDetails: React.FC = () => {
     setIsEditingRole(true);
   };
 
-  const handleRoleUpdate = async (values: { role: string }) => {
-    if (selectedUser) {
-      try {
-        await axiosInstance.put(`/users/${selectedUser.id}`, { role: values.role });
-        setDepartment(prevDepartment => {
-          if (prevDepartment) {
-            return {
-              ...prevDepartment,
-              users: prevDepartment.users.map(user =>
-                user.id === selectedUser.id ? { ...user, role: values.role } : user
-              ),
-            };
-          }
-          return prevDepartment;
-        });
-        message.success("User role updated successfully.");
-        setIsEditingRole(false);
-      } catch (error: any) {
-        console.error("Error updating user role:", error);
-        message.error("Failed to update user role.");
-      }
-    }
+  const onRoleChange = (userId: string, newRole: string) => {
+    setUpdatedUsers(prevState => {
+      const updated = prevState.filter(user => user.id !== userId);
+      return [...updated, { id: userId, position: newRole }];
+    });
   };
 
   const userColumns = [
@@ -146,9 +124,18 @@ const DepartmentDetails: React.FC = () => {
         <Dropdown
           menu={{
             items: [
-              { key: 'edit-role', label: <><EditOutlined /> Edit Role</>, onClick: () => handleEditRole(record) },
-              { key: 'delete', label: <><DeleteOutlined /> Delete</>, onClick: () => handleRemoveUser(record.id), danger: true },
-            ],
+              {
+                key: 'edit-role',
+                label: <><EditOutlined /> Edit Role</>,
+                onClick: () => handleEditRole(record)
+              },
+              {
+                key: 'delete',
+                label: <><DeleteOutlined /> Delete</>,
+                onClick: () => handleRemoveUser(record.id),
+                danger: true
+              }
+            ]
           }}
           trigger={['click']}
         >
@@ -158,8 +145,8 @@ const DepartmentDetails: React.FC = () => {
             style={{ padding: '0', height: 'auto' }}
           />
         </Dropdown>
-      ),
-    },
+      )
+    }
   ];
 
   if (loading) {
@@ -203,20 +190,16 @@ const DepartmentDetails: React.FC = () => {
       {/* Modal for Editing User Role */}
       <Modal
         title="Edit User Role"
-        visible={isEditingRole}
+        open={isEditingRole}
         onCancel={() => setIsEditingRole(false)}
         footer={null}
       >
-        <Form
-          initialValues={{ role: selectedUser?.role }}
-          onFinish={handleRoleUpdate}
-        >
-          <Form.Item
-            name="role"
-            label="Role"
-            rules={[{ required: true, message: "Please select the role!" }]}
-          >
-            <Select>
+        <Form onFinish={handleRoleUpdate}>
+          <Form.Item label="Role">
+            <Select
+              defaultValue={selectedUser?.role}
+              onChange={(value) => onRoleChange(selectedUser?.id as string, value)}
+            >
               {roles.map(role => (
                 <Option key={role} value={role}>{role}</Option>
               ))}

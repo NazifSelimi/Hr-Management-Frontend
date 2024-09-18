@@ -3,6 +3,7 @@ import axiosInstance from "../../api/axiosInstance";
 import { Department } from "../types";
 import { Spin, message } from "antd";
 import VacationForm from "./VacationForm";
+import Spinner from "../Spinner";
 
 const RequestVacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,6 +50,7 @@ const RequestVacationView: React.FC = () => {
       alert(message);
     }
   };
+  if (loading) return <Spinner />;
 
   if (error) return <p>{error}</p>;
 
