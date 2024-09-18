@@ -93,9 +93,7 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
       {loading ? (
         <Spin />
       ) : (
-        <Table
-          virtual
-          scroll={{ x: 2000, y: 500 }}
+        <Table virtual scroll={{ x: 1000, y: 300 }}
           dataSource={employees}
           columns={[
             { title: "First Name", dataIndex: "first_name", key: "first_name" },

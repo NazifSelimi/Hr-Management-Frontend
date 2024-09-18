@@ -3,8 +3,8 @@ import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import { Department } from "../types";
 import AssignUsersModal from "./AssignUserModal";
-import { EllipsisOutlined, DeleteOutlined, UserAddOutlined} from "@ant-design/icons";
-
+import { EllipsisOutlined, DeleteOutlined, UserAddOutlined, EyeOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom"; 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -12,6 +12,7 @@ const DepartmentsList: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [visibleActions, setVisibleActions] = useState<{ [key: string]: boolean }>({});
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -76,18 +77,32 @@ const DepartmentsList: React.FC = () => {
     }));
   };
 
+  const handleViewDepartment = (id: string) => {
+    navigate(`/departments/${id}`); 
+  };
+
   const menuItems = (record: Department) => [
     {
       key: '1',
       label: (
-        <span onClick={() => handleModalOpen(record)}><><UserAddOutlined /> Assign Users</></span>
+        <span onClick={() => handleViewDepartment(record.id)}>
+          <><EyeOutlined /> View</>
+        </span>
       ),
     },
     {
       key: '2',
       label: (
+        <span onClick={() => handleModalOpen(record)}>
+          <><UserAddOutlined /> Assign Users</>
+        </span>
+      ),
+    },
+    {
+      key: '3',
+      label: (
         <span onClick={() => handleDeleteDepartment(record.id)}>
-          {deleting === record.id ? <Spin size="small" /> : <><DeleteOutlined/> Delete</>}
+          {deleting === record.id ? <Spin size="small" /> : <><DeleteOutlined /> Delete</>}
         </span>
       ),
       danger: true,
@@ -99,6 +114,8 @@ const DepartmentsList: React.FC = () => {
     <div>
       <Spin spinning={loading}>
         <Table
+          virtual
+          scroll={{ x: 1000, y: 300 }}
           dataSource={departments}
           columns={[
             {

@@ -62,7 +62,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
         users: selectedUsers,
       });
       message.success("Users and positions assigned successfully!");
-      onSubmit({ users: selectedUsers });
+      // onSubmit({ users: selectedUsers });  //* when assign users, this line displayes on console. We don't need it but its good for testing.
       onClose();
     } catch (error: any) {
       console.error("Error assigning users:", error);
