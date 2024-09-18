@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
-import CreateDepartmentForm from "./CreateDepartmentForm";
+import CreateDepartmentForm from "./CreateDepartmentform";
 import { Spin, message } from "antd";
-
 
 const CreateDepartmentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -31,9 +30,8 @@ const CreateDepartmentView: React.FC = () => {
     }
   };
 
-
   return (
-    <Spin spinning={loading}> 
+    <Spin spinning={loading}>
       <CreateDepartmentForm onSubmit={handleSubmit} />
     </Spin>
   );

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import { ColumnsType } from "antd/es/table";
-import { Table, Button, Space, message, Spin } from "antd";
+import { Table, Button, Space, message } from "antd";
 import { Vacation } from "../types";
 import { User } from "../types";
+import Spinner from "../Spinner";
 
 const VacationReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -118,7 +119,7 @@ const VacationReview: React.FC = () => {
     <div>
       <h2>Vacations</h2>
       {loading ? (
-        <Spin />
+        <Spinner />
       ) : (
         <Table dataSource={vacations} columns={columns} rowKey="id" />
       )}

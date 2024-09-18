@@ -3,15 +3,23 @@ import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import { Department } from "../types";
 import AssignUsersModal from "./AssignUserModal";
-import { EllipsisOutlined, DeleteOutlined, UserAddOutlined} from "@ant-design/icons";
+import {
+  EllipsisOutlined,
+  DeleteOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
+import Spinner from "../Spinner";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
-  const [visibleActions, setVisibleActions] = useState<{ [key: string]: boolean }>({});
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<Department | null>(null);
+  const [visibleActions, setVisibleActions] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -31,11 +39,11 @@ const DepartmentsList: React.FC = () => {
 
   const handleDeleteDepartment = async (id: string) => {
     Modal.confirm({
-      title: 'Are you sure you want to delete this department?',
-      content: 'This action cannot be undone.',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      title: "Are you sure you want to delete this department?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk: async () => {
         setDeleting(id);
         try {
@@ -64,7 +72,9 @@ const DepartmentsList: React.FC = () => {
     setSelectedDepartment(null);
   };
 
-  const handleAssignUsers = (values: { users: { id: string; position: string }[] }) => {
+  const handleAssignUsers = (values: {
+    users: { id: string; position: string }[];
+  }) => {
     console.log("Users assigned:", values);
     handleModalClose();
   };
@@ -78,16 +88,26 @@ const DepartmentsList: React.FC = () => {
 
   const menuItems = (record: Department) => [
     {
-      key: '1',
+      key: "1",
       label: (
-        <span onClick={() => handleModalOpen(record)}><><UserAddOutlined /> Assign Users</></span>
+        <span onClick={() => handleModalOpen(record)}>
+          <>
+            <UserAddOutlined /> Assign Users
+          </>
+        </span>
       ),
     },
     {
-      key: '2',
+      key: "2",
       label: (
         <span onClick={() => handleDeleteDepartment(record.id)}>
-          {deleting === record.id ? <Spin size="small" /> : <><DeleteOutlined/> Delete</>}
+          {deleting === record.id ? (
+            <Spin size="small" />
+          ) : (
+            <>
+              <DeleteOutlined /> Delete
+            </>
+          )}
         </span>
       ),
       danger: true,
@@ -95,41 +115,40 @@ const DepartmentsList: React.FC = () => {
     },
   ];
 
+  if (loading) return <Spinner />;
   return (
     <div>
-      <Spin spinning={loading}>
-        <Table
-          dataSource={departments}
-          columns={[
-            {
-              title: "Name",
-              dataIndex: "name",
-              key: "name",
-            },
-            {
-              title: "Actions",
-              key: "actions",
-              render: (_, record: Department) => (
-                <>
-                  <Dropdown
-                    menu={{ items: menuItems(record) }}
-                    trigger={['click']}
-                    open={visibleActions[record.id]}
-                    onOpenChange={() => toggleActionsVisibility(record.id)}
-                  >
-                    <Button
-                      type="link"
-                      icon={<EllipsisOutlined style={{ fontSize: '35px' }} />}
-                      style={{ padding: '0', height: 'auto' }}
-                    />
-                  </Dropdown>
-                </>
-              ),
-            },
-          ]}
-          rowKey="id"
-        />
-      </Spin>
+      <Table
+        dataSource={departments}
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "Actions",
+            key: "actions",
+            render: (_, record: Department) => (
+              <>
+                <Dropdown
+                  menu={{ items: menuItems(record) }}
+                  trigger={["click"]}
+                  open={visibleActions[record.id]}
+                  onOpenChange={() => toggleActionsVisibility(record.id)}
+                >
+                  <Button
+                    type="link"
+                    icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+                    style={{ padding: "0", height: "auto" }}
+                  />
+                </Dropdown>
+              </>
+            ),
+          },
+        ]}
+        rowKey="id"
+      />
       {selectedDepartment && (
         <AssignUsersModal
           visible={isModalVisible}

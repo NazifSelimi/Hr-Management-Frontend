@@ -3,6 +3,7 @@ import { Form, Input, Button, Select, message, Spin } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import { Department, Project } from "../types";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../Spinner";
 
 const { Option } = Select;
 
@@ -14,11 +15,14 @@ const CreateProjectView: React.FC = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
+        setLoading(true);
         const response = await axiosInstance.get("/departments");
         setDepartments(response.data);
       } catch (error: any) {
         console.error("Error fetching departments:", error?.response || error);
         message.error("Failed to fetch departments.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -73,7 +77,12 @@ const CreateProjectView: React.FC = () => {
             },
           ]}
         >
-          <Select mode="multiple" placeholder="Select departments">
+          <Select
+            mode="multiple"
+            placeholder="Select departments"
+            loading={loading}
+            notFoundContent={loading ? <Spin size="small" /> : "No data"}
+          >
             {departments.map((dept) => (
               <Option key={dept.id} value={dept.id}>
                 {dept.name}
@@ -82,7 +91,7 @@ const CreateProjectView: React.FC = () => {
           </Select>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button type="primary" htmlType="submit">
             Create Project
           </Button>
         </Form.Item>

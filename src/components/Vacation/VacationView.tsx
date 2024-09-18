@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import { ColumnsType } from "antd/es/table";
-import { Table, Button, Space, message, Spin } from "antd";
+import { Table, Button, Space, message } from "antd";
 import { Vacation } from "../types";
 import { User } from "../types";
+import Spinner from "../Spinner";
 
 const VacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -81,7 +82,7 @@ const VacationView: React.FC = () => {
         {vacations.length > 0 ? vacations[0]?.user?.days_off : "N/A"}
       </h3>
       {loading ? (
-        <Spin />
+        <Spinner />
       ) : (
         <Table dataSource={vacations} columns={columns} rowKey="id" />
       )}
