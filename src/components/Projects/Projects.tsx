@@ -204,13 +204,20 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
               name: "description",
               label: "Description",
               rules: [
-                { required: true, message: "Please select departments!" },
+                { required: true, message: "Please edit the description!" },
+              ],
+            },
+            {
+              name: "departments",
+              label: "Departments",
+              rules: [
+                { required: true, message: "Please select the departments!" },
               ],
               options: departments.map((dept) => ({
                 value: dept.id,
                 label: dept.name,
               })),
-            },
+            }
           ]}
         />
       )}

@@ -12,6 +12,7 @@ import CreateDepartmentView from "./components/Departments/CreateDepartmentView"
 import RequestVacationView from "./components/Vacation/RequestVacationView";
 import VacationReview from "./components/Vacation/VacationReview";
 import VacationView from "./components/Vacation/VacationView";
+import DepartmentDetails from "./components/Departments/DepartmentDetails";
 import MyProjects from "./components/Employee/Projects/MyProjects";
 import MyProjectDetails from "./components/Employee/Projects/MyProjectDetails";
 import MyDepartments from "./components/Employee/Departments/MyDepartments";
@@ -37,6 +38,12 @@ const AppRoutes: React.FC = () => {
         path="/departments"
         element={
           <ProtectedRoute element={DepartmentsList} requiredRole="admin" />
+        }
+      />
+      <Route
+        path="/departments/:id"
+        element={
+          <ProtectedRoute element={DepartmentDetails} requiredRole="admin" />
         }
       />
       <Route

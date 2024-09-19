@@ -84,7 +84,8 @@ const VacationView: React.FC = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <Table dataSource={vacations} columns={columns} rowKey="id" />
+        <Table virtual scroll={{ x: 1000, y: 300 }}
+        dataSource={vacations} columns={columns} rowKey="id" />
       )}
     </div>
   );

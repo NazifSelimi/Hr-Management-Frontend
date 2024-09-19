@@ -9,6 +9,7 @@ import {
   UserAddOutlined,
 } from "@ant-design/icons";
 import Spinner from "../Spinner";
+import { useNavigate } from "react-router-dom";
 
 const DepartmentsList: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -20,7 +21,7 @@ const DepartmentsList: React.FC = () => {
   const [visibleActions, setVisibleActions] = useState<{
     [key: string]: boolean;
   }>({});
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -84,6 +85,10 @@ const DepartmentsList: React.FC = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const handleViewDepartment = (id: string) => {
+    navigate(`/departments/${id}`); 
   };
 
   const menuItems = (record: Department) => [
