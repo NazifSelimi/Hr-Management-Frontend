@@ -84,10 +84,9 @@ const MyDepartmentDetails: React.FC = () => {
           </Col>
         </Row>
         <Divider />
-        <Divider />
         <Row>
           <Col span={24}>
-            <Title level={4}>Project Colleagues</Title>
+            <Title level={4}>Department Colleagues</Title>
             <Table
               virtual
               scroll={{ x: 500, y: 500 }}

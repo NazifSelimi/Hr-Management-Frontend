@@ -17,6 +17,7 @@ import MyProjects from "./components/Employee/Projects/MyProjects";
 import MyProjectDetails from "./components/Employee/Projects/MyProjectDetails";
 import MyDepartments from "./components/Employee/Departments/MyDepartments";
 import MyDepartmentDetails from "./components/Employee/Departments/MyDepartmentDetails";
+import UserProfile from "./components/Employee/Profile/UserProfile";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -104,6 +105,12 @@ const AppRoutes: React.FC = () => {
         path="/my-project/:id"
         element={
           <ProtectedRoute element={MyProjectDetails} requiredRole="employee" />
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute element={UserProfile} requiredRole="employee" />
         }
       />
       <Route

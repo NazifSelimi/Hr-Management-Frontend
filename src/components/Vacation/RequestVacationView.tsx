@@ -9,22 +9,6 @@ const RequestVacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const fetchDepartments = async () => {
-  //     try {
-  //       const response = await axiosInstance.get<Department[]>("/departments");
-  //       setVacations(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching departments:", error);
-  //       setError("Failed to load departments.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchDepartments();
-  // }, []);
-
   const handleSubmit = async (values: {
     user_id: string;
     start_date: Date;
@@ -50,9 +34,9 @@ const RequestVacationView: React.FC = () => {
       alert(message);
     }
   };
-  if (loading) return <Spinner />;
+  // if (loading) return <Spinner />;
 
-  if (error) return <p>{error}</p>;
+  // if (error) return <p>{error}</p>;
 
   return <VacationForm onSubmit={handleSubmit} />;
 };
