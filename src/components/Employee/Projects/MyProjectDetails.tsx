@@ -57,7 +57,7 @@ const MyProjectDetails: React.FC = () => {
     },
     {
       title: "Role",
-      render: (_: any, record: User) => record.pivotProject?.role,
+      render: (_: any, record: User) => record.pivot?.role,
       key: "role",
     },
     {

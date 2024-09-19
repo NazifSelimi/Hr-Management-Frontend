@@ -14,6 +14,8 @@ import VacationReview from "./components/Vacation/VacationReview";
 import VacationView from "./components/Vacation/VacationView";
 import MyProjects from "./components/Employee/Projects/MyProjects";
 import MyProjectDetails from "./components/Employee/Projects/MyProjectDetails";
+import MyDepartments from "./components/Employee/Departments/MyDepartments";
+import MyDepartmentDetails from "./components/Employee/Departments/MyDepartmentDetails";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -74,6 +76,12 @@ const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/my-departments"
+        element={
+          <ProtectedRoute element={MyDepartments} requiredRole="employee" />
+        }
+      />
+      <Route
         path="/vacations"
         element={
           <ProtectedRoute element={VacationView} requiredRole="employee" />
@@ -89,6 +97,15 @@ const AppRoutes: React.FC = () => {
         path="/my-project/:id"
         element={
           <ProtectedRoute element={MyProjectDetails} requiredRole="employee" />
+        }
+      />
+      <Route
+        path="/my-department/:id"
+        element={
+          <ProtectedRoute
+            element={MyDepartmentDetails}
+            requiredRole="employee"
+          />
         }
       />
     </Routes>

@@ -4,7 +4,8 @@ import {
   UserOutlined,
   ApartmentOutlined,
   ProjectOutlined,
-  ThunderboltOutlined,
+  CarOutlined,
+  DeploymentUnitOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
@@ -32,9 +33,9 @@ const Sidebar: React.FC = () => {
       icon: <ProjectOutlined />,
       label: "Projects",
       children: [
-        { key: "4", label: <Link to="/projects">View Projects</Link> },
+        { key: "2", label: <Link to="/projects">View Projects</Link> },
         {
-          key: "5",
+          key: "3",
           label: <Link to="/create-projects">Create Project</Link>,
         },
       ],
@@ -44,21 +45,21 @@ const Sidebar: React.FC = () => {
       icon: <ApartmentOutlined />,
       label: "Departments",
       children: [
-        { key: "6", label: <Link to="/departments">View Departments</Link> },
+        { key: "4", label: <Link to="/departments">View Departments</Link> },
         {
-          key: "7",
+          key: "5",
           label: <Link to="/create-department">Create Department</Link>,
         },
       ],
     },
     {
       key: "sub4",
-      icon: <ThunderboltOutlined />,
+      icon: <CarOutlined />,
       label: "Vacations",
       children: [
-        { key: "8", label: <Link to="/review-vacations">Vacations</Link> },
+        { key: "6", label: <Link to="/review-vacations">Vacations</Link> },
         {
-          key: "10",
+          key: "7",
           label: <Link to="/login">Log In</Link>,
         },
       ],
@@ -68,18 +69,36 @@ const Sidebar: React.FC = () => {
   // Employee-specific menu items
   const employeeMenuItems = [
     {
-      key: "sub5",
-      icon: <ApartmentOutlined />,
-      label: "Employee sidebar elements",
+      key: "sub1",
+      icon: <ProjectOutlined />,
+      label: "Projects",
       children: [
-        { key: "8", label: <Link to="/vacations">My Vacations</Link> },
         {
-          key: "9",
+          key: "1",
+          label: <Link to="/my-projects">View my Projects</Link>,
+        },
+      ],
+    },
+    {
+      key: "sub2",
+      icon: <CarOutlined />,
+      label: "Vacations",
+      children: [
+        { key: "2", label: <Link to="/vacations">My Vacations</Link> },
+        {
+          key: "3",
           label: <Link to="/request-vacation">Request Vacation</Link>,
         },
+      ],
+    },
+    {
+      key: "sub3",
+      icon: <ApartmentOutlined />,
+      label: "Departments",
+      children: [
         {
-          key: "10",
-          label: <Link to="/my-projects">View my Projects</Link>,
+          key: "4",
+          label: <Link to="/my-departments">View my Departments</Link>,
         },
       ],
     },

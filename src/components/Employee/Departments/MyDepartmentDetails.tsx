@@ -15,7 +15,7 @@ import { Department, User } from "../../types";
 
 const { Title, Text } = Typography;
 
-const MyProjectDetails: React.FC = () => {
+const MyDepartmentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [department, setDepartment] = useState<Department | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -56,9 +56,9 @@ const MyProjectDetails: React.FC = () => {
       key: "last_name",
     },
     {
-      title: "Role",
-      render: (_: any, record: User) => record.pivotDepartment?.position,
-      key: "role",
+      title: "Position",
+      render: (_: any, record: User) => record.pivot?.position,
+      key: "position",
     },
     {
       title: "E-mail",
@@ -103,4 +103,4 @@ const MyProjectDetails: React.FC = () => {
   );
 };
 
-export default MyProjectDetails;
+export default MyDepartmentDetails;

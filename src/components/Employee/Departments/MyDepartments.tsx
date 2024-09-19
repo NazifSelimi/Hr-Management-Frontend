@@ -31,7 +31,7 @@ const MyDepartments: React.FC = () => {
   }, [error]);
 
   const handleView = (id: string) => {
-    navigate(`/my-project/${id}`);
+    navigate(`/my-department/${id}`);
   };
 
   const columns: ColumnsType<Department> = [
@@ -73,7 +73,7 @@ const MyDepartments: React.FC = () => {
 
   return (
     <div>
-      <h2>Projects</h2>
+      <h2>Departments</h2>
       {loading ? (
         <Spin />
       ) : (

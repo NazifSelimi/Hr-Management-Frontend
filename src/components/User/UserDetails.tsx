@@ -154,8 +154,7 @@ const UserDetails: React.FC = () => {
                   color="blue"
                   style={{ marginBottom: "5px", fontSize: "16px" }}
                 >
-                  {dept.name}
-                  {dept.pivot.position}
+                  {dept.name} {dept.pivot.position}
                 </Tag>
               ))
             ) : (
