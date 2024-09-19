@@ -3,6 +3,7 @@ export interface Department {
   name: string;
   pivot: DepartmentsUsers;
   users: User[];
+  projects?: Project[]
 }
 
 export interface Project {
