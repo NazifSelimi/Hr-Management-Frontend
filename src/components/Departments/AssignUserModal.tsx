@@ -6,15 +6,15 @@ import { User } from "../types";
 interface AssignUsersModalProps {
   visible: boolean;
   onClose: () => void;
-  departmentId: string;
-  onSubmit: (values: { users: { id: string; position: string }[] }) => void;
+  department: string;
+  // onSubmit: (values: { users: { id: string; position: string }[] }) => void;
 }
 
 const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   visible,
   onClose,
-  departmentId,
-  onSubmit,
+  department,
+  // onSubmit,
 }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<
@@ -58,7 +58,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   const handleAssign = async () => {
     setLoading(true); 
     try {
-      await axiosInstance.post(`/assign-users/${departmentId}`, {
+      await axiosInstance.post(`/assign-users-departments/${department}`, {
         users: selectedUsers,
       });
       message.success("Users and positions assigned successfully!");

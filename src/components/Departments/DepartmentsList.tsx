@@ -4,6 +4,7 @@ import axiosInstance from "../../api/axiosInstance";
 import { Department } from "../types";
 import AssignUsersModal from "./AssignUserModal";
 import {
+  EyeOutlined,
   EllipsisOutlined,
   DeleteOutlined,
   UserAddOutlined,
@@ -95,6 +96,14 @@ const DepartmentsList: React.FC = () => {
     {
       key: "1",
       label: (
+        <span onClick={() => handleViewDepartment(record.id)}>
+          <EyeOutlined /> View
+        </span>
+      ),
+    },
+    {
+      key: "2",
+      label: (
         <span onClick={() => handleModalOpen(record)}>
           <>
             <UserAddOutlined /> Assign Users
@@ -103,7 +112,7 @@ const DepartmentsList: React.FC = () => {
       ),
     },
     {
-      key: "2",
+      key: "3",
       label: (
         <span onClick={() => handleDeleteDepartment(record.id)}>
           {deleting === record.id ? (
@@ -158,8 +167,8 @@ const DepartmentsList: React.FC = () => {
         <AssignUsersModal
           visible={isModalVisible}
           onClose={handleModalClose}
-          departmentId={selectedDepartment.id}
-          onSubmit={handleAssignUsers}
+          department={selectedDepartment.id}
+          // onSubmit={handleAssignUsers}
         />
       )}
     </div>

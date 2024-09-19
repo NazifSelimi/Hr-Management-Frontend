@@ -1,9 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Spin, Typography, Divider, Row, Col, Table, Button, message, Dropdown, Modal, Form, Select } from "antd";
-import { EllipsisOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  Card,
+  Spin,
+  Typography,
+  Divider,
+  Row,
+  Col,
+  Table,
+  Tag,
+  message,
+  Button,
+  Modal,
+  Select,
+  Dropdown,
+} from "antd";
+import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
-import { Department, User } from "../types";
+import { Department, User } from "../types"; 
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -13,13 +27,11 @@ const DepartmentDetails: React.FC = () => {
   const [department, setDepartment] = useState<Department | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditingRole, setIsEditingRole] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [roles, setRoles] = useState<string[]>([]); // State to store roles
-  const [updatedUsers, setUpdatedUsers] = useState<{ id: string; position: string }[]>([]);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [newRole, setNewRole] = useState<string>("");
+  const [roleUpdateLoading, setRoleUpdateLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Fetch the department details
     const fetchDepartment = async () => {
       try {
         const response = await axiosInstance.get(`/departments/${id}`);
@@ -36,65 +48,58 @@ const DepartmentDetails: React.FC = () => {
     fetchDepartment();
   }, [id]);
 
-  // Fetch available roles
-  useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await axiosInstance.get(`/roles`); // Adjust endpoint based on your API
-        setRoles(response.data); // Assuming the API response returns a list of roles
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-        message.error("Failed to fetch roles.");
-      }
-    };
-
-    fetchRoles();
-  }, []); // Fetch roles once on component mount
+  const handleRoleChange = async () => {
+    if (!editingUser) return;
+    setRoleUpdateLoading(true);
+    try {
+      await axiosInstance.post(`/departments/${id}/update-user-position`, {
+        users: [
+          {
+            id: editingUser.id,
+            position: newRole,
+          },
+        ],
+      });
+      message.success("Role updated successfully.");
+      setEditingUser(null);
+      setNewRole("");
+      const response = await axiosInstance.get(`/departments/${id}`);
+      setDepartment(response.data);
+    } catch (error: any) {
+      console.error("Error updating role:", error);
+      message.error("Failed to update role.");
+    } finally {
+      setRoleUpdateLoading(false);
+    }
+  };
 
   const handleRemoveUser = async (userId: string) => {
     try {
-      await axiosInstance.delete(`/departments/${id}/remove-user`, {
-        data: { userId }
-      });
+      await axiosInstance.post(`/departments/${id}/remove-user`, { user_id: userId });
       message.success("User removed successfully.");
-      setDepartment(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          users: prev.users.filter(user => user.id !== userId)
-        };
-      });
+      // Refresh department data
+      const response = await axiosInstance.get(`/departments/${id}`);
+      setDepartment(response.data);
     } catch (error: any) {
       console.error("Error removing user:", error);
       message.error("Failed to remove user.");
     }
   };
 
-  const handleRoleUpdate = async () => {
-    try {
-      const response = await axiosInstance.put(`/departments/${id}/update-user-position`, {
-        users: updatedUsers
-      });
-      setDepartment(response.data);
-      message.success("User positions updated successfully.");
-      setIsEditingRole(false);
-    } catch (error: any) {
-      console.error("Error updating user positions:", error);
-      message.error("Failed to update user positions.");
-    }
-  };
-
   const handleEditRole = (user: User) => {
-    setSelectedUser(user);
-    setIsEditingRole(true);
+    setEditingUser(user);
+    setNewRole(user.pivot?.position || user.role);
   };
 
-  const onRoleChange = (userId: string, newRole: string) => {
-    setUpdatedUsers(prevState => {
-      const updated = prevState.filter(user => user.id !== userId);
-      return [...updated, { id: userId, position: newRole }];
-    });
-  };
+  if (loading) {
+    return <Spin size="large" />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!department) return <p>Department not found</p>;
 
   const userColumns = [
     {
@@ -114,8 +119,11 @@ const DepartmentDetails: React.FC = () => {
     },
     {
       title: "Role",
-      dataIndex: "role",
+      dataIndex: "pivot",
       key: "role",
+      render: (_: any, user: User) => (
+        <span>{user.pivot?.position || user.role}</span>
+      ),
     },
     {
       title: "Actions",
@@ -127,15 +135,15 @@ const DepartmentDetails: React.FC = () => {
               {
                 key: 'edit-role',
                 label: <><EditOutlined /> Edit Role</>,
-                onClick: () => handleEditRole(record)
+                onClick: () => handleEditRole(record),
               },
               {
                 key: 'delete',
                 label: <><DeleteOutlined /> Delete</>,
                 onClick: () => handleRemoveUser(record.id),
-                danger: true
-              }
-            ]
+                danger: true,
+              },
+            ],
           }}
           trigger={['click']}
         >
@@ -145,17 +153,9 @@ const DepartmentDetails: React.FC = () => {
             style={{ padding: '0', height: 'auto' }}
           />
         </Dropdown>
-      )
-    }
+      ),
+    },
   ];
-
-  if (loading) {
-    return <Spin size="large" />;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <>
@@ -170,7 +170,7 @@ const DepartmentDetails: React.FC = () => {
             </Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{department?.name}</Text>
+            <Text style={{ fontSize: "18px" }}>{department.name}</Text>
           </Col>
         </Row>
         <Divider />
@@ -178,7 +178,9 @@ const DepartmentDetails: React.FC = () => {
           <Col span={24}>
             <Title level={4}>Users in this Department</Title>
             <Table
-              dataSource={department?.users}
+              virtual
+              scroll={{ x: 1000, y: 300 }}
+              dataSource={department.users}
               columns={userColumns}
               rowKey="id"
               pagination={false}
@@ -187,30 +189,37 @@ const DepartmentDetails: React.FC = () => {
         </Row>
       </Card>
 
-      {/* Modal for Editing User Role */}
       <Modal
+        open={!!editingUser}
         title="Edit User Role"
-        open={isEditingRole}
-        onCancel={() => setIsEditingRole(false)}
-        footer={null}
+        onCancel={() => setEditingUser(null)}
+        onOk={handleRoleChange}
+        footer={[
+          <Button key="cancel" onClick={() => setEditingUser(null)}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={roleUpdateLoading}
+            onClick={handleRoleChange}
+          >
+            {roleUpdateLoading ? 'Updating Role...' : 'Update Role'}
+          </Button>,
+        ]}
       >
-        <Form onFinish={handleRoleUpdate}>
-          <Form.Item label="Role">
-            <Select
-              defaultValue={selectedUser?.role}
-              onChange={(value) => onRoleChange(selectedUser?.id as string, value)}
-            >
-              {roles.map(role => (
-                <Option key={role} value={role}>{role}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Update Role
-            </Button>
-          </Form.Item>
-        </Form>
+        <p>Editing role for: {editingUser?.first_name} {editingUser?.last_name}</p>
+        <Select
+          value={newRole}
+          onChange={(value) => setNewRole(value)}
+          style={{ width: "100%" }}
+        >
+          <Option value="Manager">Manager</Option>
+          <Option value="Team Lead">Team Lead</Option>
+          <Option value="Developer">Developer</Option>
+          <Option value="Designer">Designer</Option>
+          {/* Add other roles as necessary */}
+        </Select>
       </Modal>
     </>
   );
