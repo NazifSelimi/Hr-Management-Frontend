@@ -192,7 +192,7 @@ const EmployeeDetails: React.FC = () => {
       </Modal>
 
       <Title level={3}>Assigned Projects</Title>
-      <Table virtual scroll={{ x: 2000, y: 500 }}
+      <Table virtual scroll={{ x: 1000, y: 300 }}
         dataSource={employee.projects}
         columns={projectColumns}
         rowKey="id"

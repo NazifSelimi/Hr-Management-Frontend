@@ -1,19 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  Spin,
-  Typography,
-  Divider,
-  Row,
-  Col,
-  Tag,
-  Table,
-  Button,
-  message,
-  Dropdown,
-  Modal,
-} from "antd";
+import {Card, Spin, Typography, Divider, Row, Col, Tag, Table, Button, message, Dropdown, Modal} from "antd";
 import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
 import { Project, User } from "../types";
@@ -165,7 +152,7 @@ const ProjectDetails: React.FC = () => {
         <Row>
           <Col span={24}>
             <Title level={4}>Users in this Project</Title>
-            <Table virtual scroll={{ x: 2000, y: 500 }}
+            <Table virtual scroll={{ x: 1000, y: 300 }}
               dataSource={project.users}
               columns={userColumns}
               rowKey="id"

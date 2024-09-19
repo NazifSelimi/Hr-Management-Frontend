@@ -92,10 +92,14 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
       key: "2",
       label: (
         <span onClick={() => handleDelete(record.id)}>
-          <>
-            <DeleteOutlined />
-            Delete{" "}
-          </>
+          {deleting === record.id ? (
+            <Spin size="small" />
+          ) : (
+            <>
+              <DeleteOutlined />
+              Delete{" "}
+            </>
+          )}
         </span>
       ),
       danger: true,

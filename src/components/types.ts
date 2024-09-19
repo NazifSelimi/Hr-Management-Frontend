@@ -2,6 +2,8 @@ export interface Department {
   id: string;
   name: string;
   pivot: DepartmentsUsers;
+  users: User[];
+  projects?: Project[];
 }
 
 export interface Project {
@@ -30,8 +32,10 @@ export interface User {
   days_off: number;
   departments: Department[];
   projects: Project[];
-  pivot: DepartmentsUsers;
-  projectRole: ProjectsUsers;
+  pivot?: {
+    role?: string; // Assuming this comes from the ProjectUsers pivot
+    position?: string; // Assuming this comes from the DepartmentsUsers pivot
+  };
 }
 
 export interface Vacation {

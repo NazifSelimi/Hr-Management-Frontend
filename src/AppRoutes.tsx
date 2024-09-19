@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import CreateProjectView from "./components/Projects/CreateProjectView";
 import Projects from "./components/Projects/Projects";
 import Employees from "./components/Employees/Employees";
-import DepartmentsList from "./components/Departments/DepartmentsList"
+import DepartmentsList from "./components/Departments/DepartmentsList";
 import ProjectDetails from "./components/Projects/ProjetcDetails";
 import UserDetails from "./components/User/UserDetails";
 import LogIn from "./components/Auth/LogIn";
@@ -12,6 +12,11 @@ import CreateDepartmentView from "./components/Departments/CreateDepartmentView"
 import RequestVacationView from "./components/Vacation/RequestVacationView";
 import VacationReview from "./components/Vacation/VacationReview";
 import VacationView from "./components/Vacation/VacationView";
+import DepartmentDetails from "./components/Departments/DepartmentDetails";
+import MyProjects from "./components/Employee/Projects/MyProjects";
+import MyProjectDetails from "./components/Employee/Projects/MyProjectDetails";
+import MyDepartments from "./components/Employee/Departments/MyDepartments";
+import MyDepartmentDetails from "./components/Employee/Departments/MyDepartmentDetails";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -33,6 +38,12 @@ const AppRoutes: React.FC = () => {
         path="/departments"
         element={
           <ProtectedRoute element={DepartmentsList} requiredRole="admin" />
+        }
+      />
+      <Route
+        path="/departments/:id"
+        element={
+          <ProtectedRoute element={DepartmentDetails} requiredRole="admin" />
         }
       />
       <Route
@@ -66,6 +77,18 @@ const AppRoutes: React.FC = () => {
         }
       />
       <Route
+        path="/my-projects"
+        element={
+          <ProtectedRoute element={MyProjects} requiredRole="employee" />
+        }
+      />
+      <Route
+        path="/my-departments"
+        element={
+          <ProtectedRoute element={MyDepartments} requiredRole="employee" />
+        }
+      />
+      <Route
         path="/vacations"
         element={
           <ProtectedRoute element={VacationView} requiredRole="employee" />
@@ -75,6 +98,21 @@ const AppRoutes: React.FC = () => {
         path="/review-vacations"
         element={
           <ProtectedRoute element={VacationReview} requiredRole="admin" />
+        }
+      />
+      <Route
+        path="/my-project/:id"
+        element={
+          <ProtectedRoute element={MyProjectDetails} requiredRole="employee" />
+        }
+      />
+      <Route
+        path="/my-department/:id"
+        element={
+          <ProtectedRoute
+            element={MyDepartmentDetails}
+            requiredRole="employee"
+          />
         }
       />
     </Routes>

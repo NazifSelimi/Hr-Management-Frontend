@@ -6,15 +6,15 @@ import { User } from "../types";
 interface AssignUsersModalProps {
   visible: boolean;
   onClose: () => void;
-  departmentId: string;
-  onSubmit: (values: { users: { id: string; position: string }[] }) => void;
+  department: string;
+  // onSubmit: (values: { users: { id: string; position: string }[] }) => void;
 }
 
 const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   visible,
   onClose,
-  departmentId,
-  onSubmit,
+  department,
+  // onSubmit,
 }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<
@@ -58,11 +58,11 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   const handleAssign = async () => {
     setLoading(true); 
     try {
-      await axiosInstance.post(`/assign-users/${departmentId}`, {
+      await axiosInstance.post(`/assign-users-departments/${department}`, {
         users: selectedUsers,
       });
       message.success("Users and positions assigned successfully!");
-      onSubmit({ users: selectedUsers });
+      // onSubmit({ users: selectedUsers });  //* when assign users, this line displayes on console. We don't need it but its good for testing.
       onClose();
     } catch (error: any) {
       console.error("Error assigning users:", error);
