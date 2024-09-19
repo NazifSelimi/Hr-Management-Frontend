@@ -10,6 +10,10 @@ export interface Project {
   description: string;
   departments: Department[];
   users: User[];
+  projectRole: ProjectsUsers;
+}
+export interface ProjectsUsers {
+  role: string;
 }
 export interface DepartmentsUsers {
   position: string;
@@ -27,6 +31,7 @@ export interface User {
   departments: Department[];
   projects: Project[];
   pivot: DepartmentsUsers;
+  projectRole: ProjectsUsers;
 }
 
 export interface Vacation {
