@@ -14,8 +14,8 @@ import {
   Col,
   Input,
 } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-import { User, Project } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { User, Project } from "../../types";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -192,7 +192,9 @@ const EmployeeDetails: React.FC = () => {
       </Modal>
 
       <Title level={3}>Assigned Projects</Title>
-      <Table virtual scroll={{ x: 1000, y: 300 }}
+      <Table
+        virtual
+        scroll={{ x: 1000, y: 300 }}
         dataSource={employee.projects}
         columns={projectColumns}
         rowKey="id"

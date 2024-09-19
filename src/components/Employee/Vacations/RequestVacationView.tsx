@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../../api/axiosInstance";
-import { Department } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { Department } from "../../types";
 import { Spin, message } from "antd";
 import VacationForm from "./VacationForm";
-import Spinner from "../Spinner";
+import Spinner from "../../Spinner";
 
 const RequestVacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Select, Button, message, Spin, Input, Tag } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-import { Department, Project } from "../types"; // Import Project type similarly to Department
+import axiosInstance from "../../../api/axiosInstance";
+import { Department, Project } from "../../types"; // Import Project type similarly to Department
 
 interface AssignEntityModalProps {
   visible: boolean;

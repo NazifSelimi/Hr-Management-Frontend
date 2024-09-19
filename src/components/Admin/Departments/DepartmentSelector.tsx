@@ -1,6 +1,6 @@
 import React from "react";
 import { Select } from "antd";
-import { Department } from "../types";
+import { Department } from "../../types";
 
 interface DepartmentSelectorProps {
   departments: Department[];

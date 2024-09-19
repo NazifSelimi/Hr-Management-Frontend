@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Select, message, Spin } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-import { Department } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { Department } from "../../types";
 import { useNavigate } from "react-router-dom";
-import Spinner from "../Spinner";
+import Spinner from "../../Spinner";
 
 const { Option } = Select;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
 import DepartmentSelector from "../Departments/DepartmentSelector";
-import { Department } from "../types";
+import { Department } from "../../types";
 
 interface CreateProjectFormProps {
   departments: Department[];
