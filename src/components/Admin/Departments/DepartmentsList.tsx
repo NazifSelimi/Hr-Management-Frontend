@@ -74,12 +74,6 @@ const DepartmentsList: React.FC = () => {
     setSelectedDepartment(null);
   };
 
-  const handleAssignUsers = (values: {
-    users: { id: string; position: string }[];
-  }) => {
-    console.log("Users assigned:", values);
-    handleModalClose();
-  };
 
   const toggleActionsVisibility = (id: string) => {
     setVisibleActions((prev) => ({

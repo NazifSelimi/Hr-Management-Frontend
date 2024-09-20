@@ -15,19 +15,9 @@ import {
   Select,
   Dropdown,
 } from "antd";
-<<<<<<< HEAD:src/components/Departments/DepartmentDetails.tsx
 import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
-import axiosInstance from "../../api/axiosInstance";
-import { Department, User } from "../types";
-=======
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EllipsisOutlined,
-} from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import { Department, User } from "../../types";
->>>>>>> f1c0fc4f69aff1e3cee6789402380b8453eb329d:src/components/Admin/Departments/DepartmentDetails.tsx
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -228,15 +218,8 @@ const DepartmentDetails: React.FC = () => {
           </Button>,
         ]}
       >
-<<<<<<< HEAD:src/components/Departments/DepartmentDetails.tsx
         <p>Editing role for: {editingUser?.first_name} {editingUser?.last_name}</p>
         <Input
-=======
-        <p>
-          Editing role for: {editingUser?.first_name} {editingUser?.last_name}
-        </p>
-        <Select
->>>>>>> f1c0fc4f69aff1e3cee6789402380b8453eb329d:src/components/Admin/Departments/DepartmentDetails.tsx
           value={newRole}
           onChange={(e) => setNewRole(e.target.value)}
           placeholder="Enter a custom role"
