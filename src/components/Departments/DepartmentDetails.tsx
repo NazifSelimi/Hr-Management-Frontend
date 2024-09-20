@@ -8,7 +8,7 @@ import {
   Row,
   Col,
   Table,
-  Tag,
+  Input,
   message,
   Button,
   Modal,
@@ -17,7 +17,7 @@ import {
 } from "antd";
 import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
-import { Department, User } from "../types"; 
+import { Department, User } from "../types";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -209,18 +209,14 @@ const DepartmentDetails: React.FC = () => {
         ]}
       >
         <p>Editing role for: {editingUser?.first_name} {editingUser?.last_name}</p>
-        <Select
+        <Input
           value={newRole}
-          onChange={(value) => setNewRole(value)}
+          onChange={(e) => setNewRole(e.target.value)}
+          placeholder="Enter a custom role"
           style={{ width: "100%" }}
-        >
-          <Option value="Manager">Manager</Option>
-          <Option value="Team Lead">Team Lead</Option>
-          <Option value="Developer">Developer</Option>
-          <Option value="Designer">Designer</Option>
-          {/* Add other roles as necessary */}
-        </Select>
+        />
       </Modal>
+
     </>
   );
 };
