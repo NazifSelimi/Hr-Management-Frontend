@@ -1,15 +1,16 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Table, Button, message, Dropdown, Modal } from "antd";
 import { ColumnsType } from "antd/es/table";
 import axiosInstance from "../../../api/axiosInstance";
-import EditModal from "../../Modal/EditModal";
-import { Department, Project } from "../../types";
+import AssignUsersModal from "../Departments/AssignUserModal";
+import { Project } from "../../types";
 import { useNavigate } from "react-router-dom";
 import {
   EllipsisOutlined,
   EditOutlined,
   EyeOutlined,
   DeleteOutlined,
+  UserAddOutlined
 } from "@ant-design/icons";
 import Spinner from "../../Spinner";
 
@@ -18,39 +19,31 @@ interface ProjectsProps {
   onClose?: () => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
+const Projects: React.FC<ProjectsProps> = ({ data, }) => {
   const [projects, setProjects] = useState<Project[]>(data || []);
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState<boolean>(!data?.length);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState<boolean>(!data);
+  const [isAssignUsersModalVisible, setAssignUsersModalVisible] =
+    useState<boolean>(false);
   const navigate = useNavigate();
 
-  const fetchData = useCallback(
-    async (
-      endpoint: string,
-      setter: React.Dispatch<React.SetStateAction<any>>
-    ) => {
-      try {
-        const { data } = await axiosInstance.get(endpoint);
-        setter(data);
-      } catch (error: any) {
-        console.error(`Error fetching ${endpoint}:`, error);
-        message.error(`Failed to fetch ${endpoint}: ${error.message}`);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (!data) {
-      fetchData("/projects", setProjects);
-      fetchData("/departments", setDepartments);
-    } else {
+  const fetchProjects = useCallback(async () => {
+    try {
+      const { data } = await axiosInstance.get("/projects");
+      setProjects(data);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      message.error("Failed to load projects.");
+    } finally {
       setLoading(false);
     }
-  }, [data, fetchData]);
+  }, []);
+
+  useEffect(() => {
+    if (!data?.length) {
+      fetchProjects();
+    }
+  }, [fetchProjects, data]);
 
   const handleDelete = async (id: string) => {
     Modal.confirm({
@@ -70,30 +63,13 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
     });
   };
 
-  const handleEditSubmit = async (values: Record<string, any>) => {
-    if (!selectedProject) return;
-
-    try {
-      await axiosInstance.put(`/projects/${selectedProject.id}`, {
-        name: values.name,
-        description: values.description,
-        department_ids: values.departments,
-      });
-
-      message.success("Project updated successfully.");
-      handleCancel();
-      fetchData("/projects", setProjects);
-    } catch (error: any) {
-      console.error("Error updating project:", error);
-      message.error("Failed to update project.");
-    }
-  };
-
-  const handleCancel = () => setSelectedProject(null);
-
   const handleView = (id: string) => {
     navigate(`/project/${id}`);
-    if (onClose) onClose();
+  };
+
+  const handleAssignUsers = (project: Project) => {
+    setSelectedProject(project);
+    setAssignUsersModalVisible(true);
   };
 
   const columns: ColumnsType<Project> = [
@@ -112,8 +88,7 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       key: "departments",
       render: (_, record) => (
         <span>
-          {record.departments?.map((dept) => dept.name).join(", ") ||
-            "No departments"}
+          {record.departments?.map((dept) => dept.name).join(", ") || "No departments"}
         </span>
       ),
     },
@@ -141,6 +116,15 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
                   </>
                 ),
                 onClick: () => setSelectedProject(record),
+              },
+              {
+                key: "assignUsers",
+                label: (
+                  <>
+                    <UserAddOutlined /> Assign Users
+                  </>
+                ),
+                onClick: () => handleAssignUsers(record),
               },
               {
                 key: "delete",
@@ -172,53 +156,13 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       {loading ? (
         <Spinner />
       ) : (
-        <Table
-          virtual
-          scroll={{ x: 2000, y: 500 }}
-          dataSource={projects}
-          columns={columns}
-          rowKey="id"
-        />
+        <Table dataSource={projects} columns={columns} rowKey="id" />
       )}
-      {selectedProject && (
-        <EditModal
-          open={!!selectedProject}
-          title="Edit Project"
-          initialValues={{
-            name: selectedProject.name,
-            description: selectedProject.description,
-            departments:
-              selectedProject.departments?.map((dept) => dept.id) || [],
-          }}
-          onCancel={handleCancel}
-          onSubmit={handleEditSubmit}
-          fields={[
-            {
-              name: "name",
-              label: "Name",
-              rules: [
-                { required: true, message: "Please input the project name!" },
-              ],
-            },
-            {
-              name: "description",
-              label: "Description",
-              rules: [
-                { required: true, message: "Please edit the description!" },
-              ],
-            },
-            {
-              name: "departments",
-              label: "Departments",
-              rules: [
-                { required: true, message: "Please select the departments!" },
-              ],
-              options: departments.map((dept) => ({
-                value: dept.id,
-                label: dept.name,
-              })),
-            },
-          ]}
+      {isAssignUsersModalVisible && (
+        <AssignUsersModal
+          visible={isAssignUsersModalVisible}
+          project={selectedProject?.id}
+          onClose={() => setAssignUsersModalVisible(false)}
         />
       )}
     </div>

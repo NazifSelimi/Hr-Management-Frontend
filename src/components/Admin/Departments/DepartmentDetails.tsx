@@ -18,6 +18,7 @@ import {
 import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import { Department, User } from "../../types";
+import Spinner from "../../Spinner";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -94,7 +95,7 @@ const DepartmentDetails: React.FC = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Spinner />;
   }
 
   if (error) {
