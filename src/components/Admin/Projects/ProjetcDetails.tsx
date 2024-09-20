@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {Card, Spin, Typography, Divider, Row, Col, Tag, Table, Button, message, Dropdown, Modal} from "antd";
+import {
+  Card,
+  Spin,
+  Typography,
+  Divider,
+  Row,
+  Col,
+  Tag,
+  Table,
+  Button,
+  message,
+  Dropdown,
+  Modal,
+} from "antd";
 import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
-import axiosInstance from "../../api/axiosInstance";
-import { Project, User } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { Project, User } from "../../types";
 
 const { Title, Text } = Typography;
 
@@ -44,13 +57,16 @@ const ProjectDetails: React.FC = () => {
       onOk: async () => {
         try {
           await axiosInstance.delete(`/projects/${id}/users/${userId}`);
-          setProject(prevProject => ({
+          setProject((prevProject) => ({
             ...prevProject!,
-            users: prevProject!.users.filter(user => user.id !== userId),
+            users: prevProject!.users.filter((user) => user.id !== userId),
           }));
           message.success("User removed from project successfully.");
         } catch (error: any) {
-          console.error("Error removing user from project:", error?.response || error);
+          console.error(
+            "Error removing user from project:",
+            error?.response || error
+          );
           message.error("Failed to remove user from project.");
         }
       },
@@ -78,7 +94,7 @@ const ProjectDetails: React.FC = () => {
       key: "departments",
       render: (_: any, record: User) => (
         <span>
-          {record.departments.map(dept => (
+          {record.departments.map((dept) => (
             <Tag key={dept.id} color="blue" style={{ marginBottom: "5px" }}>
               {dept.name}
             </Tag>
@@ -93,15 +109,24 @@ const ProjectDetails: React.FC = () => {
         <Dropdown
           menu={{
             items: [
-              { key: 'delete', label: <><DeleteOutlined/> Delete </>, onClick: () => handleRemoveUser(record.id), danger: true },
+              {
+                key: "delete",
+                label: (
+                  <>
+                    <DeleteOutlined /> Delete{" "}
+                  </>
+                ),
+                onClick: () => handleRemoveUser(record.id),
+                danger: true,
+              },
             ],
           }}
-          trigger={['click']}
+          trigger={["click"]}
         >
           <Button
             type="link"
-            icon={<EllipsisOutlined style={{ fontSize: '35px' }} />}
-            style={{ padding: '0', height: 'auto' }}
+            icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+            style={{ padding: "0", height: "auto" }}
           />
         </Dropdown>
       ),
@@ -144,7 +169,7 @@ const ProjectDetails: React.FC = () => {
           </Col>
           <Col span={18}>
             <Text style={{ fontSize: "18px" }}>
-              {project.departments.map(dept => dept.name).join(", ")}
+              {project.departments.map((dept) => dept.name).join(", ")}
             </Text>
           </Col>
         </Row>
@@ -152,7 +177,9 @@ const ProjectDetails: React.FC = () => {
         <Row>
           <Col span={24}>
             <Title level={4}>Users in this Project</Title>
-            <Table virtual scroll={{ x: 1000, y: 300 }}
+            <Table
+              virtual
+              scroll={{ x: 1000, y: 300 }}
               dataSource={project.users}
               columns={userColumns}
               rowKey="id"

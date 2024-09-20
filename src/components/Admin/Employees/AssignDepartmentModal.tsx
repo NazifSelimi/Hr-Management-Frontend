@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Select, Input, Button, Form } from "antd";
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance from "../../../api/axiosInstance";
 
 interface Department {
   id: number;

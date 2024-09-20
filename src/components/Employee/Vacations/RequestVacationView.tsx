@@ -1,29 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../../api/axiosInstance";
-import { Department } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { Department } from "../../types";
 import { Spin, message } from "antd";
 import VacationForm from "./VacationForm";
-import Spinner from "../Spinner";
+import Spinner from "../../Spinner";
 
 const RequestVacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   const fetchDepartments = async () => {
-  //     try {
-  //       const response = await axiosInstance.get<Department[]>("/departments");
-  //       setVacations(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching departments:", error);
-  //       setError("Failed to load departments.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchDepartments();
-  // }, []);
 
   const handleSubmit = async (values: {
     user_id: string;
@@ -50,9 +34,9 @@ const RequestVacationView: React.FC = () => {
       alert(message);
     }
   };
-  if (loading) return <Spinner />;
+  // if (loading) return <Spinner />;
 
-  if (error) return <p>{error}</p>;
+  // if (error) return <p>{error}</p>;
 
   return <VacationForm onSubmit={handleSubmit} />;
 };

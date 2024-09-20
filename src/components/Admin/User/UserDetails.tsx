@@ -14,9 +14,9 @@ import {
   Modal,
 } from "antd";
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
-import axiosInstance from "../../api/axiosInstance";
-import { User } from "../types";
-import Spinner from "../Spinner";
+import axiosInstance from "../../../api/axiosInstance";
+import { User } from "../../types";
+import Spinner from "../../Spinner";
 import AssignEntityModal from "./AsignDepartmentsModal"; // Reuse AssignEntityModal
 
 const { Title, Text } = Typography;

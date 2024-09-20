@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchDepartments } from "../../../redux/departmentsSlice";
 import { RootState, AppDispatch } from "../../../redux/store";
 import { Department } from "../../types";
+import Spinner from "../../Spinner";
 
 const MyDepartments: React.FC = () => {
   const navigate = useNavigate();
@@ -75,11 +76,11 @@ const MyDepartments: React.FC = () => {
     <div>
       <h2>Departments</h2>
       {loading ? (
-        <Spin />
+        <Spinner />
       ) : (
         <Table
           virtual
-          scroll={{ x: 1000, y: 500 }}
+          scroll={{ x: 500, y: 500 }}
           dataSource={departments}
           columns={columns}
           rowKey="id"

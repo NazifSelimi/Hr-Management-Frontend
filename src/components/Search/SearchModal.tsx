@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Modal, Select, Input, Spin, message } from "antd";
 import axiosInstance from "../../api/axiosInstance";
-import Employees from "../Employees/Employees";
-import Projects from "../Projects/Projects";
+import Employees from "../Admin/Employees/Employees";
+import Projects from "../Admin/Projects/Projects";
 
 // TODO APPLY THE SEARCH IN THE DEPARTMENTS ALSO...
 

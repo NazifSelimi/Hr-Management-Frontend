@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Select, Button, message, Spin, Input } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-import { User } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { User } from "../../types";
 
 interface AssignUsersModalProps {
   visible: boolean;
@@ -20,20 +20,20 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   const [selectedUsers, setSelectedUsers] = useState<
     { id: string; position: string }[]
   >([]);
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (visible) {
       const fetchUsers = async () => {
         try {
-          setLoading(true); 
+          setLoading(true);
           const response = await axiosInstance.get("/users");
           setUsers(response.data);
         } catch (error: any) {
           console.error("Error fetching users:", error);
           message.error("Failed to load users.");
         } finally {
-          setLoading(false); 
+          setLoading(false);
         }
       };
 
@@ -56,7 +56,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
   };
 
   const handleAssign = async () => {
-    setLoading(true); 
+    setLoading(true);
     try {
       await axiosInstance.post(`/assign-users-departments/${department}`, {
         users: selectedUsers,
@@ -68,7 +68,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       console.error("Error assigning users:", error);
       message.error("Failed to assign users.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -92,7 +92,14 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
       ]}
     >
       {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+          }}
+        >
           <Spin size="large" />
         </div>
       ) : (

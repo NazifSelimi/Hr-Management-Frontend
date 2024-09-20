@@ -1,22 +1,23 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import CreateProjectView from "./components/Projects/CreateProjectView";
-import Projects from "./components/Projects/Projects";
-import Employees from "./components/Employees/Employees";
-import DepartmentsList from "./components/Departments/DepartmentsList";
-import ProjectDetails from "./components/Projects/ProjetcDetails";
-import UserDetails from "./components/User/UserDetails";
+import CreateProjectView from "./components/Admin/Projects/CreateProjectView";
+import Projects from "./components/Admin/Projects/Projects";
+import Employees from "./components/Admin/Employees/Employees";
+import DepartmentsList from "./components/Admin/Departments/DepartmentsList";
+import ProjectDetails from "./components/Admin/Projects/ProjetcDetails";
+import UserDetails from "./components/Admin/User/UserDetails";
 import LogIn from "./components/Auth/LogIn";
 import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute component
-import CreateDepartmentView from "./components/Departments/CreateDepartmentView";
-import RequestVacationView from "./components/Vacation/RequestVacationView";
-import VacationReview from "./components/Vacation/VacationReview";
-import VacationView from "./components/Vacation/VacationView";
-import DepartmentDetails from "./components/Departments/DepartmentDetails";
+import CreateDepartmentView from "./components/Admin/Departments/CreateDepartmentView";
+import RequestVacationView from "./components/Employee/Vacations/RequestVacationView";
+import VacationReview from "./components/Admin/Vacation/VacationReview";
+import VacationView from "./components/Admin/Vacation/VacationView";
+import DepartmentDetails from "./components/Admin/Departments/DepartmentDetails";
 import MyProjects from "./components/Employee/Projects/MyProjects";
 import MyProjectDetails from "./components/Employee/Projects/MyProjectDetails";
 import MyDepartments from "./components/Employee/Departments/MyDepartments";
 import MyDepartmentDetails from "./components/Employee/Departments/MyDepartmentDetails";
+import UserProfile from "./components/Employee/Profile/UserProfile";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -104,6 +105,12 @@ const AppRoutes: React.FC = () => {
         path="/my-project/:id"
         element={
           <ProtectedRoute element={MyProjectDetails} requiredRole="employee" />
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute element={UserProfile} requiredRole="employee" />
         }
       />
       <Route

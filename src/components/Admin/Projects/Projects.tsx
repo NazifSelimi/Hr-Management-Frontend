@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Table, Button, message, Dropdown, Modal } from "antd";
 import { ColumnsType } from "antd/es/table";
-import axiosInstance from "../../api/axiosInstance";
-import EditModal from "../Modal/EditModal";
-import { Department, Project } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import EditModal from "../../Modal/EditModal";
+import { Department, Project } from "../../types";
 import { useNavigate } from "react-router-dom";
 import {
   EllipsisOutlined,
@@ -11,7 +11,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import Spinner from "../Spinner";
+import Spinner from "../../Spinner";
 
 interface ProjectsProps {
   data?: Project[];
@@ -217,7 +217,7 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
                 value: dept.id,
                 label: dept.name,
               })),
-            }
+            },
           ]}
         />
       )}

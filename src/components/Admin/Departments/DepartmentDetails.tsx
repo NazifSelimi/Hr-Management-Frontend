@@ -15,9 +15,19 @@ import {
   Select,
   Dropdown,
 } from "antd";
+<<<<<<< HEAD:src/components/Departments/DepartmentDetails.tsx
 import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
 import axiosInstance from "../../api/axiosInstance";
 import { Department, User } from "../types";
+=======
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EllipsisOutlined,
+} from "@ant-design/icons";
+import axiosInstance from "../../../api/axiosInstance";
+import { Department, User } from "../../types";
+>>>>>>> f1c0fc4f69aff1e3cee6789402380b8453eb329d:src/components/Admin/Departments/DepartmentDetails.tsx
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -75,7 +85,9 @@ const DepartmentDetails: React.FC = () => {
 
   const handleRemoveUser = async (userId: string) => {
     try {
-      await axiosInstance.post(`/departments/${id}/remove-user`, { user_id: userId });
+      await axiosInstance.post(`/departments/${id}/remove-user`, {
+        user_id: userId,
+      });
       message.success("User removed successfully.");
       // Refresh department data
       const response = await axiosInstance.get(`/departments/${id}`);
@@ -133,24 +145,32 @@ const DepartmentDetails: React.FC = () => {
           menu={{
             items: [
               {
-                key: 'edit-role',
-                label: <><EditOutlined /> Edit Role</>,
+                key: "edit-role",
+                label: (
+                  <>
+                    <EditOutlined /> Edit Role
+                  </>
+                ),
                 onClick: () => handleEditRole(record),
               },
               {
-                key: 'delete',
-                label: <><DeleteOutlined /> Delete</>,
+                key: "delete",
+                label: (
+                  <>
+                    <DeleteOutlined /> Delete
+                  </>
+                ),
                 onClick: () => handleRemoveUser(record.id),
                 danger: true,
               },
             ],
           }}
-          trigger={['click']}
+          trigger={["click"]}
         >
           <Button
             type="link"
-            icon={<EllipsisOutlined style={{ fontSize: '35px' }} />}
-            style={{ padding: '0', height: 'auto' }}
+            icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+            style={{ padding: "0", height: "auto" }}
           />
         </Dropdown>
       ),
@@ -204,12 +224,19 @@ const DepartmentDetails: React.FC = () => {
             loading={roleUpdateLoading}
             onClick={handleRoleChange}
           >
-            {roleUpdateLoading ? 'Updating Role...' : 'Update Role'}
+            {roleUpdateLoading ? "Updating Role..." : "Update Role"}
           </Button>,
         ]}
       >
+<<<<<<< HEAD:src/components/Departments/DepartmentDetails.tsx
         <p>Editing role for: {editingUser?.first_name} {editingUser?.last_name}</p>
         <Input
+=======
+        <p>
+          Editing role for: {editingUser?.first_name} {editingUser?.last_name}
+        </p>
+        <Select
+>>>>>>> f1c0fc4f69aff1e3cee6789402380b8453eb329d:src/components/Admin/Departments/DepartmentDetails.tsx
           value={newRole}
           onChange={(e) => setNewRole(e.target.value)}
           placeholder="Enter a custom role"

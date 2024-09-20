@@ -102,6 +102,17 @@ const Sidebar: React.FC = () => {
         },
       ],
     },
+    {
+      key: "sub4",
+      icon: <UserOutlined />,
+      label: "Profile",
+      children: [
+        {
+          key: "5",
+          label: <Link to="/profile">My Profile</Link>,
+        },
+      ],
+    },
   ];
 
   // Render different menu items based on user role

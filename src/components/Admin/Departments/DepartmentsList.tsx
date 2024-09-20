@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
-import axiosInstance from "../../api/axiosInstance";
-import { Department } from "../types";
+import axiosInstance from "../../../api/axiosInstance";
+import { Department } from "../../types";
 import AssignUsersModal from "./AssignUserModal";
 import {
   EyeOutlined,
@@ -9,7 +9,7 @@ import {
   DeleteOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import Spinner from "../Spinner";
+import Spinner from "../../Spinner";
 import { useNavigate } from "react-router-dom";
 
 const DepartmentsList: React.FC = () => {
@@ -89,7 +89,7 @@ const DepartmentsList: React.FC = () => {
   };
 
   const handleViewDepartment = (id: string) => {
-    navigate(`/departments/${id}`); 
+    navigate(`/departments/${id}`);
   };
 
   const menuItems = (record: Department) => [

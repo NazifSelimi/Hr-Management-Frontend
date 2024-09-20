@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance from "../../../api/axiosInstance";
 import { ColumnsType } from "antd/es/table";
 import { Table, Button, Space, message } from "antd";
-import { Vacation } from "../types";
-import { User } from "../types";
-import Spinner from "../Spinner";
+import { Vacation } from "../../types";
+import { User } from "../../types";
+import Spinner from "../../Spinner";
 
-const VacationReview: React.FC = () => {
+const VacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [vacations, setVacations] = useState<Vacation[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ const VacationReview: React.FC = () => {
   useEffect(() => {
     const fetchVacations = async () => {
       try {
-        await fetchData("/vacation", setVacations);
+        await fetchData("/employee-vacation", setVacations);
       } catch (error: any) {
         console.error("Error fetching vacations:", error);
         setError(error.response.data.message);
@@ -42,32 +42,11 @@ const VacationReview: React.FC = () => {
     };
 
     fetchVacations();
-  }, [fetchData]);
-
-  const handleReview = async (status: string, record: Vacation) => {
-    try {
-      const response = await axiosInstance.patch(`/vacation/${record.id}`, {
-        status: status,
-      });
-
-      message.success(response.data.message);
-      fetchData("/vacation", setVacations);
-    } catch (error: any) {
-      console.error("Error updating project:", error);
-      message.error("Failed to update project.");
-    }
-  };
+  }, []);
 
   if (error) return <p>{error}</p>;
 
   const columns: ColumnsType<Vacation> = [
-    {
-      title: "Employee",
-      dataIndex: "user",
-      key: "user",
-      render: (employee: User) =>
-        employee.first_name + " " + employee.last_name,
-    },
     {
       title: "Start Date",
       dataIndex: "formatted_start_date",
@@ -93,39 +72,28 @@ const VacationReview: React.FC = () => {
       dataIndex: "status",
       key: "status",
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
-          <Button
-            onClick={() => handleReview("accept", record)}
-            disabled={record.status !== "pending"}
-          >
-            Accept
-          </Button>
-          <Button
-            onClick={() => handleReview("reject", record)}
-            disabled={record.status !== "pending"}
-          >
-            Reject
-          </Button>
-        </Space>
-      ),
-    },
   ];
 
   return (
     <div>
       <h2>Vacations</h2>
+      <h3>
+        Available days off:{" "}
+        {vacations.length > 0 ? vacations[0]?.user?.days_off : "N/A"}
+      </h3>
       {loading ? (
         <Spinner />
       ) : (
-        <Table virtual scroll={{ x: 1000, y: 300 }} 
-        dataSource={vacations} columns={columns} rowKey="id" />
+        <Table
+          virtual
+          scroll={{ x: 1000, y: 300 }}
+          dataSource={vacations}
+          columns={columns}
+          rowKey="id"
+        />
       )}
     </div>
   );
 };
 
-export default VacationReview;
+export default VacationView;

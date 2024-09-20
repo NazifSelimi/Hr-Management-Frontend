@@ -5,10 +5,10 @@ import {
   DeleteOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance from "../../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import type { User } from "../types";
-import Spinner from "../Spinner";
+import type { User } from "../../types";
+import Spinner from "../../Spinner";
 
 interface EmployeesProps {
   data?: User[];
