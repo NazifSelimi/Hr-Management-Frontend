@@ -8,20 +8,17 @@ import {
   Row,
   Col,
   Table,
-  Tag,
+  Input,
   message,
   Button,
   Modal,
   Select,
   Dropdown,
 } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EllipsisOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import { Department, User } from "../../types";
+import Spinner from "../../Spinner";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -98,7 +95,7 @@ const DepartmentDetails: React.FC = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Spinner />;
   }
 
   if (error) {
@@ -222,21 +219,15 @@ const DepartmentDetails: React.FC = () => {
           </Button>,
         ]}
       >
-        <p>
-          Editing role for: {editingUser?.first_name} {editingUser?.last_name}
-        </p>
-        <Select
+        <p>Editing role for: {editingUser?.first_name} {editingUser?.last_name}</p>
+        <Input
           value={newRole}
-          onChange={(value) => setNewRole(value)}
+          onChange={(e) => setNewRole(e.target.value)}
+          placeholder="Enter a custom role"
           style={{ width: "100%" }}
-        >
-          <Option value="Manager">Manager</Option>
-          <Option value="Team Lead">Team Lead</Option>
-          <Option value="Developer">Developer</Option>
-          <Option value="Designer">Designer</Option>
-          {/* Add other roles as necessary */}
-        </Select>
+        />
       </Modal>
+
     </>
   );
 };
