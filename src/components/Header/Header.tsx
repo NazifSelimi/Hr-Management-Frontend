@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { Layout, Menu, Button } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Layout, Menu, Button, Dropdown } from "antd";
 import { useAuth } from "../../Context/AuthContext";
 import { useNavigate } from "react-router-dom"; // Move navigation to the component level
-import { SearchOutlined } from "@ant-design/icons";
+import {
+  SearchOutlined,
+  LogoutOutlined,
+  UserOutlined,
+  RobotOutlined,
+} from "@ant-design/icons";
 import SearchModal from "../Search/SearchModal";
 
 const { Header } = Layout;
@@ -45,19 +49,39 @@ const HeaderComponent: React.FC = () => {
       {/* <Menu mode="horizontal" style={{ lineHeight: "64px" }} /> */}
       <div style={{ paddingRight: "24px" }}>
         {isLoggedIn ? (
-          <>
-            <Button type="primary" onClick={handleLogout}>
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "profile",
+                  label: (
+                    <a href="/profile">
+                      <RobotOutlined /> Profile
+                    </a>
+                  ),
+                },
+                {
+                  key: "logout",
+                  label: (
+                    <span onClick={handleLogout}>
+                      <LogoutOutlined /> Logout
+                    </span>
+                  ),
+                },
+              ],
+            }}
+            placement="bottomRight"
+          >
+            <Button type="primary">
               <UserOutlined />
-              Logout
+              Account
             </Button>
-          </>
+          </Dropdown>
         ) : (
-          <>
-            <Button type="primary" href="/login">
-              <UserOutlined />
-              Login
-            </Button>
-          </>
+          <Button type="primary" href="/login">
+            <UserOutlined />
+            Login
+          </Button>
         )}
       </div>
     </Header>

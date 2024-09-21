@@ -107,12 +107,7 @@ const AppRoutes: React.FC = () => {
           <ProtectedRoute element={MyProjectDetails} requiredRole="employee" />
         }
       />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute element={UserProfile} requiredRole="employee" />
-        }
-      />
+      <Route path="/profile" element={<UserProfile />} />
       <Route
         path="/my-department/:id"
         element={

@@ -55,14 +55,7 @@ const Sidebar: React.FC = () => {
     {
       key: "sub4",
       icon: <CarOutlined />,
-      label: "Vacations",
-      children: [
-        { key: "6", label: <Link to="/review-vacations">Vacations</Link> },
-        {
-          key: "7",
-          label: <Link to="/login">Log In</Link>,
-        },
-      ],
+      label: <Link to="/review-vacations">Review Vacations</Link>,
     },
   ];
 
@@ -71,13 +64,7 @@ const Sidebar: React.FC = () => {
     {
       key: "sub1",
       icon: <ProjectOutlined />,
-      label: "Projects",
-      children: [
-        {
-          key: "1",
-          label: <Link to="/my-projects">View my Projects</Link>,
-        },
-      ],
+      label: <Link to="/my-projects">My Projects</Link>,
     },
     {
       key: "sub2",
@@ -94,24 +81,12 @@ const Sidebar: React.FC = () => {
     {
       key: "sub3",
       icon: <ApartmentOutlined />,
-      label: "Departments",
-      children: [
-        {
-          key: "4",
-          label: <Link to="/my-departments">View my Departments</Link>,
-        },
-      ],
+      label: <Link to="/my-departments">My Departments</Link>,
     },
     {
       key: "sub4",
       icon: <UserOutlined />,
-      label: "Profile",
-      children: [
-        {
-          key: "5",
-          label: <Link to="/profile">My Profile</Link>,
-        },
-      ],
+      label: <Link to="/profile">My Profile</Link>,
     },
   ];
 
