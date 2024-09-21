@@ -3,6 +3,7 @@ import { Button, Input, Form, message } from "antd";
 import Spinner from "../../Spinner";
 import axiosInstance from "../../../api/axiosInstance";
 import { User } from "../../types";
+import UserProfileForm from "./UserProfileForm";
 
 const UserProfile: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -60,41 +61,7 @@ const UserProfile: React.FC = () => {
       </p>
 
       {editing ? (
-        <Form
-          initialValues={user || undefined}
-          onFinish={handleSave}
-          layout="vertical"
-        >
-          <Form.Item label="First Name" name="first_name">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Last Name" name="last_name">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Email" name="email">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Phone" name="phone">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Address" name="address">
-            <Input />
-          </Form.Item>
-          <Form.Item label="City" name="city">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Days Off" name="days_off">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item label="Role" name="role">
-            <Input disabled />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Save Changes
-            </Button>
-          </Form.Item>
-        </Form>
+        <UserProfileForm onSubmit={handleSave} user={user} />
       ) : (
         <Button type="primary" onClick={() => setEditing(true)}>
           Edit Profile
