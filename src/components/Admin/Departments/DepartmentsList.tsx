@@ -133,9 +133,9 @@ const DepartmentsList: React.FC = () => {
     <div>
       <h2>Departments</h2>
       {loading ? ( // Check if loading is true, then display the spinner
-        <Spinner /> 
+        <Spinner />
       ) : (
-        <Table 
+        <Table
           virtual
           scroll={{ x: 2000, y: 500 }}
           dataSource={departments}

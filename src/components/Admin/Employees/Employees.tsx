@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
 import {
   EllipsisOutlined,
@@ -42,7 +42,7 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
     }
   }, [data]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     Modal.confirm({
       title: "Are you sure you want to delete this employee?",
       content: "This action cannot be undone.",
@@ -63,49 +63,54 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
         }
       },
     });
-  };
+  }, []);
 
-  const handleView = (id: string) => {
-    navigate(`/users/${id}`);
-    if (onClose) onClose();
-  };
+  const handleView = useCallback(
+    (id: string) => {
+      navigate(`/users/${id}`);
+      if (onClose) onClose();
+    },
+    [navigate, onClose]
+  );
 
-  const toggleActionsVisibility = (id: string) => {
+  const toggleActionsVisibility = useCallback((id: string) => {
     setVisibleActions((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
-  };
+  }, []);
 
-  const menuItems = (record: User) => [
-    {
-      key: "1",
-      label: (
-        <span onClick={() => handleView(record.id)}>
-          <>
-            <EyeOutlined /> View{" "}
-          </>
-        </span>
-      ),
-    },
-    {
-      key: "2",
-      label: (
-        <span onClick={() => handleDelete(record.id)}>
-          {deleting === record.id ? (
-            <Spin size="small" />
-          ) : (
-            <>
-              <DeleteOutlined />
-              Delete{" "}
-            </>
-          )}
-        </span>
-      ),
-      danger: true,
-      disabled: deleting === record.id,
-    },
-  ];
+  const menuItems = useMemo(
+    () => (record: User) =>
+      [
+        {
+          key: "1",
+          label: (
+            <span onClick={() => handleView(record.id)}>
+              <EyeOutlined /> View{" "}
+            </span>
+          ),
+        },
+        {
+          key: "2",
+          label: (
+            <span onClick={() => handleDelete(record.id)}>
+              {deleting === record.id ? (
+                <Spin size="small" />
+              ) : (
+                <>
+                  <DeleteOutlined />
+                  Delete{" "}
+                </>
+              )}
+            </span>
+          ),
+          danger: true,
+          disabled: deleting === record.id,
+        },
+      ],
+    [deleting, handleDelete, handleView]
+  );
 
   return (
     <div>
