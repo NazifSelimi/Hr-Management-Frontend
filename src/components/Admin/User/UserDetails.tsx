@@ -3,22 +3,22 @@ import { useParams } from "react-router-dom";
 import {
   Card,
   Typography,
-  Divider,
-  Row,
-  Col,
   Table,
   message,
   Dropdown,
   Button,
   Modal,
+  Row,
+  Col,
 } from "antd";
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
 import AssignEntityModal from "./AsignDepartmentsModal";
+import UserInfo from "./UserInfo"; // Import the UserInfo component
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const UserDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -75,6 +75,7 @@ const UserDetails: React.FC = () => {
         if (!prevUser) return prevUser;
 
         if (assignEntityType === "department") {
+          // Update existing departments
           const updatedDepartments = prevUser.departments.map((dept) => {
             const updatedEntity = values.entities.find(
               (entity) => entity.id === dept.id
@@ -87,8 +88,25 @@ const UserDetails: React.FC = () => {
               : dept;
           });
 
-          return { ...prevUser, departments: updatedDepartments };
+          // Add new departments that are not in the current list
+          const newDepartments = values.entities
+            .filter(
+              (entity) =>
+                !prevUser.departments.some((dept) => dept.id === entity.id)
+            )
+            .map((entity) => ({
+              id: entity.id,
+              name: "New Department", // Replace this with actual name if needed
+              pivot: { position: entity.position },
+              users: prevUser ? [prevUser] : [], // Ensure new departments have users
+            }));
+
+          return {
+            ...prevUser,
+            departments: [...updatedDepartments, ...newDepartments],
+          };
         } else {
+          // Update existing projects
           const updatedProjects = prevUser.projects.map((proj) => {
             const updatedEntity = values.entities.find(
               (entity) => entity.id === proj.id
@@ -104,9 +122,33 @@ const UserDetails: React.FC = () => {
               : proj;
           });
 
-          return { ...prevUser, projects: updatedProjects };
+          // Add new projects that are not in the current list
+          const newProjects = values.entities
+            .filter(
+              (entity) =>
+                !prevUser.projects.some((proj) => proj.id === entity.id)
+            )
+            .map((entity) => ({
+              id: entity.id,
+              name: "New Project", // Replace this with actual name if needed
+              description: "New Project Description", // Replace with actual description if needed
+              projectRole: { role: entity.position },
+              users: prevUser ? [prevUser] : [], // Ensure new projects have users
+              departments: [], // Initialize with an empty departments array if needed
+            }));
+
+          return {
+            ...prevUser,
+            projects: [...updatedProjects, ...newProjects],
+          };
         }
       });
+
+      message.success(
+        `${
+          assignEntityType === "department" ? "Departments" : "Projects"
+        } assigned successfully!`
+      );
     },
     [assignEntityType]
   );
@@ -118,12 +160,12 @@ const UserDetails: React.FC = () => {
         position:
           entityType === "department"
             ? record.pivot.position
-            : record.projectRole.role,
+            : record.pivot.role,
       };
 
       setAssignEntityType(entityType);
-      setIsAssignModalVisible(true);
       setEditEntity(editEntity);
+      setIsAssignModalVisible(true); // Open the modal with the entity pre-filled
     },
     []
   );
@@ -266,117 +308,26 @@ const UserDetails: React.FC = () => {
 
   return (
     <>
-      <Card style={{ maxWidth: 900, margin: "0 auto", padding: "20px" }}>
-        <Row justify="space-between" align="middle">
-          <Col>
-            <Title style={{ textAlign: "center", marginBottom: 0 }}>
-              User Details
-            </Title>
-          </Col>
-          <Col>
-            <Button
-              type="primary"
-              icon={<UserAddOutlined />}
-              style={{ marginRight: 8 }}
-              onClick={() => openAssignModal("project")}
-            >
-              Assign Project
-            </Button>
-            <Button
-              type="primary"
-              icon={<UserAddOutlined />}
-              onClick={() => openAssignModal("department")}
-            >
-              Assign Department
-            </Button>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              Name:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>
-              {user.first_name} {user.last_name}
-            </Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              E-mail:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>{user.email}</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              Phone:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>{user.phone}</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              City:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>{user.city}</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              Address:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>{user.address}</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              Role:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>{user.role}</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={6}>
-            <Text strong style={{ fontSize: "16px" }}>
-              Days Off:
-            </Text>
-          </Col>
-          <Col span={18}>
-            <Text style={{ fontSize: "16px" }}>{user.days_off}</Text>
-          </Col>
-        </Row>
-        {/* ... Add user detail display code here ... */}
-      </Card>
+      <Title style={{ textAlign: "center", marginBottom: 0 }}>
+        User Details
+      </Title>
+      {/* Display User Info */}
+      {user && <UserInfo user={user} />}
+
       {/* Display for Departments */}
       <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
         Associated Departments
       </Title>
       <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
+        <Row justify="end" style={{ marginBottom: "10px" }}>
+          <Button
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={() => openAssignModal("department")}
+          >
+            Assign Department
+          </Button>
+        </Row>
         <Table
           virtual
           scroll={{ x: 600, y: 500 }}
@@ -385,11 +336,21 @@ const UserDetails: React.FC = () => {
           rowKey="id"
         />
       </Card>
+
       {/* Display for Projects */}
       <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
         Associated Projects
       </Title>
       <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
+        <Row justify="end" style={{ marginBottom: "10px" }}>
+          <Button
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={() => openAssignModal("project")}
+          >
+            Assign Project
+          </Button>
+        </Row>
         <Table
           virtual
           scroll={{ x: 600, y: 500 }}
@@ -403,8 +364,8 @@ const UserDetails: React.FC = () => {
       <AssignEntityModal
         visible={isAssignModalVisible}
         onClose={closeAssignModal}
-        userId={user.id}
-        userEntities={
+        entityId={user.id} // Changed to entityId for consistency
+        existingEntities={
           assignEntityType === "department" ? user.departments : user.projects
         }
         entityType={assignEntityType}

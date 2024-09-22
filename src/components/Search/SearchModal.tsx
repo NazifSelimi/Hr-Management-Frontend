@@ -3,8 +3,7 @@ import { Modal, Select, Input, Spin, message } from "antd";
 import axiosInstance from "../../api/axiosInstance";
 import Employees from "../Admin/Employees/Employees";
 import Projects from "../Admin/Projects/Projects";
-
-// TODO APPLY THE SEARCH IN THE DEPARTMENTS ALSO...
+import DepartmentsList from "../Admin/Departments/DepartmentsList"; // Import Departments
 
 const { Option } = Select;
 
@@ -36,10 +35,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
         {
           Employees: data.user || [],
           Projects: data.projects || [],
+          Departments: data.departments || [], // Add departments to results
         }[searchType] || [];
 
-      setSearchResults(results);
-
+      setSearchResults(results); // Set the results here
       message.success("Search completed successfully.");
     } catch (error) {
       console.error("Error searching:", error);
@@ -49,33 +48,47 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  // Handle search type change and reset state if needed
   const handleSearchTypeChange = (value: string) => {
     if (query.trim()) {
       setQuery("");
-      setSearchResults([]);
-      // message.info("Search type changed, resetting query and results.");
+      setSearchResults([]); // Clear previous search results when search type changes
     }
     setSearchType(value);
   };
 
   const renderTable = () => {
+    if (searchResults.length === 0) {
+      return null; // Return nothing if no results
+    }
+
+    // Render the table based on searchType and results
     switch (searchType) {
       case "Employees":
         return <Employees data={searchResults} onClose={onClose} />;
       case "Projects":
         return <Projects data={searchResults} onClose={onClose} />;
+      case "Departments":
+        return <DepartmentsList data={searchResults} onClose={onClose} />;
       default:
         return null;
     }
+  };
+
+  // Reset the modal when it's closed
+  const handleModalClose = () => {
+    setSearchType("Employees"); // Reset to default
+    setQuery(""); // Clear the query
+    setSearchResults([]); // Clear the search results
+    setLoading(false); // Stop any loading indicators
+    onClose(); // Call the onClose prop to actually close the modal
   };
 
   return (
     <Modal
       title="Search"
       open={isOpen}
-      onOk={handleSearch}
-      onCancel={onClose}
+      onOk={handleSearch} // Search happens on clicking the 'Search' button
+      onCancel={handleModalClose} // Reset and close the modal
       okText="Search"
       width={800}
     >
@@ -92,9 +105,13 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
         placeholder="Enter your search query"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        onPressEnter={handleSearch}
+        onPressEnter={handleSearch} // Search on pressing Enter
       />
-      {loading ? <Spin style={{ marginTop: 20 }} /> : renderTable()}
+      {loading ? (
+        <Spin style={{ marginTop: 20 }} />
+      ) : (
+        renderTable() // Only render the table if there are search results
+      )}
     </Modal>
   );
 };

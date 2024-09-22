@@ -1,4 +1,5 @@
 import axios from "axios";
+import { message } from "antd";
 
 // Create an axios instance
 const axiosInstance = axios.create({
@@ -32,5 +33,24 @@ axiosInstance.interceptors.request.use((config) => {
 //     throw error;
 //   }
 // };
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Customize error handling logic
+    if (error.response) {
+      // Server-side error
+      message.error(
+        error.response.data.message || "An error occurred. Please try again."
+      );
+    } else if (error.request) {
+      // Network error
+      message.error("Network error. Please check your internet connection.");
+    } else {
+      // Client-side error
+      message.error("An unexpected error occurred.");
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

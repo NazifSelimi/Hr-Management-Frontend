@@ -1,179 +1,226 @@
-import React, { useEffect, useState } from "react";
-import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
-import axiosInstance from "../../../api/axiosInstance";
-import { Department } from "../../types";
-import AssignUsersModal from "./AssignUserModal";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Button, message, Dropdown, Modal } from "antd";
 import {
-  EyeOutlined,
   EllipsisOutlined,
+  EyeOutlined,
   DeleteOutlined,
   UserAddOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
+import AssignUsersModal from "./AssignUserModal";
+import EditModal from "../../Modal/EditModal"; // Import EditModal
+import { Department } from "../../types";
 import Spinner from "../../Spinner";
 import { useNavigate } from "react-router-dom";
+import CustomTable from "../../Table/CustomTable"; // Assuming this is your custom table component
+import {
+  fetchDepartmentsApi,
+  deleteDepartmentApi,
+  updateDepartmentApi,
+} from "../../../apiService"; // Add updateDepartmentApi
 
-const DepartmentsList: React.FC = () => {
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+const DepartmentsList: React.FC<{
+  data?: Department[];
+  onClose?: () => void;
+}> = ({ data, onClose }) => {
+  const [departments, setDepartments] = useState<Department[]>(data || []);
+  const [loading, setLoading] = useState<boolean>(!data?.length);
+  const [isEditModalVisible, setEditModalVisible] = useState<boolean>(false);
+  const [isAssignUsersModalVisible, setAssignUsersModalVisible] =
+    useState<boolean>(false);
   const [selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
-  const [visibleActions, setVisibleActions] = useState<{
-    [key: string]: boolean;
-  }>({});
   const navigate = useNavigate();
+
+  // Fetch departments if not provided
   useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const response = await axiosInstance.get("/departments");
-        setDepartments(response.data);
-      } catch (error: any) {
-        console.error("Error fetching departments:", error);
-        message.error("Failed to load departments.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!data) {
+      const loadData = async () => {
+        try {
+          const fetchedDepartments = await fetchDepartmentsApi();
+          setDepartments(fetchedDepartments);
+        } catch (error) {
+          console.error("Failed to fetch departments:", error);
+          message.error("Failed to load departments.");
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadData();
+    } else {
+      setLoading(false);
+    }
+  }, [data]);
 
-    fetchDepartments();
-  }, []);
-
-  const handleDeleteDepartment = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     Modal.confirm({
       title: "Are you sure you want to delete this department?",
-      content: "This action cannot be undone.",
       okText: "Yes",
-      okType: "danger",
       cancelText: "No",
       onOk: async () => {
-        setDeleting(id);
         try {
-          await axiosInstance.delete(`/departments/${id}`);
-          setDepartments((prevDepartments) =>
-            prevDepartments.filter((department) => department.id !== id)
-          );
+          await deleteDepartmentApi(id);
+          setDepartments((prev) => prev.filter((dept) => dept.id !== id));
           message.success("Department deleted successfully.");
-        } catch (error: any) {
+        } catch (error) {
           console.error("Error deleting department:", error);
           message.error("Failed to delete department.");
-        } finally {
-          setDeleting(null);
         }
       },
     });
-  };
+  }, []);
 
-  const handleModalOpen = (department: Department) => {
+  const handleView = useCallback(
+    (id: string) => {
+      navigate(`/departments/${id}`);
+      if (onClose) onClose();
+    },
+    [navigate, onClose]
+  );
+
+  const handleEdit = useCallback((department: Department) => {
     setSelectedDepartment(department);
-    setIsModalVisible(true);
-  };
+    setEditModalVisible(true);
+  }, []);
 
-  const handleModalClose = () => {
-    setIsModalVisible(false);
+  const handleEditSubmit = useCallback(
+    async (values: Record<string, any>) => {
+      if (!selectedDepartment) return;
+
+      try {
+        await updateDepartmentApi(selectedDepartment.id, {
+          name: values.name,
+        });
+
+        message.success("Department updated successfully.");
+        handleCancel();
+        const updatedDepartments = await fetchDepartmentsApi();
+        setDepartments(updatedDepartments);
+      } catch (error: any) {
+        console.error("Error updating department:", error);
+        message.error("Failed to update department.");
+      }
+    },
+    [selectedDepartment]
+  );
+
+  const handleCancel = useCallback(() => {
     setSelectedDepartment(null);
-  };
+    setEditModalVisible(false);
+  }, []);
 
-  // const handleAssignUsers = (values: {
-  //   users: { id: string; position: string }[];
-  // }) => {
-  //   console.log("Users assigned:", values);
-  //   handleModalClose();
-  // };
+  const handleAssignUsers = useCallback((department: Department) => {
+    setSelectedDepartment(department);
+    setAssignUsersModalVisible(true);
+  }, []);
 
-  const toggleActionsVisibility = (id: string) => {
-    setVisibleActions((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const handleViewDepartment = (id: string) => {
-    navigate(`/departments/${id}`);
-  };
-
-  const menuItems = (record: Department) => [
-    {
-      key: "1",
-      label: (
-        <span onClick={() => handleViewDepartment(record.id)}>
-          <EyeOutlined /> View
-        </span>
-      ),
-    },
-    {
-      key: "2",
-      label: (
-        <span onClick={() => handleModalOpen(record)}>
-          <>
-            <UserAddOutlined /> Assign Users
-          </>
-        </span>
-      ),
-    },
-    {
-      key: "3",
-      label: (
-        <span onClick={() => handleDeleteDepartment(record.id)}>
-          {deleting === record.id ? (
-            <Spin size="small" />
-          ) : (
-            <>
-              <DeleteOutlined /> Delete
-            </>
-          )}
-        </span>
-      ),
-      danger: true,
-      disabled: deleting === record.id,
-    },
-  ];
+  const columns = useMemo(
+    () => [
+      {
+        title: "Name",
+        dataIndex: "name",
+        key: "name",
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        render: (_: any, record: Department) => (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "view",
+                  label: (
+                    <>
+                      <EyeOutlined /> View
+                    </>
+                  ),
+                  onClick: () => handleView(record.id),
+                },
+                {
+                  key: "edit",
+                  label: (
+                    <>
+                      <EditOutlined /> Edit
+                    </>
+                  ),
+                  onClick: () => handleEdit(record),
+                },
+                {
+                  key: "assignUsers",
+                  label: (
+                    <>
+                      <UserAddOutlined /> Assign Users
+                    </>
+                  ),
+                  onClick: () => handleAssignUsers(record),
+                },
+                {
+                  key: "delete",
+                  label: (
+                    <>
+                      <DeleteOutlined /> Delete
+                    </>
+                  ),
+                  onClick: () => handleDelete(record.id),
+                  danger: true,
+                },
+              ],
+            }}
+            trigger={["click"]}
+          >
+            <Button
+              type="link"
+              icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+            />
+          </Dropdown>
+        ),
+      },
+    ],
+    [handleView, handleEdit, handleAssignUsers, handleDelete]
+  );
 
   return (
     <div>
       <h2>Departments</h2>
-      {loading ? ( // Check if loading is true, then display the spinner
+      {loading ? (
         <Spinner />
       ) : (
-        <Table
-          virtual
-          scroll={{ x: 2000, y: 500 }}
+        <CustomTable
           dataSource={departments}
-          columns={[
-            {
-              title: "Name",
-              dataIndex: "name",
-              key: "name",
-            },
-            {
-              title: "Actions",
-              key: "actions",
-              render: (_, record: Department) => (
-                <>
-                  <Dropdown
-                    menu={{ items: menuItems(record) }}
-                    trigger={["click"]}
-                    open={visibleActions[record.id]}
-                    onOpenChange={() => toggleActionsVisibility(record.id)}
-                  >
-                    <Button
-                      type="link"
-                      icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
-                      style={{ padding: "0", height: "auto" }}
-                    />
-                  </Dropdown>
-                </>
-              ),
-            },
-          ]}
+          columns={columns}
+          loading={!departments.length}
           rowKey="id"
         />
       )}
-      {selectedDepartment && (
+      {isEditModalVisible && selectedDepartment && (
+        <EditModal
+          open={isEditModalVisible}
+          title="Edit Department"
+          initialValues={{
+            name: selectedDepartment.name,
+          }}
+          onCancel={handleCancel}
+          onSubmit={handleEditSubmit}
+          fields={[
+            {
+              name: "name",
+              label: "Department Name",
+              rules: [
+                {
+                  required: true,
+                  message: "Please input the department name!",
+                },
+              ],
+            },
+          ]}
+        />
+      )}
+      {isAssignUsersModalVisible && (
         <AssignUsersModal
-          visible={isModalVisible}
-          onClose={handleModalClose}
-          department={selectedDepartment.id}
+          visible={isAssignUsersModalVisible}
+          onClose={() => setAssignUsersModalVisible(false)}
+          department={selectedDepartment?.id}
         />
       )}
     </div>

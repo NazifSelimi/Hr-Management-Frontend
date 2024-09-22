@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Table, Button, message, Spin, Dropdown, Modal } from "antd";
+import { Button, message, Spin, Dropdown, Modal } from "antd";
 import {
   EllipsisOutlined,
   DeleteOutlined,
@@ -9,6 +9,8 @@ import axiosInstance from "../../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../../types";
 import Spinner from "../../Spinner";
+import CustomTable from "../../Table/CustomTable"; // CustomTable component
+import { fetchEmployees } from "../../../apiService";
 
 interface EmployeesProps {
   data?: User[];
@@ -26,10 +28,10 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
 
   useEffect(() => {
     if (!data) {
-      const fetchEmployees = async () => {
+      const loadEmployees = async () => {
         try {
-          const { data } = await axiosInstance.get<User[]>("/employees");
-          setEmployees(data);
+          const fetchedEmployees = await fetchEmployees();
+          setEmployees(fetchedEmployees);
         } catch (error: any) {
           console.error("Error fetching employees:", error);
           message.error("Failed to load employees.");
@@ -38,7 +40,7 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
         }
       };
 
-      fetchEmployees();
+      loadEmployees();
     }
   }, [data]);
 
@@ -84,23 +86,22 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
     () => (record: User) =>
       [
         {
-          key: "1",
+          key: "view",
           label: (
             <span onClick={() => handleView(record.id)}>
-              <EyeOutlined /> View{" "}
+              <EyeOutlined /> View
             </span>
           ),
         },
         {
-          key: "2",
+          key: "delete",
           label: (
             <span onClick={() => handleDelete(record.id)}>
               {deleting === record.id ? (
                 <Spin size="small" />
               ) : (
                 <>
-                  <DeleteOutlined />
-                  Delete{" "}
+                  <DeleteOutlined /> Delete
                 </>
               )}
             </span>
@@ -112,40 +113,45 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
     [deleting, handleDelete, handleView]
   );
 
+  // Define columns for the CustomTable
+  const columns = useMemo(
+    () => [
+      { title: "First Name", dataIndex: "first_name", key: "first_name" },
+      { title: "Last Name", dataIndex: "last_name", key: "last_name" },
+      { title: "E-mail", dataIndex: "email", key: "email" },
+      { title: "Days Left", dataIndex: "days_off", key: "days_off" },
+      {
+        title: "Actions",
+        key: "actions",
+        render: (record: User) => (
+          <Dropdown
+            menu={{ items: menuItems(record) }}
+            trigger={["click"]}
+            open={visibleActions[record.id]}
+            onOpenChange={() => toggleActionsVisibility(record.id)}
+          >
+            <Button
+              type="link"
+              icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+              style={{ padding: "0", height: "auto" }}
+            />
+          </Dropdown>
+        ),
+      },
+    ],
+    [menuItems, visibleActions, toggleActionsVisibility]
+  );
+
   return (
     <div>
       <h2>Employees</h2>
       {loading ? (
         <Spinner />
       ) : (
-        <Table
-          virtual
-          scroll={{ x: 1000, y: 500 }}
+        <CustomTable
+          columns={columns}
           dataSource={employees}
-          columns={[
-            { title: "First Name", dataIndex: "first_name", key: "first_name" },
-            { title: "Last Name", dataIndex: "last_name", key: "last_name" },
-            { title: "E-mail", dataIndex: "email", key: "email" },
-            { title: "Days Left", dataIndex: "days_off", key: "days_off" },
-            {
-              title: "Actions",
-              key: "actions",
-              render: (_, record: User) => (
-                <Dropdown
-                  menu={{ items: menuItems(record) }}
-                  trigger={["click"]}
-                  open={visibleActions[record.id]}
-                  onOpenChange={() => toggleActionsVisibility(record.id)}
-                >
-                  <Button
-                    type="link"
-                    icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
-                    style={{ padding: "0", height: "auto" }}
-                  />
-                </Dropdown>
-              ),
-            },
-          ]}
+          loading={loading}
           rowKey="id"
         />
       )}

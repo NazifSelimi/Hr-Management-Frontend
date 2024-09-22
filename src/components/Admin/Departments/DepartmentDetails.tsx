@@ -2,46 +2,42 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
-  Spin,
   Typography,
-  Divider,
   Row,
   Col,
   Table,
-  Input,
-  message,
   Button,
-  Modal,
-  Select,
   Dropdown,
+  message,
 } from "antd";
-import { EditOutlined, DeleteOutlined, EllipsisOutlined } from "@ant-design/icons";
+import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
-import { Department, User } from "../../types";
 import Spinner from "../../Spinner";
+import AssignEntityModal from "../User/AsignDepartmentsModal"; // Use the refactored modal
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 const DepartmentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [department, setDepartment] = useState<Department | null>(null);
+  const [department, setDepartment] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [newRole, setNewRole] = useState<string>("");
-  const [roleUpdateLoading, setRoleUpdateLoading] = useState<boolean>(false);
+  const [isAssignModalVisible, setIsAssignModalVisible] = useState(false); // Modal visibility
+  const [assignEntityType, setAssignEntityType] = useState<"user" | "project">(
+    "user"
+  ); // Tracks if we are assigning users or projects
+  const [editEntity, setEditEntity] = useState<
+    { id: string; position: string } | undefined
+  >(undefined); // To handle editing an entity
 
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
         const response = await axiosInstance.get(`/departments/${id}`);
         setDepartment(response.data);
+        setLoading(false);
       } catch (error: any) {
         console.error("Error fetching department details:", error);
         message.error("Failed to fetch department details.");
-        setError("Failed to fetch department details");
-      } finally {
         setLoading(false);
       }
     };
@@ -49,61 +45,102 @@ const DepartmentDetails: React.FC = () => {
     fetchDepartment();
   }, [id]);
 
-  const handleRoleChange = async () => {
-    if (!editingUser) return;
-    setRoleUpdateLoading(true);
+  // Open the assign modal for either user or project
+  const openAssignModal = (entityType: "user" | "project") => {
+    setAssignEntityType(entityType);
+    setIsAssignModalVisible(true);
+  };
+
+  // Close the assign modal
+  const closeAssignModal = () => {
+    setIsAssignModalVisible(false);
+    setEditEntity(undefined); // Reset edit mode
+  };
+
+  // Handle entity assignment (users or projects)
+  const handleAssignSubmit = (values: {
+    entities: { id: string; position: string }[];
+  }) => {
+    if (!department) return;
+
+    if (assignEntityType === "user") {
+      const updatedUsers = values.entities.map((entity) => ({
+        id: entity.id,
+        first_name: "User FirstName", // Replace with actual user data
+        last_name: "User LastName", // Replace with actual user data
+        pivot: { position: entity.position },
+      }));
+
+      setDepartment((prevDepartment: any) => ({
+        ...prevDepartment,
+        users: [...prevDepartment.users, ...updatedUsers],
+      }));
+    } else {
+      const updatedProjects = values.entities.map((entity) => ({
+        id: entity.id,
+        name: "Project Name", // Replace with actual project data
+        projectRole: { role: entity.position },
+      }));
+
+      setDepartment((prevDepartment: any) => ({
+        ...prevDepartment,
+        projects: [...prevDepartment.projects, ...updatedProjects],
+      }));
+    }
+
+    message.success("Entities assigned successfully!");
+    closeAssignModal(); // Close modal after submission
+  };
+
+  // Handle editing an entity's position or role
+  const handleEditEntity = (record: any, entityType: "user" | "project") => {
+    setEditEntity({
+      id: record.id,
+      position:
+        entityType === "user" ? record.pivot.position : record.projectRole.role,
+    });
+    openAssignModal(entityType);
+  };
+
+  // Handle removing an entity (either user or project)
+  const handleRemoveEntity = async (
+    entityId: string,
+    entityType: "user" | "project"
+  ) => {
     try {
-      await axiosInstance.post(`/departments/${id}/update-user-position`, {
-        users: [
-          {
-            id: editingUser.id,
-            position: newRole,
-          },
-        ],
-      });
-      message.success("Role updated successfully.");
-      setEditingUser(null);
-      setNewRole("");
-      const response = await axiosInstance.get(`/departments/${id}`);
-      setDepartment(response.data);
-    } catch (error: any) {
-      console.error("Error updating role:", error);
-      message.error("Failed to update role.");
-    } finally {
-      setRoleUpdateLoading(false);
+      if (entityType === "user") {
+        await axiosInstance.post(`/departments/${id}/remove-user`, {
+          user_id: entityId,
+        });
+        setDepartment((prevDepartment: any) => ({
+          ...prevDepartment,
+          users: prevDepartment.users.filter(
+            (user: any) => user.id !== entityId
+          ),
+        }));
+        message.success("User removed successfully.");
+      } else {
+        await axiosInstance.post(`/departments/${id}/remove-project`, {
+          project_id: entityId,
+        });
+        setDepartment((prevDepartment: any) => ({
+          ...prevDepartment,
+          projects: prevDepartment.projects.filter(
+            (project: any) => project.id !== entityId
+          ),
+        }));
+        message.success("Project removed successfully.");
+      }
+    } catch (error) {
+      console.error(`Error removing ${entityType}:`, error);
+      message.error(`Failed to remove the ${entityType}.`);
     }
   };
 
-  const handleRemoveUser = async (userId: string) => {
-    try {
-      await axiosInstance.post(`/departments/${id}/remove-user`, {
-        user_id: userId,
-      });
-      message.success("User removed successfully.");
-      // Refresh department data
-      const response = await axiosInstance.get(`/departments/${id}`);
-      setDepartment(response.data);
-    } catch (error: any) {
-      console.error("Error removing user:", error);
-      message.error("Failed to remove user.");
-    }
-  };
-
-  const handleEditRole = (user: User) => {
-    setEditingUser(user);
-    setNewRole(user.pivot?.position || user.role);
-  };
-
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
+  if (loading) return <Spinner />;
   if (!department) return <p>Department not found</p>;
 
+  // User columns
   const userColumns = [
     {
       title: "First Name",
@@ -116,42 +153,32 @@ const DepartmentDetails: React.FC = () => {
       key: "last_name",
     },
     {
-      title: "E-mail",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Role",
-      dataIndex: "pivot",
-      key: "role",
-      render: (_: any, user: User) => (
-        <span>{user.pivot?.position || user.role}</span>
-      ),
+      title: "Position",
+      dataIndex: ["pivot", "position"],
+      key: "position",
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_: any, record: User) => (
+      render: (text: string, record: any) => (
         <Dropdown
           menu={{
             items: [
               {
-                key: "edit-role",
+                key: "edit-position",
                 label: (
-                  <>
-                    <EditOutlined /> Edit Role
-                  </>
+                  <span onClick={() => handleEditEntity(record, "user")}>
+                    Edit Position
+                  </span>
                 ),
-                onClick: () => handleEditRole(record),
               },
               {
-                key: "delete",
+                key: "remove-user",
                 label: (
-                  <>
-                    <DeleteOutlined /> Delete
-                  </>
+                  <span onClick={() => handleRemoveEntity(record.id, "user")}>
+                    Remove User
+                  </span>
                 ),
-                onClick: () => handleRemoveUser(record.id),
                 danger: true,
               },
             ],
@@ -160,7 +187,59 @@ const DepartmentDetails: React.FC = () => {
         >
           <Button
             type="link"
-            icon={<EllipsisOutlined style={{ fontSize: "35px" }} />}
+            icon={<EllipsisOutlined style={{ fontSize: "24px" }} />}
+            style={{ padding: "0", height: "auto" }}
+          />
+        </Dropdown>
+      ),
+    },
+  ];
+
+  // Project columns
+  const projectColumns = [
+    {
+      title: "Project Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Role",
+      dataIndex: ["projectRole", "role"],
+      key: "role",
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (text: string, record: any) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "edit-role",
+                label: (
+                  <span onClick={() => handleEditEntity(record, "project")}>
+                    Edit Role
+                  </span>
+                ),
+              },
+              {
+                key: "remove-project",
+                label: (
+                  <span
+                    onClick={() => handleRemoveEntity(record.id, "project")}
+                  >
+                    Remove Project
+                  </span>
+                ),
+                danger: true,
+              },
+            ],
+          }}
+          trigger={["click"]}
+        >
+          <Button
+            type="link"
+            icon={<EllipsisOutlined style={{ fontSize: "24px" }} />}
             style={{ padding: "0", height: "auto" }}
           />
         </Dropdown>
@@ -170,64 +249,72 @@ const DepartmentDetails: React.FC = () => {
 
   return (
     <>
-      <Title level={2} style={{ textAlign: "center" }}>
+      <Title style={{ textAlign: "center", marginBottom: 0 }}>
         Department Details
       </Title>
-      <Card style={{ maxWidth: 900, margin: "0 auto", padding: "20px" }}>
+      <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
         <Row>
           <Col span={6}>
-            <Text strong style={{ fontSize: "18px" }}>
-              Department Name:
-            </Text>
+            <Text strong>Department Name:</Text>
           </Col>
           <Col span={18}>
-            <Text style={{ fontSize: "18px" }}>{department.name}</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col span={24}>
-            <Title level={4}>Users in this Department</Title>
-            <Table
-              virtual
-              scroll={{ x: 1000, y: 300 }}
-              dataSource={department.users}
-              columns={userColumns}
-              rowKey="id"
-              pagination={false}
-            />
+            <Text>{department.name}</Text>
           </Col>
         </Row>
       </Card>
 
-      <Modal
-        open={!!editingUser}
-        title="Edit User Role"
-        onCancel={() => setEditingUser(null)}
-        onOk={handleRoleChange}
-        footer={[
-          <Button key="cancel" onClick={() => setEditingUser(null)}>
-            Cancel
-          </Button>,
+      <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
+        Associated Users
+      </Title>
+      <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
+        <Row justify="end" style={{ marginBottom: "10px" }}>
           <Button
-            key="submit"
             type="primary"
-            loading={roleUpdateLoading}
-            onClick={handleRoleChange}
+            icon={<UserAddOutlined />}
+            onClick={() => openAssignModal("user")}
           >
-            {roleUpdateLoading ? "Updating Role..." : "Update Role"}
-          </Button>,
-        ]}
-      >
-        <p>Editing role for: {editingUser?.first_name} {editingUser?.last_name}</p>
-        <Input
-          value={newRole}
-          onChange={(e) => setNewRole(e.target.value)}
-          placeholder="Enter a custom role"
-          style={{ width: "100%" }}
+            Assign User
+          </Button>
+        </Row>
+        <Table
+          virtual
+          scroll={{ x: 600, y: 500 }}
+          dataSource={department.users}
+          columns={userColumns}
+          rowKey="id"
         />
-      </Modal>
+      </Card>
 
+      <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
+        Associated Projects
+      </Title>
+      <Card style={{ maxWidth: 900, margin: "20px auto", padding: "20px" }}>
+        <Row justify="end" style={{ marginBottom: "10px" }}>
+          <Button type="primary" onClick={() => openAssignModal("project")}>
+            Assign Project
+          </Button>
+        </Row>
+        <Table
+          virtual
+          scroll={{ x: 600, y: 500 }}
+          dataSource={department.projects}
+          columns={projectColumns}
+          rowKey="id"
+        />
+      </Card>
+
+      {/* Reusable Assign Entity Modal */}
+      <AssignEntityModal
+        visible={isAssignModalVisible}
+        onClose={closeAssignModal}
+        entityId={id || ""} // Provide a fallback if id is undefined
+        existingEntities={
+          assignEntityType === "user" ? department.users : department.projects
+        }
+        entityType={assignEntityType}
+        onSubmit={handleAssignSubmit}
+        editEntity={editEntity}
+      />
     </>
   );
 };

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
-  Spin,
   Typography,
   Divider,
   Row,
@@ -43,12 +42,6 @@ const ProjectDetails: React.FC = () => {
     fetchProject();
   }, [id]);
 
-  if (loading) return <Spin />;
-
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
-  if (!project) return <p>Project not found</p>;
-
   const handleRemoveUser = async (userId: string) => {
     Modal.confirm({
       title: "Are you sure you want to remove this user from the project?",
@@ -72,6 +65,12 @@ const ProjectDetails: React.FC = () => {
       },
     });
   };
+
+  if (loading) return <div>Loading...</div>;
+
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
+  if (!project) return <p>Project not found</p>;
 
   const userColumns = [
     {
@@ -113,7 +112,7 @@ const ProjectDetails: React.FC = () => {
                 key: "delete",
                 label: (
                   <>
-                    <DeleteOutlined /> Delete{" "}
+                    <DeleteOutlined /> Delete
                   </>
                 ),
                 onClick: () => handleRemoveUser(record.id),

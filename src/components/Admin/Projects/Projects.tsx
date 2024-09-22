@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Table, Button, message, Dropdown, Modal } from "antd";
+import { Button, message, Dropdown, Modal } from "antd";
 import { ColumnsType } from "antd/es/table";
-import axiosInstance from "../../../api/axiosInstance";
+import {
+  fetchProjects,
+  fetchDepartmentsApi,
+  deleteProject,
+  updateProject,
+} from "../../../apiService";
 import AssignUsersModal from "../Departments/AssignUserModal";
 import EditModal from "../../Modal/EditModal";
 import { Department, Project } from "../../types";
@@ -14,6 +19,7 @@ import {
   UserAddOutlined,
 } from "@ant-design/icons";
 import Spinner from "../../Spinner";
+import CustomTable from "../../Table/CustomTable"; // Import the custom table component
 
 interface ProjectsProps {
   data?: Project[];
@@ -30,32 +36,28 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
     useState<boolean>(false);
   const navigate = useNavigate();
 
-  const fetchData = useCallback(
-    async (
-      endpoint: string,
-      setter: React.Dispatch<React.SetStateAction<any>>
-    ) => {
-      try {
-        const { data } = await axiosInstance.get(endpoint);
-        setter(data);
-      } catch (error: any) {
-        console.error(`Error fetching ${endpoint}:`, error);
-        message.error(`Failed to fetch ${endpoint}: ${error.message}`);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
+  // Fetch data using the API service
   useEffect(() => {
     if (!data) {
-      fetchData("/projects", setProjects);
-      fetchData("/departments", setDepartments);
+      const loadData = async () => {
+        try {
+          const fetchedProjects = await fetchProjects();
+          setProjects(fetchedProjects);
+          const fetchedDepartments = await fetchDepartmentsApi();
+          setDepartments(fetchedDepartments);
+        } catch (error) {
+          console.error("Failed to fetch projects or departments:", error);
+          message.error("Failed to load projects or departments.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadData();
     } else {
       setLoading(false);
     }
-  }, [data, fetchData]);
+  }, [data]);
 
   const handleDelete = useCallback(async (id: string) => {
     Modal.confirm({
@@ -64,10 +66,10 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       cancelText: "No",
       onOk: async () => {
         try {
-          await axiosInstance.delete(`/projects/${id}`);
+          await deleteProject(id);
           setProjects((prev) => prev.filter((project) => project.id !== id));
           message.success("Project deleted successfully.");
-        } catch (error: any) {
+        } catch (error) {
           console.error("Error deleting project:", error);
           message.error("Failed to delete project.");
         }
@@ -93,7 +95,8 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       if (!selectedProject) return;
 
       try {
-        await axiosInstance.put(`/projects/${selectedProject.id}`, {
+        // Use the new updateProject function
+        await updateProject(selectedProject.id, {
           name: values.name,
           description: values.description,
           department_ids: values.departments,
@@ -101,13 +104,14 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
 
         message.success("Project updated successfully.");
         handleCancel();
-        fetchData("/projects", setProjects);
+        const updatedProjects = await fetchProjects();
+        setProjects(updatedProjects);
       } catch (error: any) {
         console.error("Error updating project:", error);
         message.error("Failed to update project.");
       }
     },
-    [selectedProject, fetchData]
+    [selectedProject]
   );
 
   const handleCancel = useCallback(() => {
@@ -208,12 +212,12 @@ const Projects: React.FC<ProjectsProps> = ({ data, onClose }) => {
       {loading ? (
         <Spinner />
       ) : (
-        <Table
-          virtual
-          scroll={{ x: 2000, y: 500 }}
-          dataSource={projects}
+        <CustomTable
           columns={columns}
+          dataSource={projects}
+          loading={loading}
           rowKey="id"
+          scroll={{ x: 2000, y: 500 }} // You can pass custom scroll values here
         />
       )}
       {selectedProject && (

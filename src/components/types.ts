@@ -1,9 +1,12 @@
 export interface Department {
   id: string;
   name: string;
-  pivot: DepartmentsUsers;
+  // pivot: DepartmentsUsers;
   users: User[];
   projects?: Project[];
+  pivot?: {
+    position?: string; // Assuming this comes from the DepartmentsUsers pivot
+  };
 }
 
 export interface Project {
