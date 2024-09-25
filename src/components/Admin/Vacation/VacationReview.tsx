@@ -54,7 +54,7 @@ const VacationReview: React.FC = () => {
       fetchData("/vacation", setVacations);
     } catch (error: any) {
       console.error("Error updating project:", error);
-      message.error("Failed to update project.");
+      message.error(error.data.message);
     }
   };
 

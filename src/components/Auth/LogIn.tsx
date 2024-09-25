@@ -19,7 +19,7 @@ const Login: React.FC = () => {
     try {
       // Fetch the CSRF token before attempting to log in
       await axios.get("http://localhost/sanctum/csrf-cookie", {
-        withCredentials: true, //CSRF token is set in the cookies
+        withCredentials: true, // CSRF token is set in the cookies
       });
 
       // Perform the login request with the CSRF token included automatically
@@ -33,9 +33,10 @@ const Login: React.FC = () => {
           withCredentials: true, // Ensure credentials are sent with the login request
         }
       );
+
       const authToken = response.data.token;
       localStorage.setItem("authToken", authToken);
-      //seting the authToken in the LocalStorage
+      // Set authToken in LocalStorage
 
       if (response.status === 200) {
         message.success("Login successful!");
@@ -45,16 +46,24 @@ const Login: React.FC = () => {
         });
 
         const userRole = userResponse.data.role;
+        const mustChangePassword = userResponse.data.must_change_password;
+
         localStorage.setItem("userRole", userRole);
-        console.log(userRole);
-        //saving role in local storage
-        login(userRole, authToken);
-        // Navigate to a page based on userRole
-        if (userRole === "admin") {
-          navigate("/projects");
-        }
-        if (userRole === "employee") {
-          navigate("/employee");
+        login(userRole, authToken); // Set auth context with role and token
+
+        // Check if user needs to change password on first login
+        if (mustChangePassword) {
+          message.warning(
+            "You need to change your password before proceeding."
+          );
+          navigate("/update-password"); // Redirect to the password change page
+        } else {
+          // Navigate to a page based on userRole
+          if (userRole === "admin") {
+            navigate("/projects");
+          } else if (userRole === "employee") {
+            navigate("/employee");
+          }
         }
       } else {
         message.error("Invalid email or password");

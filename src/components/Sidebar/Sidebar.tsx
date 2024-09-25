@@ -26,7 +26,10 @@ const Sidebar: React.FC = () => {
       key: "sub1",
       icon: <UserOutlined />,
       label: "Users",
-      children: [{ key: "1", label: <Link to="/employees">Employees</Link> }],
+      children: [
+        { key: "1", label: <Link to="/employees">Employees</Link> },
+        { key: "8", label: <Link to="/create-users">Create User</Link> },
+      ],
     },
     {
       key: "sub2",
@@ -55,7 +58,17 @@ const Sidebar: React.FC = () => {
     {
       key: "sub4",
       icon: <CarOutlined />,
-      label: <Link to="/review-vacations">Review Vacations</Link>,
+      label: "Vacations",
+      children: [
+        {
+          key: "6",
+          label: <Link to="/review-vacations">Review Vacations</Link>,
+        },
+        {
+          key: "7",
+          label: <Link to="/vacations">View Vacations</Link>,
+        },
+      ],
     },
   ];
 

@@ -11,19 +11,23 @@ import ProtectedRoute from "./ProtectedRoute"; // Import the ProtectedRoute comp
 import CreateDepartmentView from "./components/Admin/Departments/CreateDepartmentView";
 import RequestVacationView from "./components/Employee/Vacations/RequestVacationView";
 import VacationReview from "./components/Admin/Vacation/VacationReview";
-import VacationView from "./components/Admin/Vacation/VacationView";
+import VacationView from "./components/Employee/Vacations/VacationView";
 import DepartmentDetails from "./components/Admin/Departments/DepartmentDetails";
 import MyProjects from "./components/Employee/Projects/MyProjects";
 import MyProjectDetails from "./components/Employee/Projects/MyProjectDetails";
 import MyDepartments from "./components/Employee/Departments/MyDepartments";
 import MyDepartmentDetails from "./components/Employee/Departments/MyDepartmentDetails";
 import UserProfile from "./components/Employee/Profile/UserProfile";
+import CreateUserView from "./components/Admin/Employees/CreateUserView";
+import ChangePassword from "./components/Auth/ChangePassword";
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Public Route */}
       <Route path="/login" element={<LogIn />} />
+      <Route path="/update-password" element={<ChangePassword />} />
+
       {/* Protected Admin Routes */}
       <Route
         path="/projects"
@@ -33,6 +37,12 @@ const AppRoutes: React.FC = () => {
         path="/create-projects"
         element={
           <ProtectedRoute element={CreateProjectView} requiredRole="admin" />
+        }
+      />
+      <Route
+        path="/create-users"
+        element={
+          <ProtectedRoute element={CreateUserView} requiredRole="admin" />
         }
       />
       <Route
