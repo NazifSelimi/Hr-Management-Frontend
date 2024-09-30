@@ -42,7 +42,9 @@ const UserProfile: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      message.error("Something went wrong while updating your profile");
+      message.error(
+        error.data.message || "Something went wrong while updating your profile"
+      );
     }
   };
 
