@@ -28,7 +28,7 @@ const UserProfileForm: React.FC<VacationFormProps> = ({ onSubmit, user }) => {
   return (
     <Form
       initialValues={user || undefined}
-      onFinish={onSubmit}
+      onFinish={handleFinish}
       layout="vertical"
     >
       <Form.Item label="First Name" name="first_name">
