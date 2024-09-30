@@ -47,7 +47,7 @@ const UserDetails: React.FC = () => {
         setLoading(false);
       } catch (error: any) {
         console.error("Error fetching user details:", error);
-        message.error("Failed to fetch user details.");
+        message.error(error.response?.data?.message || "Failed to fetch user details.");
         setLoading(false);
       }
     };
@@ -82,9 +82,9 @@ const UserDetails: React.FC = () => {
             );
             return updatedEntity
               ? {
-                  ...dept,
-                  pivot: { ...dept.pivot, position: updatedEntity.position },
-                }
+                ...dept,
+                pivot: { ...dept.pivot, position: updatedEntity.position },
+              }
               : dept;
           });
 
@@ -113,12 +113,12 @@ const UserDetails: React.FC = () => {
             );
             return updatedEntity
               ? {
-                  ...proj,
-                  projectRole: {
-                    ...proj.projectRole,
-                    role: updatedEntity.position,
-                  },
-                }
+                ...proj,
+                projectRole: {
+                  ...proj.projectRole,
+                  role: updatedEntity.position,
+                },
+              }
               : proj;
           });
 
@@ -145,8 +145,7 @@ const UserDetails: React.FC = () => {
       });
 
       message.success(
-        `${
-          assignEntityType === "department" ? "Departments" : "Projects"
+        `${assignEntityType === "department" ? "Departments" : "Projects"
         } assigned successfully!`
       );
     },
@@ -209,7 +208,7 @@ const UserDetails: React.FC = () => {
             });
           } catch (error: any) {
             console.error(`Error removing user from ${entityType}:`, error);
-            message.error(`Failed to remove the user from ${entityType}.`);
+            message.error(error.response?.data?.message || `Failed to remove the user from ${entityType}.`);
           }
         },
       });

@@ -3,7 +3,6 @@ import { Form, Input, Button, Select, message, Spin } from "antd";
 import axiosInstance from "../../../api/axiosInstance";
 import { Department } from "../../types";
 import { useNavigate } from "react-router-dom";
-import Spinner from "../../Spinner";
 
 const { Option } = Select;
 
@@ -20,7 +19,7 @@ const CreateProjectView: React.FC = () => {
         setDepartments(response.data);
       } catch (error: any) {
         console.error("Error fetching departments:", error?.response || error);
-        message.error("Failed to fetch departments.");
+        message.error(error.response?.data?.message || "Failed to fetch departments.");
       } finally {
         setLoading(false);
       }
@@ -41,7 +40,7 @@ const CreateProjectView: React.FC = () => {
       navigate("/projects");
     } catch (error: any) {
       console.error("Error creating project:", error?.response || error);
-      message.error("Failed to create project: " + error.message);
+      message.error(error.response?.data?.message || "Failed to create project.");
     } finally {
       setLoading(false);
     }

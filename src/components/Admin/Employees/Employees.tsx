@@ -34,7 +34,7 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
           setEmployees(fetchedEmployees);
         } catch (error: any) {
           console.error("Error fetching employees:", error);
-          message.error("Failed to load employees.");
+          message.error(error.response?.data?.message || "Failed to load employees.");
         } finally {
           setLoading(false);
         }
@@ -59,7 +59,7 @@ const Employees: React.FC<EmployeesProps> = ({ data, onClose }) => {
           message.success("Employee deleted successfully.");
         } catch (error: any) {
           console.error("Error deleting employee:", error);
-          message.error("Failed to delete employee.");
+          message.error(error.response?.data?.message || "Failed to load employees.");
         } finally {
           setDeleting(null);
         }

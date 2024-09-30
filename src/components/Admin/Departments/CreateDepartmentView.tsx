@@ -6,15 +6,12 @@ import { Spin, message } from "antd";
 const CreateDepartmentView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = async (values: {
-    name: string;
-    description: string;
-  }) => {
+  const handleSubmit = async (values: { name: string; description: string }) => {
     setLoading(true);
     try {
       const response = await axiosInstance.post("/departments", values);
       if (response.status === 201) {
-        message.success("Department created successfully!");
+        // message.success("Department created successfully!"); //! commented this message.success because when we were creating departments, the message was displayed twice 
       } else {
         console.error("Unexpected response:", response);
         message.error("Failed to create department.");
@@ -32,7 +29,7 @@ const CreateDepartmentView: React.FC = () => {
 
   return (
     <Spin spinning={loading}>
-      <CreateDepartmentForm onSubmit={handleSubmit} />
+      <CreateDepartmentForm onSubmit={handleSubmit} disabled={loading} />
     </Spin>
   );
 };

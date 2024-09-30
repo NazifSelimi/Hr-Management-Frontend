@@ -3,9 +3,13 @@ import { Form, Input, Button } from "antd";
 
 interface CreateDepartmentFormProps {
   onSubmit: (values: { name: string; description: string }) => void;
+  disabled?: boolean; // Add the disabled prop here
 }
 
-const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onSubmit }) => {
+const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({
+  onSubmit,
+  disabled, // Destructure the disabled prop
+}) => {
   return (
     <div>
       <h2>Create Department</h2>
@@ -22,14 +26,11 @@ const CreateDepartmentForm: React.FC<CreateDepartmentFormProps> = ({ onSubmit })
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          name="description"
-          label="Description"
-        >
+        <Form.Item name="description" label="Description">
           <Input.TextArea rows={4} />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" disabled={disabled}>
             Create Department
           </Button>
         </Form.Item>

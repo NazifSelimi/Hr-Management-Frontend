@@ -37,7 +37,7 @@ const DepartmentDetails: React.FC = () => {
         setLoading(false);
       } catch (error: any) {
         console.error("Error fetching department details:", error);
-        message.error("Failed to fetch department details.");
+        message.error(error.response?.data?.message || "Failed to fetch department details.");
         setLoading(false);
       }
     };

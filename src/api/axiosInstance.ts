@@ -7,7 +7,7 @@ const axiosInstance = axios.create({
   withCredentials: true, // Include credentials (cookies) in requests
 });
 
-// Add a request interceptor to dynamically set CSRF and Auth tokens (idk if this is even needed?)
+// Add a request interceptor to dynamically set CSRF and Auth tokens
 axiosInstance.interceptors.request.use((config) => {
   const csrfToken = document.cookie
     .split("; ")
@@ -24,17 +24,16 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
-// export const getEmployees = async () => {
-//   try {
-//     const response = await axiosInstance.get("/employees");
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching employees:", error);
-//     throw error;
-//   }
-// };
+
+// Add a response interceptor to handle responses and errors
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // If the response has a message, show it
+    if (response.data.message) {
+      message.success(response.data.message);
+    }
+    return response;
+  },
   (error) => {
     // Customize error handling logic
     if (error.response) {
@@ -53,4 +52,5 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+// Export the axios instance
 export default axiosInstance;

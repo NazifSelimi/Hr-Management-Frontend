@@ -34,7 +34,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
           // console.log(response.data)
         } catch (error: any) {
           console.error("Error fetching users:", error);
-          message.error("Failed to load users.");
+          message.error(error.response?.data?.message || "Failed to load users.");
         } finally {
           setLoading(false);
         }
@@ -79,7 +79,7 @@ const AssignUsersModal: React.FC<AssignUsersModalProps> = ({
         onClose();
       } catch (error: any) {
         console.error("Error assigning users:", error);
-        message.error("Failed to assign users.");
+        message.error(error.response?.data?.message || "Failed to assign users.");
       } finally {
         setLoading(false);
       }

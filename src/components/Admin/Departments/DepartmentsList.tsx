@@ -98,7 +98,7 @@ const DepartmentsList: React.FC<{
         setDepartments(updatedDepartments);
       } catch (error: any) {
         console.error("Error updating department:", error);
-        message.error("Failed to update department.");
+        message.error(error.response?.data?.message || "Failed to update department.");
       }
     },
     [selectedDepartment]

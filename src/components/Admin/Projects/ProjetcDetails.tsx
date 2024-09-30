@@ -32,7 +32,7 @@ const ProjectDetails: React.FC = () => {
         setProject(response.data);
       } catch (error: any) {
         console.error("Error fetching project details:", error);
-        message.error("Failed to fetch project details.");
+        message.error(error.response?.data?.message || "Failed to fetch project details.");
         setError("Failed to fetch project details");
       } finally {
         setLoading(false);
@@ -60,7 +60,7 @@ const ProjectDetails: React.FC = () => {
             "Error removing user from project:",
             error?.response || error
           );
-          message.error("Failed to remove user from project.");
+          message.error(error.response?.data?.message || "Failed to remove user from project.");
         }
       },
     });

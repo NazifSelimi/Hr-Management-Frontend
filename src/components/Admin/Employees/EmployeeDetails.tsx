@@ -37,7 +37,7 @@ const EmployeeDetails: React.FC = () => {
         console.log(response.data);
       } catch (error: any) {
         console.error("Error fetching employee details:", error);
-        message.error("Failed to fetch employee details.");
+        message.error(error.response?.data?.message || "Failed to fetch employee details.");
       }
     };
 
@@ -47,7 +47,7 @@ const EmployeeDetails: React.FC = () => {
         setProjects(response.data);
       } catch (error: any) {
         console.error("Error fetching projects:", error);
-        message.error("Failed to fetch projects.");
+        message.error(error.response?.data?.message || "Failed to fetch projects.");
       }
     };
 
@@ -75,7 +75,7 @@ const EmployeeDetails: React.FC = () => {
       }));
     } catch (error: any) {
       console.error("Error assigning projects:", error);
-      message.error("Failed to assign projects.");
+      message.error(error.response?.data?.message || "Failed to assign projects. Please check your inputs and try again.");
     } finally {
       setLoading(false);
     }
