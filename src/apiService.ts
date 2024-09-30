@@ -1,5 +1,5 @@
 import axiosInstance from "./api/axiosInstance";
-import { Department, Project, User } from "./components/types";
+import { Department, Project, User, Vacation } from "./components/types";
 
 // Employee APIs
 export const fetchEmployees = async (): Promise<User[]> => {
@@ -31,11 +31,20 @@ export const fetchDepartmentsApi = async (): Promise<Department[]> => {
   return data;
 };
 
+export const fetchDepartment = async (id?: string): Promise<Department> => {
+  const { data } = await axiosInstance.get<Department>(`/departments/${id}`);
+  return data;
+};
+
 export const updateDepartmentApi = async (
   id: string,
   departmentData: { name: string }
 ): Promise<void> => {
   await axiosInstance.put(`/departments/${id}`, departmentData);
+};
+
+export const removeUserDepartment = async (id?: string): Promise<void> => {
+  await axiosInstance.put(`/departments/${id}/remove-user`);
 };
 
 export const deleteDepartmentApi = async (id: string): Promise<void> => {
@@ -126,22 +135,36 @@ export const removeFromDepartment = async (userId: string): Promise<void> => {
 };
 
 // Vacation (Days Off) APIs
-export const fetchEmployeeVacation = async (): Promise<void> => {
+export const fetchEmployeeVacation = async (): Promise<Vacation[]> => {
   const { data } = await axiosInstance.get("/employee-vacation");
   return data;
 };
 
 export const requestVacation = async (vacationData: {
-  days_off: number;
-}): Promise<void> => {
-  await axiosInstance.post("/request-vacation", vacationData);
+  user_id: string;
+  start_date: Date;
+  end_date: Date;
+  reason: string;
+  type: string;
+  status: boolean;
+}): Promise<any> => {
+  const response = await axiosInstance.post("/request-vacation", vacationData);
+  return response;
+};
+
+export const fetchVacations = async (): Promise<Vacation[]> => {
+  const { data } = await axiosInstance.get("/vacation");
+  return data;
 };
 
 export const updateVacation = async (
   daysOffId: string,
-  daysOffData: { days_off: number }
-): Promise<void> => {
-  await axiosInstance.patch(`/vacation/${daysOffId}`, daysOffData);
+  data: {
+    status: string;
+  }
+): Promise<any> => {
+  const response = await axiosInstance.patch(`/vacation/${daysOffId}`, data);
+  return response;
 };
 
 // Search API

@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axiosInstance from "../../../api/axiosInstance";
-import { Department } from "../../types";
-import { Spin, message } from "antd";
 import VacationForm from "./VacationForm";
 import Spinner from "../../Spinner";
+import { requestVacation } from "../../../apiService";
+import { message } from "antd";
 
 const RequestVacationView: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
   const handleSubmit = async (values: {
     user_id: string;
     start_date: Date;
@@ -18,13 +15,14 @@ const RequestVacationView: React.FC = () => {
     status: boolean;
   }) => {
     try {
-      const response = await axiosInstance.post("/request-vacation", values);
+      // const response = await axiosInstance.post("/request-vacation", values);
+      const response = await requestVacation(values);
 
       if (response.status === 201) {
-        alert(response.data.message);
+        message.success(response.data.message);
       } else {
         console.error("Unexpected response:", response);
-        alert(response.data.message);
+        message.error(response.data.message);
       }
     } catch (error: any) {
       console.error("Error requesting days off:", error);
@@ -32,11 +30,9 @@ const RequestVacationView: React.FC = () => {
         error.response?.data?.message ||
         "An error occurred while requesting days off.";
       alert(message);
+    } finally {
     }
   };
-  // if (loading) return <Spinner />;
-
-  // if (error) return <p>{error}</p>;
 
   return <VacationForm onSubmit={handleSubmit} />;
 };

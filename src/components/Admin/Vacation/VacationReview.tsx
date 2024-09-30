@@ -5,6 +5,7 @@ import { Table, Button, Space, message } from "antd";
 import { Vacation } from "../../types";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
+import { fetchVacations, updateVacation } from "../../../apiService";
 
 const VacationReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -12,16 +13,13 @@ const VacationReview: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(
-    async (
-      endpoint: string,
-      setter: React.Dispatch<React.SetStateAction<any>>
-    ) => {
+    async (setter: React.Dispatch<React.SetStateAction<any>>) => {
       try {
-        const { data } = await axiosInstance.get(endpoint);
+        const data = await fetchVacations();
         setter(data);
       } catch (error: any) {
-        console.error(`Error fetching ${endpoint}:`, error);
-        message.error(`Failed to fetch ${endpoint}: ${error.message}`);
+        console.error(`Error fetching vacations:`, error);
+        message.error(`Failed to fetch vacations: ${error.message}`);
       } finally {
         setLoading(false);
       }
@@ -32,7 +30,7 @@ const VacationReview: React.FC = () => {
   useEffect(() => {
     const fetchVacations = async () => {
       try {
-        await fetchData("/vacation", setVacations);
+        await fetchData(setVacations);
       } catch (error: any) {
         console.error("Error fetching vacations:", error);
         setError(error.response.data.message);
@@ -46,12 +44,10 @@ const VacationReview: React.FC = () => {
 
   const handleReview = async (status: string, record: Vacation) => {
     try {
-      const response = await axiosInstance.patch(`/vacation/${record.id}`, {
-        status: status,
-      });
+      const response = await updateVacation(record.id, { status: status });
 
       message.success(response.data.message);
-      fetchData("/vacation", setVacations);
+      fetchData(setVacations);
     } catch (error: any) {
       console.error("Error updating project:", error);
       message.error(error.data.message);

@@ -14,6 +14,7 @@ import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import Spinner from "../../Spinner";
 import AssignEntityModal from "../User/AsignDepartmentsModal"; // Use the refactored modal
+import { fetchDepartment, removeUserDepartment } from "../../../apiService";
 
 const { Title, Text } = Typography;
 
@@ -30,10 +31,10 @@ const DepartmentDetails: React.FC = () => {
   >(undefined); // To handle editing an entity
 
   useEffect(() => {
-    const fetchDepartment = async () => {
+    const getDepartment = async () => {
       try {
-        const response = await axiosInstance.get(`/departments/${id}`);
-        setDepartment(response.data);
+        const response = await fetchDepartment(id);
+        setDepartment(response);
         setLoading(false);
       } catch (error: any) {
         console.error("Error fetching department details:", error);
@@ -42,7 +43,7 @@ const DepartmentDetails: React.FC = () => {
       }
     };
 
-    fetchDepartment();
+    getDepartment();
   }, [id]);
 
   // Open the assign modal for either user or project
@@ -112,6 +113,7 @@ const DepartmentDetails: React.FC = () => {
         await axiosInstance.post(`/departments/${id}/remove-user`, {
           user_id: entityId,
         });
+        // await removeUserDepartment(id);
         setDepartment((prevDepartment: any) => ({
           ...prevDepartment,
           users: prevDepartment.users.filter(

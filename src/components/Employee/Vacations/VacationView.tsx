@@ -5,37 +5,22 @@ import { Table, Button, Space, message } from "antd";
 import { Vacation } from "../../types";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
+import { fetchEmployeeVacation } from "../../../apiService";
 
 const VacationView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [vacations, setVacations] = useState<Vacation[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(
-    async (
-      endpoint: string,
-      setter: React.Dispatch<React.SetStateAction<any>>
-    ) => {
-      try {
-        const { data } = await axiosInstance.get(endpoint);
-        setter(data);
-      } catch (error: any) {
-        console.error(`Error fetching ${endpoint}:`, error);
-        message.error(`Failed to fetch ${endpoint}: ${error.message}`);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
   useEffect(() => {
     const fetchVacations = async () => {
       try {
-        await fetchData("/employee-vacation", setVacations);
+        const response = await fetchEmployeeVacation();
+        setVacations(response);
       } catch (error: any) {
-        console.error("Error fetching vacations:", error);
-        setError(error.response.data.message);
+        setError(error);
+        console.error(`Error fetching vacations:`, error);
+        message.error(`Failed to fetch vacations: ${error.message}`);
       } finally {
         setLoading(false);
       }
@@ -86,7 +71,7 @@ const VacationView: React.FC = () => {
       ) : (
         <Table
           virtual
-          scroll={{ x: 1000, y: 300 }}
+          scroll={{ x: 1000, y: 500 }}
           dataSource={vacations}
           columns={columns}
           rowKey="id"
