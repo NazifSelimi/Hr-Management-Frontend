@@ -25,17 +25,6 @@ export const createEmployee = async (employeeData: {
   return response;
 };
 
-export const updatePassword = async (
-  password: string,
-  password_confirmation: string
-): Promise<any> => {
-  const response = await axiosInstance.patch("/update-password", {
-    password,
-    password_confirmation,
-  });
-  return response;
-};
-
 // Department APIs
 export const fetchDepartmentsApi = async (): Promise<Department[]> => {
   const { data } = await axiosInstance.get<Department[]>("/departments");
@@ -92,6 +81,11 @@ export const fetchUserById = async (id: string): Promise<User> => {
   return data;
 };
 
+export const fetchUserProfile = async (): Promise<User> => {
+  const { data } = await axiosInstance.get(`/profile`);
+  return data;
+};
+
 export const updateUserProfile = async (
   userId: string,
   profileData: {
@@ -101,9 +95,26 @@ export const updateUserProfile = async (
     phone: string;
     city: string;
     address: string;
+    days_off: number;
+    role: string;
   }
-): Promise<void> => {
-  await axiosInstance.put(`/profile/update/${userId}`, profileData);
+): Promise<any> => {
+  const response = await axiosInstance.patch(
+    `/profile/update/${userId}`,
+    profileData
+  );
+  return response;
+};
+
+export const updatePassword = async (
+  password: string,
+  password_confirmation: string
+): Promise<any> => {
+  const response = await axiosInstance.patch("/update-password", {
+    password,
+    password_confirmation,
+  });
+  return response;
 };
 
 export const removeFromProject = async (userId: string): Promise<void> => {

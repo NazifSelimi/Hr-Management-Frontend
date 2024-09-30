@@ -4,6 +4,7 @@ import Spinner from "../../Spinner";
 import axiosInstance from "../../../api/axiosInstance";
 import { User } from "../../types";
 import UserProfileForm from "./UserProfileForm";
+import { updateUserProfile, fetchUserProfile } from "../../../apiService";
 
 const UserProfile: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -11,10 +12,10 @@ const UserProfile: React.FC = () => {
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchProfile = async () => {
       try {
-        const response = await axiosInstance.get(`/profile`);
-        setUser(response.data);
+        const response = await fetchUserProfile();
+        setUser(response);
       } catch (error: any) {
         console.error("Error fetching profile details:", error);
       } finally {
@@ -22,25 +23,28 @@ const UserProfile: React.FC = () => {
       }
     };
 
-    fetchUserProfile();
+    fetchProfile();
   }, []);
 
   const handleSave = async (values: any) => {
     try {
       if (user) {
-        await axiosInstance.put(`/profile/update/${user.id}`, values);
-
+        const response = await updateUserProfile(user.id, values);
         setUser((prevUser) => ({
           ...prevUser,
           ...values,
         }));
 
         setEditing(false);
-        message.success("Your profile has been updated successfully");
+        message.success(
+          response.data.message || "Your profile has been updated successfully."
+        );
       }
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      message.error("Something went wrong while updating your profile");
+      message.error(
+        error.data.message || "Something went wrong while updating your profile"
+      );
     }
   };
 
