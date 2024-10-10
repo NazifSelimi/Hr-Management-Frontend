@@ -1,42 +1,29 @@
-import React, { useEffect, useState } from "react";
+// src/components/MyProjectDetails.tsx
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  Spin,
-  Typography,
-  Divider,
-  Row,
-  Col,
-  Table,
-  message,
-} from "antd";
-import axiosInstance from "../../../api/axiosInstance";
+import { Card, Spin, Typography, Divider, Row, Col, Table, message } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../../redux/store"; // Ensure the path is correct
+import { fetchProjects } from "../../../redux/projectsSlice"; // Import the fetchProjects thunk
 import { Project, User } from "../../types";
 
 const { Title, Text } = Typography;
 
 const MyProjectDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { projects, loading, error } = useSelector(
+    (state: RootState) => state.projectStore
+  );
+
+  const project = projects.find((proj) => proj.id === id);
 
   useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        const response = await axiosInstance.get(`/view-project/${id}`);
-        setProject(response.data);
-      } catch (error: any) {
-        console.error("Error fetching project details:", error);
-        message.error(error.response?.data?.message || "Failed to fetch project details.");
-        setError("Failed to fetch project details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProject();
-  }, [id]);
+    if (!project) {
+      dispatch(fetchProjects());
+    }
+  }, [dispatch, project]);
 
   if (loading) return <Spin />;
 

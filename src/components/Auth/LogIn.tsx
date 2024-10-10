@@ -39,7 +39,7 @@ const Login: React.FC = () => {
       // Set authToken in LocalStorage
 
       if (response.status === 200) {
-        message.success("Login successful!");
+        // message.success("Login successful!"); //by default, the message is displayed
 
         const userResponse = await axiosInstance.get("/user", {
           withCredentials: true, // Ensure cookies are sent with this request too

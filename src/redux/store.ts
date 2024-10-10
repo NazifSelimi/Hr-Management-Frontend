@@ -1,12 +1,16 @@
 // src/redux/store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import projectsReducer from "./projectsSlice";
-import departmentsReducer from "./departmentsSlice";
+import departmentsSlice from "./departmentsSlice";
+import projectsSlice from "./projectsSlice";
+import vacationsSlice from "./vacationsSlice"
+import userSlice from "./userSlice";
 
 const store = configureStore({
   reducer: {
-    projects: projectsReducer,
-    departments: departmentsReducer,
+    projectStore: projectsSlice,
+    departmentStore: departmentsSlice,
+    vacationsStore: vacationsSlice,
+    userStore: userSlice,
     // Add other reducers here
   },
 });
