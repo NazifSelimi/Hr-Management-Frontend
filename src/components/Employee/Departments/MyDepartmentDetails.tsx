@@ -1,42 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  Spin,
-  Typography,
-  Divider,
-  Row,
-  Col,
-  Table,
-  message,
-} from "antd";
-import axiosInstance from "../../../api/axiosInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { Card, Spin, Typography, Divider, Row, Col, Table } from "antd";
+import { RootState } from "../../../redux/store"; // Import the correct RootState type
+import { fetchDepartments } from "../../../redux/departmentsSlice"; // Your existing slice
+import { AppDispatch } from "../../../redux/store";
 import { Department, User } from "../../types";
 
 const { Title, Text } = Typography;
 
 const MyDepartmentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [department, setDepartment] = useState<Department | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { departments, loading, error } = useSelector(
+    (state: RootState) => state.departmentStore
+  );
+
+  const department = departments.find((dep) => dep.id === id);
 
   useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        const response = await axiosInstance.get(`/view-department/${id}`);
-        setDepartment(response.data);
-      } catch (error: any) {
-        console.error("Error fetching department details:", error);
-        message.error(error.response?.data?.message || "Failed to fetch department details.");
-        setError("Failed to fetch department details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProject();
-  }, [id]);
+    if (!department) {
+      // Fetch departments if not already loaded
+      dispatch(fetchDepartments());
+    }
+  }, [dispatch, department]);
 
   if (loading) return <Spin />;
 

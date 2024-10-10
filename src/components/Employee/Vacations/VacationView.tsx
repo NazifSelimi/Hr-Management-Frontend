@@ -1,37 +1,30 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axiosInstance from "../../../api/axiosInstance";
-import { ColumnsType } from "antd/es/table";
-import { Table, Button, Space, message } from "antd";
-import { Vacation } from "../../types";
-import { User } from "../../types";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Table, message } from "antd";
+import { fetchVacations } from "../../../redux/vacationsSlice"; // Adjust the import path
 import Spinner from "../../Spinner";
-import { fetchEmployeeVacation } from "../../../apiService";
+import { RootState } from "../../../redux/store"; // Adjust the import path for RootState
+import { AppDispatch } from "../../../redux/store";
 
 const VacationView: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [vacations, setVacations] = useState<Vacation[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { vacations, loading, error } = useSelector((state: RootState) => state.vacationsStore);
 
   useEffect(() => {
-    const fetchVacations = async () => {
+    const loadVacations = async () => {
       try {
-        const response = await fetchEmployeeVacation();
-        setVacations(response);
+        await dispatch(fetchVacations()).unwrap();
       } catch (error: any) {
-        setError(error);
-        console.error(`Error fetching vacations:`, error);
         message.error(`Failed to fetch vacations: ${error.message}`);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchVacations();
-  }, []);
+    loadVacations();
+  }, [dispatch]);
 
   if (error) return <p>{error}</p>;
 
-  const columns: ColumnsType<Vacation> = [
+  const columns = [
     {
       title: "Start Date",
       dataIndex: "formatted_start_date",

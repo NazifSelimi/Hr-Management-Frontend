@@ -16,7 +16,7 @@ const MyDepartments: React.FC = () => {
 
   // Using useSelector to get projects and loading state from Redux
   const { departments, loading, error } = useSelector(
-    (state: RootState) => state.departments
+    (state: RootState) => state.departmentStore
   );
 
   useEffect(() => {

@@ -4,18 +4,19 @@ import axiosInstance from "../api/axiosInstance";
 import { Project } from "../components/types";
 
 interface ProjectsState {
-  projects: Project[];
-  loading: boolean;
-  error: string | null;
+  projects: Project[]; // Array to hold the list of projects
+  loading: boolean;     // State to track loading status
+  error: string | null; // State to track any errors
 }
 
+// Initial state for the projects slice
 const initialState: ProjectsState = {
   projects: [],
   loading: false,
   error: null,
 };
 
-// Thunk for fetching projects
+// Thunk for fetching all projects
 export const fetchProjects = createAsyncThunk<Project[]>(
   "projects/fetchProjects",
   async () => {
@@ -24,26 +25,52 @@ export const fetchProjects = createAsyncThunk<Project[]>(
   }
 );
 
+// Thunk for fetching a single project by ID
+export const fetchProjectById = createAsyncThunk<Project, string>(
+  "projects/fetchProjectById",
+  async (id) => {
+    const response = await axiosInstance.get(`/view-project/${id}`);
+    return response.data;
+  }
+);
+
 const projectsSlice = createSlice({
   name: "projects",
   initialState,
-  reducers: {},
+  reducers: {}, // Add synchronous reducers here if needed
   extraReducers: (builder) => {
+    // Handle fetchProjects actions
     builder
       .addCase(fetchProjects.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loading = true; // Set loading to true while fetching
+        state.error = null;   // Reset error
       })
       .addCase(
         fetchProjects.fulfilled,
         (state, action: PayloadAction<Project[]>) => {
-          state.projects = action.payload;
-          state.loading = false;
+          state.projects = action.payload; // Store fetched projects
+          state.loading = false;            // Set loading to false after fetching
         }
       )
       .addCase(fetchProjects.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || "Failed to fetch projects";
+        state.loading = false;                      // Set loading to false on error
+        state.error = action.error.message || "Failed to fetch projects"; // Capture error
+      })
+      // Handle fetchProjectById actions
+      .addCase(fetchProjectById.pending, (state) => {
+        state.loading = true; // Set loading to true while fetching
+        state.error = null;   // Reset error
+      })
+      .addCase(
+        fetchProjectById.fulfilled,
+        (state, action: PayloadAction<Project>) => {
+          // You can add specific logic to handle a single project's state if needed
+          state.loading = false; // Set loading to false after fetching
+        }
+      )
+      .addCase(fetchProjectById.rejected, (state, action) => {
+        state.loading = false;                      // Set loading to false on error
+        state.error = action.error.message || "Failed to fetch project"; // Capture error
       });
   },
 });
