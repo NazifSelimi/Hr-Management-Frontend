@@ -5,7 +5,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import type { User } from "../../types";
 import Spinner from "../../Spinner";

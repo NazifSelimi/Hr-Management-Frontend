@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, message } from "antd";
-import axiosInstance from "../../api/axiosInstance"; // Pre-configured axios instance
+import axiosInstance from "../../services/axiosInstance"; // Pre-configured axios instance
 import axios from "axios"; // For CSRF token fetching
 import { useAuth } from "../../Context/AuthContext"; // Import useAuth hook
 import "./LogIn.css";

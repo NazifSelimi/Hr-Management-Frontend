@@ -1,12 +1,13 @@
 // src/components/MyProjects.tsx
 import React, { useEffect } from "react";
-import { Table, Button, message, Spin, Dropdown } from "antd";
+import { Table, Button, message, Dropdown } from "antd";
+import Spinner from "../../Spinner";
 import { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
 import { EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "../../../redux/projectsSlice";
-import { RootState, AppDispatch } from "../../../redux/store";
+import { fetchProjects } from "../../../store/projectsSlice";
+import { RootState, AppDispatch } from "../../../store/store";
 import { Project } from "../../types";
 
 const MyProjects: React.FC = () => {
@@ -79,7 +80,7 @@ const MyProjects: React.FC = () => {
     <div>
       <h2>Projects</h2>
       {loading ? (
-        <Spin />
+        <Spinner />
       ) : (
         <Table
           virtual

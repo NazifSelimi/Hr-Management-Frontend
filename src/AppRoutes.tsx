@@ -77,6 +77,12 @@ const AppRoutes: React.FC = () => {
         path="/employees"
         element={<ProtectedRoute element={Employees} requiredRole="admin" />}
       />
+        <Route
+          path="/review-vacations"
+          element={
+            <ProtectedRoute element={VacationReview} requiredRole="admin" />
+          }
+        />
       {/* Protected Employee Routes */}
       <Route
         path="/request-vacation"
@@ -103,12 +109,6 @@ const AppRoutes: React.FC = () => {
         path="/vacations"
         element={
           <ProtectedRoute element={VacationView} requiredRole="employee" />
-        }
-      />
-      <Route
-        path="/review-vacations"
-        element={
-          <ProtectedRoute element={VacationReview} requiredRole="admin" />
         }
       />
       <Route

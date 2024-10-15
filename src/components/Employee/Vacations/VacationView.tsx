@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Table, message } from "antd";
-import { fetchVacations } from "../../../redux/vacationsSlice"; // Adjust the import path
+import { fetchVacations } from "../../../store/vacationsSlice"; // Adjust the import path
 import Spinner from "../../Spinner";
-import { RootState } from "../../../redux/store"; // Adjust the import path for RootState
-import { AppDispatch } from "../../../redux/store";
+import { RootState, AppDispatch } from "../../../store/store";
 
 const VacationView: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

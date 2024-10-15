@@ -3,8 +3,8 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Card, Spin, Typography, Divider, Row, Col, Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../redux/store"; // Ensure the path is correct
-import { fetchProjects } from "../../../redux/projectsSlice"; // Import the fetchProjects thunk
+import { RootState, AppDispatch } from "../../../store/store";
+import { fetchProjects } from "../../../store/projectsSlice"; // Import the fetchProjects thunk
 import { Project, User } from "../../types";
 
 const { Title, Text } = Typography;

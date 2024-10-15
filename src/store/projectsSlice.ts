@@ -1,6 +1,6 @@
 // src/redux/projectsSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance from "../services/axiosInstance";
 import { Project } from "../components/types";
 
 interface ProjectsState {

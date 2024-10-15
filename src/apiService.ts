@@ -1,4 +1,4 @@
-import axiosInstance from "./api/axiosInstance";
+import axiosInstance from "./services/axiosInstance";
 import { Department, Project, User, Vacation } from "./components/types";
 
 // Employee APIs

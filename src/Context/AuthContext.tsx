@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import Cookies from "js-cookie";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance from "../services/axiosInstance";
 
 interface AuthContextType {
   isLoggedIn: boolean;

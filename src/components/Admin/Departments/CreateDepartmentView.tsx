@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import CreateDepartmentForm from "./CreateDepartmentForm";
 import { Spin, message } from "antd";
 

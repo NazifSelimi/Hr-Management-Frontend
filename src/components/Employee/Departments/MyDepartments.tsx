@@ -1,12 +1,12 @@
 // src/components/MyProjects.tsx
 import React, { useEffect } from "react";
-import { Table, Button, message, Spin, Dropdown } from "antd";
+import { Table, Button, message,  Dropdown } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
 import { EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDepartments } from "../../../redux/departmentsSlice";
-import { RootState, AppDispatch } from "../../../redux/store";
+import { fetchDepartments } from "../../../store/departmentsSlice";
+import { RootState, AppDispatch } from "../../../store/store";
 import { Department } from "../../types";
 import Spinner from "../../Spinner";
 

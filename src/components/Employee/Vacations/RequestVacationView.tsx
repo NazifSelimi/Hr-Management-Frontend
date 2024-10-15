@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import axiosInstance from "../../../api/axiosInstance";
+// import axiosInstance from "../../../api/axiosInstance";
 import VacationForm from "./VacationForm";
-import Spinner from "../../Spinner";
 import { requestVacation } from "../../../apiService";
 import { message } from "antd";
 
@@ -19,7 +18,7 @@ const RequestVacationView: React.FC = () => {
       const response = await requestVacation(values);
 
       if (response.status === 201) {
-        message.success(response.data.message);
+        // message.success(response.data.message);
       } else {
         console.error("Unexpected response:", response);
         message.error(response.data.message);

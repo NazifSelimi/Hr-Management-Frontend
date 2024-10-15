@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, Spin, Typography, Divider, Row, Col, Table } from "antd";
-import { RootState } from "../../../redux/store"; // Import the correct RootState type
-import { fetchDepartments } from "../../../redux/departmentsSlice"; // Your existing slice
-import { AppDispatch } from "../../../redux/store";
+import { Card, Spin, Typography, Divider, Row, Col, Table } from "antd"; // Import the correct RootState type
+import { fetchDepartments } from "../../../store/departmentsSlice"; // Your existing slice
+import { RootState, AppDispatch } from "../../../store/store";
 import { Department, User } from "../../types";
 
 const { Title, Text } = Typography;

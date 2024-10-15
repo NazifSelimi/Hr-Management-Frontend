@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance from "../services/axiosInstance";
 import { Department } from "../components/types";
 
 interface DepartmentsState {

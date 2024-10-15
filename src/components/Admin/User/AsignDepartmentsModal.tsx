@@ -265,7 +265,7 @@
 // export default AssignEntityModal;
 import React, { useState, useEffect } from "react";
 import { Modal, Select, Button, message, Spin, Input, Tag } from "antd";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { Department, Project, User } from "../../types";
 
 interface AssignEntityModalProps {

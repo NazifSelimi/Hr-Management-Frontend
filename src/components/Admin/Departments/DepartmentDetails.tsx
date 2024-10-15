@@ -11,7 +11,7 @@ import {
   message,
 } from "antd";
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import Spinner from "../../Spinner";
 import AssignEntityModal from "../User/AsignDepartmentsModal"; // Use the refactored modal
 import { fetchDepartment, removeUserDepartment } from "../../../apiService";

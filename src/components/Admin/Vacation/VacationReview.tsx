@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { ColumnsType } from "antd/es/table";
 import { Table, Button, Space, message } from "antd";
 import { Vacation } from "../../types";

@@ -14,7 +14,7 @@ import {
   Col,
   Input,
 } from "antd";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { User, Project } from "../../types";
 
 const { Title, Text } = Typography;

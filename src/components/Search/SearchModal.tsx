@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Select, Input, Spin, message } from "antd";
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance from "../../services/axiosInstance";
 import Employees from "../Admin/Employees/Employees";
 import Projects from "../Admin/Projects/Projects";
 import DepartmentsList from "../Admin/Departments/DepartmentsList"; // Import Departments

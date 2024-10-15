@@ -14,7 +14,7 @@ import {
   Modal,
 } from "antd";
 import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { Project, User } from "../../types";
 
 const { Title, Text } = Typography;

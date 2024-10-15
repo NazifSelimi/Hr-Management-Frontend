@@ -12,7 +12,7 @@ import {
   Col,
 } from "antd";
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
 import AssignEntityModal from "./AsignDepartmentsModal";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Select, Button, message, Spin, Input } from "antd";
-import axiosInstance from "../../../api/axiosInstance";
+import axiosInstance from "../../../services/axiosInstance";
 import { User } from "../../types";
 
 interface AssignUsersModalProps {
