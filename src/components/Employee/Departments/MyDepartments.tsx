@@ -5,7 +5,7 @@ import { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
 import { EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDepartments } from "../../../store/departmentsSlice";
+import { fetchDepartments } from "../../../store/employee/departmentsSlice";
 import { RootState, AppDispatch } from "../../../store/store";
 import { Department } from "../../types";
 import Spinner from "../../Spinner";

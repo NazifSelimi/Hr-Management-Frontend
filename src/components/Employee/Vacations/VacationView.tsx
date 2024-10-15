@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Table, message } from "antd";
-import { fetchVacations } from "../../../store/vacationsSlice"; // Adjust the import path
+import { fetchVacations } from "../../../store/employee/vacationsSlice" 
 import Spinner from "../../Spinner";
 import { RootState, AppDispatch } from "../../../store/store";
 

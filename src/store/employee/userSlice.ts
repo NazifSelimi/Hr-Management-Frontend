@@ -1,7 +1,7 @@
 // src/redux/userSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { updateUserProfile, fetchUserProfile } from "../apiService";
-import {User} from "../components/types"
+import { updateUserProfile, fetchUserProfile } from "../../apiService";
+import {User} from "../../components/types"
 
 interface UserState {
   user: User | null;

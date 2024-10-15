@@ -1,7 +1,7 @@
 // src/redux/projectsSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../services/axiosInstance";
-import { Project } from "../components/types";
+import axiosInstance from "../../services/axiosInstance";
+import { Project } from  "../../components/types";
 
 interface ProjectsState {
   projects: Project[]; // Array to hold the list of projects

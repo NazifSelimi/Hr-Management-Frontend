@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../services/axiosInstance";
-import { Department } from "../components/types";
+import axiosInstance from "../../services/axiosInstance";
+import { Department } from "../../components/types";
 
 interface DepartmentsState {
   departments: Department[];

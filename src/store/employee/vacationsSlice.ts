@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchEmployeeVacation } from '../apiService'; // Adjust the path as needed
-import { Vacation } from "../components/types"; // Adjust to match your type definition path
+import { fetchEmployeeVacation } from "../../apiService"; 
+import { Vacation } from "../../components/types";
 
 // Define the state interface
 interface VacationsState {

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { Card, Spin, Typography, Divider, Row, Col, Table, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/store";
-import { fetchProjects } from "../../../store/projectsSlice"; // Import the fetchProjects thunk
+import { fetchProjects } from "../../../store/employee/projectsSlice"; // Import the fetchProjects thunk
 import { Project, User } from "../../types";
 
 const { Title, Text } = Typography;

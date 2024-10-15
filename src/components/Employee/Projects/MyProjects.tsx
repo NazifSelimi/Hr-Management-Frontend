@@ -6,7 +6,7 @@ import { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
 import { EllipsisOutlined, EyeOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "../../../store/projectsSlice";
+import { fetchProjects } from "../../../store/employee/projectsSlice";
 import { RootState, AppDispatch } from "../../../store/store";
 import { Project } from "../../types";
 

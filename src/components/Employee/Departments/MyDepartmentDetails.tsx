@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Spin, Typography, Divider, Row, Col, Table } from "antd"; // Import the correct RootState type
-import { fetchDepartments } from "../../../store/departmentsSlice"; // Your existing slice
+import { fetchDepartments } from "../../../store/employee/departmentsSlice"
 import { RootState, AppDispatch } from "../../../store/store";
 import { Department, User } from "../../types";
 

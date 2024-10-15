@@ -11,7 +11,7 @@ const Spinner: React.FC = () => {
         height: "100vh",
       }}
     >
-      <Spin size="large" />
+      <Spin size="default" />
     </div>
   );
 };
