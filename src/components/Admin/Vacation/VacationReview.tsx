@@ -44,9 +44,9 @@ const VacationReview: React.FC = () => {
 
   const handleReview = async (status: string, record: Vacation) => {
     try {
-      const response = await updateVacation(record.id, { status: status });
+      await updateVacation(record.id, { status: status });
 
-      message.success(response.data.message);
+      // message.success(response.data.message); //by default it has a message
       fetchData(setVacations);
     } catch (error: any) {
       console.error("Error updating project:", error);

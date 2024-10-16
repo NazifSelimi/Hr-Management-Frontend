@@ -1,11 +1,12 @@
 // src/components/MyProjectDetails.tsx
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Spin, Typography, Divider, Row, Col, Table, message } from "antd";
+import { Card,Typography, Divider, Row, Col, Table } from "antd";
+import Spinner from "../../Spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/store";
 import { fetchProjects } from "../../../store/employee/projectsSlice"; // Import the fetchProjects thunk
-import { Project, User } from "../../types";
+import { User } from "../../types";
 
 const { Title, Text } = Typography;
 
@@ -25,7 +26,7 @@ const MyProjectDetails: React.FC = () => {
     }
   }, [dispatch, project]);
 
-  if (loading) return <Spin />;
+  if (loading) return <Spinner />;
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 

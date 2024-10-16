@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import VacationForm from "./VacationForm";
 import { requestVacation } from "../../../apiService";
 import { message } from "antd";
+import { log } from "console";
 
 const RequestVacationView: React.FC = () => {
   const handleSubmit = async (values: {
@@ -28,7 +29,8 @@ const RequestVacationView: React.FC = () => {
       const message =
         error.response?.data?.message ||
         "An error occurred while requesting days off.";
-      alert(message);
+        console.log(message)
+
     } finally {
     }
   };
