@@ -13,7 +13,7 @@ import {
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import Spinner from "../../Spinner";
-import AssignEntityModal from "../User/AsignDepartmentsModal"; // Use the refactored modal
+import AssignEditModal from "../AssignEditModal";
 
 const { Title, Text } = Typography;
 
@@ -46,8 +46,23 @@ const DepartmentDetails: React.FC = () => {
   }, [id]);
 
   // Open the assign modal for either user or project
-  const openAssignModal = (entityType: "user" | "project") => {
+  const openAssignModal = (
+    entityType: "user" | "project",
+    operation: "assign" | "edit" = "assign",
+    record?: any
+  ) => {
     setAssignEntityType(entityType);
+    setEditEntity(
+      operation === "edit"
+        ? {
+            id: record.id,
+            position:
+              entityType === "user"
+                ? record.pivot?.position || ""
+                : record.projectRole?.role || "",
+          }
+        : undefined
+    );
     setIsAssignModalVisible(true);
   };
 
@@ -58,48 +73,58 @@ const DepartmentDetails: React.FC = () => {
   };
 
   // Handle entity assignment (users or projects)
-  const handleAssignSubmit = (values: {
-    entities: { id: string; position: string }[];
+  const handleAssignSubmit = async (values: {
+    entities: { id: string; position?: string; role?: string }[];
   }) => {
     if (!department) return;
 
-    if (assignEntityType === "user") {
-      const updatedUsers = values.entities.map((entity) => ({
-        id: entity.id,
-        first_name: "User FirstName", // Replace with actual user data
-        last_name: "User LastName", // Replace with actual user data
-        pivot: { position: entity.position },
-      }));
+    try {
+      // Fetch actual data for assigned entities (users or projects)
+      const fetchedEntities = await Promise.all(
+        values.entities.map(async (entity) => {
+          if (assignEntityType === "user") {
+            const response = await axiosInstance.get(`/users/${entity.id}`);
+            const userData = response.data;
+            return {
+              ...userData,
+              pivot: { position: entity.position || "" },
+            };
+          } else if (assignEntityType === "project") {
+            const response = await axiosInstance.get(`/projects/${entity.id}`);
+            const projectData = response.data;
+            return projectData; // Add or modify as needed if you need additional properties
+          }
+        })
+      );
 
-      setDepartment((prevDepartment: any) => ({
-        ...prevDepartment,
-        users: [...prevDepartment.users, ...updatedUsers],
-      }));
-    } else {
-      const updatedProjects = values.entities.map((entity) => ({
-        id: entity.id,
-        name: "Project Name", // Replace with actual project data
-        projectRole: { role: entity.position },
-      }));
+      // Update department state with the fetched data
+      setDepartment((prevDepartment: any) => {
+        if (!prevDepartment) return prevDepartment;
 
-      setDepartment((prevDepartment: any) => ({
-        ...prevDepartment,
-        projects: [...prevDepartment.projects, ...updatedProjects],
-      }));
+        if (assignEntityType === "user") {
+          return {
+            ...prevDepartment,
+            users: [...prevDepartment.users, ...fetchedEntities],
+          };
+        } else {
+          return {
+            ...prevDepartment,
+            projects: [...prevDepartment.projects, ...fetchedEntities],
+          };
+        }
+      });
+
+      message.success("Entities assigned successfully!");
+      closeAssignModal(); // Close modal after submission
+    } catch (error) {
+      console.error("Error fetching data for assignment:", error);
+      message.error("Failed to assign entities. Please try again.");
     }
-
-    message.success("Entities assigned successfully!");
-    closeAssignModal(); // Close modal after submission
   };
 
   // Handle editing an entity's position or role
   const handleEditEntity = (record: any, entityType: "user" | "project") => {
-    setEditEntity({
-      id: record.id,
-      position:
-        entityType === "user" ? record.pivot.position : record.projectRole.role,
-    });
-    openAssignModal(entityType);
+    openAssignModal(entityType, "edit", record);
   };
 
   // Handle removing an entity (either user or project)
@@ -203,25 +228,12 @@ const DepartmentDetails: React.FC = () => {
       key: "name",
     },
     {
-      title: "Role",
-      dataIndex: ["projectRole", "role"],
-      key: "role",
-    },
-    {
       title: "Actions",
       key: "actions",
       render: (text: string, record: any) => (
         <Dropdown
           menu={{
             items: [
-              {
-                key: "edit-role",
-                label: (
-                  <span onClick={() => handleEditEntity(record, "project")}>
-                    Edit Role
-                  </span>
-                ),
-              },
               {
                 key: "remove-project",
                 label: (
@@ -272,6 +284,7 @@ const DepartmentDetails: React.FC = () => {
             type="primary"
             icon={<UserAddOutlined />}
             onClick={() => openAssignModal("user")}
+            style={{ marginRight: "10px" }}
           >
             Assign User
           </Button>
@@ -302,18 +315,18 @@ const DepartmentDetails: React.FC = () => {
           rowKey="id"
         />
       </Card>
-
-      {/* Reusable Assign Entity Modal */}
-      <AssignEntityModal
+      <AssignEditModal
         visible={isAssignModalVisible}
         onClose={closeAssignModal}
-        entityId={id || ""} // Provide a fallback if id is undefined
-        existingEntities={
+        parentId={id || ""}
+        entityType={assignEntityType}
+        operationType={editEntity ? "edit" : "assign"}
+        scope="department"
+        currentAssignments={
           assignEntityType === "user" ? department.users : department.projects
         }
-        entityType={assignEntityType}
-        onSubmit={handleAssignSubmit}
         editEntity={editEntity}
+        onSubmit={handleAssignSubmit}
       />
     </>
   );

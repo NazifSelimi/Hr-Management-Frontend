@@ -3,22 +3,24 @@ import { useParams } from "react-router-dom";
 import {
   Card,
   Typography,
+  Divider,
+  Row,
+  Col,
   Table,
   message,
   Dropdown,
   Button,
   Modal,
-  Row,
-  Col,
 } from "antd";
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/axiosInstance";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
-import AssignEntityModal from "./AsignDepartmentsModal";
-import UserInfo from "./UserInfo"; // Import the UserInfo component
+import AssignEntityModal from "../AsignEntityModal";
+import UserInfo from "./UserInfo";
+import AssignEditModal from "../AssignEditModal";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const UserDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,17 +72,18 @@ const UserDetails: React.FC = () => {
   }, []);
 
   const handleAssignSubmit = useCallback(
-    (values: { entities: { id: string; position: string }[] }) => {
+    (values: {
+      entities: { id: string; role?: string; position?: string }[];
+    }) => {
       setUser((prevUser) => {
         if (!prevUser) return prevUser;
 
         if (assignEntityType === "department") {
-          // Update existing departments
           const updatedDepartments = prevUser.departments.map((dept) => {
             const updatedEntity = values.entities.find(
               (entity) => entity.id === dept.id
             );
-            return updatedEntity
+            return updatedEntity && updatedEntity.position
               ? {
                   ...dept,
                   pivot: { ...dept.pivot, position: updatedEntity.position },
@@ -88,67 +91,28 @@ const UserDetails: React.FC = () => {
               : dept;
           });
 
-          // Add new departments that are not in the current list
-          const newDepartments = values.entities
-            .filter(
-              (entity) =>
-                !prevUser.departments.some((dept) => dept.id === entity.id)
-            )
-            .map((entity) => ({
-              id: entity.id,
-              name: "New Department", // Replace this with actual name if needed
-              pivot: { position: entity.position },
-              users: prevUser ? [prevUser] : [], // Ensure new departments have users
-            }));
-
-          return {
-            ...prevUser,
-            departments: [...updatedDepartments, ...newDepartments],
-          };
-        } else {
-          // Update existing projects
+          return { ...prevUser, departments: updatedDepartments };
+        } else if (assignEntityType === "project") {
           const updatedProjects = prevUser.projects.map((proj) => {
             const updatedEntity = values.entities.find(
               (entity) => entity.id === proj.id
             );
-            return updatedEntity
+            return updatedEntity && updatedEntity.role
               ? {
                   ...proj,
                   projectRole: {
                     ...proj.projectRole,
-                    role: updatedEntity.position,
+                    role: updatedEntity.role,
                   },
                 }
               : proj;
           });
 
-          // Add new projects that are not in the current list
-          const newProjects = values.entities
-            .filter(
-              (entity) =>
-                !prevUser.projects.some((proj) => proj.id === entity.id)
-            )
-            .map((entity) => ({
-              id: entity.id,
-              name: "New Project", // Replace this with actual name if needed
-              description: "New Project Description", // Replace with actual description if needed
-              projectRole: { role: entity.position },
-              users: prevUser ? [prevUser] : [], // Ensure new projects have users
-              departments: [], // Initialize with an empty departments array if needed
-            }));
-
-          return {
-            ...prevUser,
-            projects: [...updatedProjects, ...newProjects],
-          };
+          return { ...prevUser, projects: updatedProjects };
         }
-      });
 
-      message.success(
-        `${
-          assignEntityType === "department" ? "Departments" : "Projects"
-        } assigned successfully!`
-      );
+        return prevUser;
+      });
     },
     [assignEntityType]
   );
@@ -160,12 +124,12 @@ const UserDetails: React.FC = () => {
         position:
           entityType === "department"
             ? record.pivot.position
-            : record.pivot.role,
+            : record.projectRole.role,
       };
 
       setAssignEntityType(entityType);
+      setIsAssignModalVisible(true);
       setEditEntity(editEntity);
-      setIsAssignModalVisible(true); // Open the modal with the entity pre-filled
     },
     []
   );
@@ -361,14 +325,16 @@ const UserDetails: React.FC = () => {
       </Card>
 
       {/* Reusable Modal for assigning departments or projects */}
-      <AssignEntityModal
+      <AssignEditModal
         visible={isAssignModalVisible}
         onClose={closeAssignModal}
-        entityId={user.id} // Changed to entityId for consistency
-        existingEntities={
+        parentId={user.id}
+        currentAssignments={
           assignEntityType === "department" ? user.departments : user.projects
         }
         entityType={assignEntityType}
+        operationType={editEntity ? "edit" : "assign"} // Determining if it's assign or edit mode
+        scope={assignEntityType} // Set the scope to "department" or "project" based on the entity type
         onSubmit={handleAssignSubmit}
         editEntity={editEntity}
       />
