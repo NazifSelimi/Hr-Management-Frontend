@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import VacationForm from "./VacationForm";
 import { requestVacation } from "../../../apiService";
 import { message } from "antd";
-import { log } from "console";
 
 const RequestVacationView: React.FC = () => {
   const handleSubmit = async (values: {

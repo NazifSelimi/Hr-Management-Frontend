@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Input, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { message } from "antd";
 import { fetchVacations } from "../../../store/employee/vacationsSlice"
 import Spinner from "../../Spinner";
@@ -21,7 +21,11 @@ interface VacationFormProps {
 const VacationForm: React.FC<VacationFormProps> = ({ onSubmit }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading } = useSelector((state: RootState) => state.vacationsStore);
+  const { loading: vacationsLoading } = useSelector(
+    (state: RootState) => state.vacationsStore
+  );
+  const [formLoading, setFormLoading] = useState(false);
+  const isLoading = vacationsLoading || formLoading; //isLoading is actually the function loading that is used everywhere in the vacations components
 
   useEffect(() => {
     const loadVacations = async () => {
@@ -35,16 +39,24 @@ const VacationForm: React.FC<VacationFormProps> = ({ onSubmit }) => {
     loadVacations();
   }, [dispatch]);
 
-  const handleFinish = (values: any) => {
-    onSubmit({
-      ...values,
-    });
+  const handleFinish = async (values: any) => {
+    try {
+      setFormLoading(true); // Set loading to true when submitting
+      await onSubmit({
+        ...values,
+      });
+      // message.success("Vacation requested successfully!");
+    } catch (error) {
+      message.error("Failed to request vacation. Please try again.");
+    } finally {
+      setFormLoading(false); // Set loading back to false after submission
+    }
   };
 
-  // TODO: FIX THE SPINNER SO WHEN WE REQUEST VACATION, THE PAGE SHOULD DISPLAY LOADING (SPINNER) !!!!!!!!!
+
   return (
     <>
-      {loading ? (
+      {isLoading ? (
         <Spinner />
       ) : (
         <Form form={form} onFinish={handleFinish} layout="vertical">

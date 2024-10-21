@@ -5,7 +5,6 @@ import {
   ApartmentOutlined,
   ProjectOutlined,
   CarOutlined,
-  DeploymentUnitOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
@@ -75,9 +74,19 @@ const Sidebar: React.FC = () => {
   // Employee-specific menu items
   const employeeMenuItems = [
     {
+      key: "sub4",
+      icon: <UserOutlined />,
+      label: <Link to="/profile">My Profile</Link>,
+    },
+    {
       key: "sub1",
       icon: <ProjectOutlined />,
       label: <Link to="/my-projects">My Projects</Link>,
+    },
+    {
+      key: "sub3",
+      icon: <ApartmentOutlined />,
+      label: <Link to="/my-departments">My Departments</Link>,
     },
     {
       key: "sub2",
@@ -90,16 +99,6 @@ const Sidebar: React.FC = () => {
           label: <Link to="/request-vacation">Request Vacation</Link>,
         },
       ],
-    },
-    {
-      key: "sub3",
-      icon: <ApartmentOutlined />,
-      label: <Link to="/my-departments">My Departments</Link>,
-    },
-    {
-      key: "sub4",
-      icon: <UserOutlined />,
-      label: <Link to="/profile">My Profile</Link>,
     },
   ];
 
