@@ -63,10 +63,6 @@ const Sidebar: React.FC = () => {
           key: "6",
           label: <Link to="/review-vacations">Review Vacations</Link>,
         },
-        {
-          key: "7",
-          label: <Link to="/vacations">View Vacations</Link>,
-        },
       ],
     },
   ];
@@ -84,12 +80,12 @@ const Sidebar: React.FC = () => {
       label: <Link to="/my-projects">My Projects</Link>,
     },
     {
-      key: "sub3",
+      key: "sub2",
       icon: <ApartmentOutlined />,
       label: <Link to="/my-departments">My Departments</Link>,
     },
     {
-      key: "sub2",
+      key: "sub3",
       icon: <CarOutlined />,
       label: "Vacations",
       children: [

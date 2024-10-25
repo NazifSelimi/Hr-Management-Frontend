@@ -2,30 +2,26 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetchEmployeeVacation } from "../../apiService"; 
 import { Vacation } from "../../components/types";
 
-// Define the state interface
 interface VacationsState {
   vacations: Vacation[];
   loading: boolean;
   error: string | null;
 }
 
-// Initial state
 const initialState: VacationsState = {
   vacations: [],
   loading: false,
   error: null,
 };
 
-// Thunk for fetching vacations
 export const fetchVacations = createAsyncThunk<Vacation[], void>(
   "vacations/fetchVacations",
   async () => {
-    const response = await fetchEmployeeVacation(); // Adjust as needed
-    return response; // Make sure this matches the Vacation type
+    const response = await fetchEmployeeVacation(); 
+    return response; 
   }
 );
 
-// Vacations slice
 const vacationsSlice = createSlice({
   name: "vacations",
   initialState,

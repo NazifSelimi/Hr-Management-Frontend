@@ -1,60 +1,38 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axiosInstance from "../../../services/axiosInstance";
-import { ColumnsType } from "antd/es/table";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Table, Button, Space, message } from "antd";
+import { fetchVacations, updateVacationStatus } from "../../../store/admin/vacationAdminSlice"
+import { RootState } from "../../../store/store"
+import { ColumnsType } from "antd/es/table";
 import { Vacation } from "../../types";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
-import { fetchVacations, updateVacation } from "../../../apiService";
+import type { AppDispatch } from "../../../store/store" // Adjust the path if necessary
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 const VacationReview: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [vacations, setVacations] = useState<Vacation[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(
-    async (setter: React.Dispatch<React.SetStateAction<any>>) => {
-      try {
-        const data = await fetchVacations();
-        setter(data);
-      } catch (error: any) {
-        console.error(`Error fetching vacations:`, error);
-        message.error(`Failed to fetch vacations: ${error.message}`);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const dispatch = useAppDispatch();
+  const { vacations, loading, error } = useSelector((state: RootState) => state.vacationAdminStore);
 
   useEffect(() => {
-    const fetchVacations = async () => {
-      try {
-        await fetchData(setVacations);
-      } catch (error: any) {
-        console.error("Error fetching vacations:", error);
-        setError(error.response.data.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVacations();
-  }, [fetchData]);
+    dispatch(fetchVacations());
+  }, [dispatch]);
 
   const handleReview = async (status: string, record: Vacation) => {
     try {
-      await updateVacation(record.id, { status: status });
+      const resultAction = await dispatch(updateVacationStatus({ id: record.id, status }));
 
-      // message.success(response.data.message); //by default it has a message
-      fetchData(setVacations);
+      if (updateVacationStatus.fulfilled.match(resultAction)) {
+        // message.success(resultAction.payload.message);
+      } else {
+        message.error("Failed to update vacation status.");
+      }
     } catch (error: any) {
-      console.error("Error updating project:", error);
-      message.error(error.data.message);
+      console.error("Error updating vacation:", error);
+      message.error("Failed to update vacation.");
     }
   };
-
-  if (error) return <p>{error}</p>;
 
   const columns: ColumnsType<Vacation> = [
     {
@@ -111,6 +89,8 @@ const VacationReview: React.FC = () => {
     },
   ];
 
+  if (error) return <p>{error}</p>;
+
   return (
     <div>
       <h2>Vacations</h2>
@@ -119,7 +99,7 @@ const VacationReview: React.FC = () => {
       ) : (
         <Table
           virtual
-          scroll={{ x: 1000, y: 300 }}
+          scroll={{ x: 1300, y: 400 }}
           dataSource={vacations}
           columns={columns}
           rowKey="id"
