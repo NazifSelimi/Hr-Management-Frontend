@@ -1,19 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Button, Space, message } from "antd";
-import { fetchVacations, updateVacationStatus } from "../../../store/admin/vacationAdminSlice"
-import { RootState } from "../../../store/store"
+import { Table, Button, Space, message, Spin } from "antd";
+import { fetchVacations, updateVacationStatus } from "../../../store/admin/vacationAdminSlice";
+import { RootState } from "../../../store/store";
 import { ColumnsType } from "antd/es/table";
 import { Vacation } from "../../types";
 import { User } from "../../types";
 import Spinner from "../../Spinner";
-import type { AppDispatch } from "../../../store/store" // Adjust the path if necessary
+import type { AppDispatch } from "../../../store/store"; // Adjust the path if necessary
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 const VacationReview: React.FC = () => {
   const dispatch = useAppDispatch();
   const { vacations, loading, error } = useSelector((state: RootState) => state.vacationAdminStore);
+  const [loadingReview, setLoadingReview] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     dispatch(fetchVacations());
@@ -21,16 +22,19 @@ const VacationReview: React.FC = () => {
 
   const handleReview = async (status: string, record: Vacation) => {
     try {
+      setLoadingReview((prev) => ({ ...prev, [record.id]: true }));
       const resultAction = await dispatch(updateVacationStatus({ id: record.id, status }));
 
       if (updateVacationStatus.fulfilled.match(resultAction)) {
-        // message.success(resultAction.payload.message);
+        message.success("Vacation status updated successfully.");
       } else {
         message.error("Failed to update vacation status.");
       }
     } catch (error: any) {
       console.error("Error updating vacation:", error);
       message.error("Failed to update vacation.");
+    } finally {
+      setLoadingReview((prev) => ({ ...prev, [record.id]: false }));
     }
   };
 
@@ -74,20 +78,21 @@ const VacationReview: React.FC = () => {
         <Space size="middle">
           <Button
             onClick={() => handleReview("accept", record)}
-            disabled={record.status !== "pending"}
+            disabled={record.status !== "pending" || loadingReview[record.id]}
           >
-            Accept
+            {loadingReview[record.id] ? <Spin size="small" /> : "Accept"}
           </Button>
           <Button
             onClick={() => handleReview("reject", record)}
-            disabled={record.status !== "pending"}
+            disabled={record.status !== "pending" || loadingReview[record.id]}
           >
-            Reject
+            {loadingReview[record.id] ? <Spin size="small" /> : "Reject"}
           </Button>
         </Space>
       ),
     },
   ];
+  //TODO SPINNER WHEN ACCEPT OR REJECT!
 
   if (error) return <p>{error}</p>;
 

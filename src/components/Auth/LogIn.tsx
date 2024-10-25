@@ -36,11 +36,8 @@ const Login: React.FC = () => {
 
       const authToken = response.data.token;
       localStorage.setItem("authToken", authToken);
-      // Set authToken in LocalStorage
 
       if (response.status === 200) {
-        // message.success("Login successful!"); //by default, the message is displayed
-
         const userResponse = await axiosInstance.get("/user", {
           withCredentials: true, // Ensure cookies are sent with this request too
         });
@@ -53,12 +50,10 @@ const Login: React.FC = () => {
 
         // Check if user needs to change password on first login
         if (mustChangePassword) {
-          message.warning(
-            "You need to change your password before proceeding."
-          );
+          message.warning("You need to change your password before proceeding.");
           navigate("/update-password"); // Redirect to the password change page
         } else {
-          // Navigate to a page based on userRole
+          // Navigate based on user role
           if (userRole === "admin") {
             navigate("/projects");
           } else if (userRole === "employee") {
@@ -68,11 +63,17 @@ const Login: React.FC = () => {
       } else {
         message.error("Invalid email or password");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      message.error("An error occurred during login. Please try again.");
+      if (error.response) {
+        message.error(`Error: ${error.response.data.message || "Login failed"}`);
+      } else if (error.request) {
+        message.error("No response from server. Please try again later.");
+      } else {
+        message.error("An error occurred during login. Please try again.");
+      }
     } finally {
-      setLoading(false);
+      setLoading(false); // Ensure loading is disabled after the request is done
     }
   };
 
@@ -106,7 +107,10 @@ const Login: React.FC = () => {
               },
             ]}
           >
-            <Input placeholder="Enter your email" />
+            <Input
+              placeholder="Enter your email"
+              disabled={loading} // Disable input when loading is true
+            />
           </Form.Item>
 
           <Form.Item
@@ -119,7 +123,10 @@ const Login: React.FC = () => {
               },
             ]}
           >
-            <Input.Password placeholder="Enter your password" />
+            <Input.Password
+              placeholder="Enter your password"
+              disabled={loading} // Disable password input when loading is true
+            />
           </Form.Item>
 
           <Form.Item>
@@ -127,7 +134,7 @@ const Login: React.FC = () => {
               type="primary"
               htmlType="submit"
               className="submit-button"
-              loading={loading}
+              loading={loading} // Button shows loading state
               block
             >
               Sign In
