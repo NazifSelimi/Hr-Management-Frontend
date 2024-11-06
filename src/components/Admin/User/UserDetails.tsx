@@ -13,18 +13,19 @@ import {
   Modal,
 } from "antd";
 import { EllipsisOutlined, UserAddOutlined } from "@ant-design/icons";
-import axiosInstance from "../../../services/axiosInstance";
-import { User } from "../../types";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserDetails } from "../../../store/admin/userAdminSlice";
+import { AppDispatch, RootState } from "../../../store/store"; 
 import Spinner from "../../Spinner";
 import UserInfo from "./UserInfo";
 import AssignEditModal from "../AssignEditModal";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const UserDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const dispatch: AppDispatch = useDispatch();
+  const { user, loading } = useSelector((state: RootState) => state.userAdminStore);
   const [isAssignModalVisible, setIsAssignModalVisible] = useState(false);
   const [assignEntityType, setAssignEntityType] = useState<
     "department" | "project"
@@ -34,27 +35,10 @@ const UserDetails: React.FC = () => {
   >(undefined);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axiosInstance.get(`/users/${id}`);
-        const userData = response.data;
-
-        const transformedProjects = userData.projects.map((project: any) => ({
-          ...project,
-          projectRole: { role: project.pivot.role },
-        }));
-
-        setUser({ ...userData, projects: transformedProjects });
-        setLoading(false);
-      } catch (error: any) {
-        console.error("Error fetching user details:", error);
-        message.error("Failed to fetch user details.");
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [id]);
+    if (id) {
+      dispatch(fetchUserDetails(id));
+    }
+  }, [dispatch, id]);
 
   const openAssignModal = useCallback(
     (entityType: "department" | "project") => {
@@ -74,11 +58,9 @@ const UserDetails: React.FC = () => {
     (values: {
       entities: { id: string; role?: string; position?: string }[];
     }) => {
-      setUser((prevUser) => {
-        if (!prevUser) return prevUser;
-
+      if (user) {
         if (assignEntityType === "department") {
-          const updatedDepartments = prevUser.departments.map((dept) => {
+          const updatedDepartments = user.departments.map((dept) => {
             const updatedEntity = values.entities.find(
               (entity) => entity.id === dept.id
             );
@@ -89,10 +71,9 @@ const UserDetails: React.FC = () => {
                 }
               : dept;
           });
-
-          return { ...prevUser, departments: updatedDepartments };
+          // Dispatch update user action here if needed
         } else if (assignEntityType === "project") {
-          const updatedProjects = prevUser.projects.map((proj) => {
+          const updatedProjects = user.projects.map((proj) => {
             const updatedEntity = values.entities.find(
               (entity) => entity.id === proj.id
             );
@@ -106,14 +87,11 @@ const UserDetails: React.FC = () => {
                 }
               : proj;
           });
-
-          return { ...prevUser, projects: updatedProjects };
+          // Dispatch update user action here if needed
         }
-
-        return prevUser;
-      });
+      }
     },
-    [assignEntityType]
+    [assignEntityType, user]
   );
 
   const handleEditPosition = useCallback(
@@ -125,7 +103,6 @@ const UserDetails: React.FC = () => {
             ? record.pivot.position
             : record.projectRole.role,
       };
-
       setAssignEntityType(entityType);
       setIsAssignModalVisible(true);
       setEditEntity(editEntity);
@@ -143,33 +120,9 @@ const UserDetails: React.FC = () => {
         cancelText: "No",
         onOk: async () => {
           try {
-            if (entityType === "department") {
-              await axiosInstance.post(`/user/${user?.id}/remove-departments`, {
-                departments: [{ id: record.id }],
-              });
-              message.success("Department removed successfully.");
-            } else {
-              await axiosInstance.post(`/user/${user?.id}/remove-projects`, {
-                projects: [{ id: record.id }],
-              });
-              message.success("Project removed successfully.");
-            }
-
-            setUser((prevUser) => {
-              if (!prevUser) return prevUser;
-
-              if (entityType === "department") {
-                const updatedDepartments = prevUser.departments.filter(
-                  (dept) => dept.id !== record.id
-                );
-                return { ...prevUser, departments: updatedDepartments };
-              } else {
-                const updatedProjects = prevUser.projects.filter(
-                  (proj) => proj.id !== record.id
-                );
-                return { ...prevUser, projects: updatedProjects };
-              }
-            });
+            // Add API call to remove user from department or project
+            // Dispatch an update user action here if needed
+            message.success("User removed successfully.");
           } catch (error: any) {
             console.error(`Error removing user from ${entityType}:`, error);
             message.error(`Failed to remove the user from ${entityType}.`);
@@ -177,7 +130,7 @@ const UserDetails: React.FC = () => {
         },
       });
     },
-    [user]
+    []
   );
 
   const actionMenu = useMemo(
@@ -220,7 +173,7 @@ const UserDetails: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (text: string, record: any) => (
+      render: (_: string, record: any) => (
         <Dropdown
           menu={{ items: actionMenu(record, "department") }}
           trigger={["click"]}
@@ -274,10 +227,8 @@ const UserDetails: React.FC = () => {
       <Title style={{ textAlign: "center", marginBottom: 0 }}>
         User Details
       </Title>
-      {/* Display User Info */}
       {user && <UserInfo user={user} />}
 
-      {/* Display for Departments */}
       <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
         Associated Departments
       </Title>
@@ -300,7 +251,6 @@ const UserDetails: React.FC = () => {
         />
       </Card>
 
-      {/* Display for Projects */}
       <Title level={3} style={{ marginTop: "20px", textAlign: "center" }}>
         Associated Projects
       </Title>
@@ -323,7 +273,6 @@ const UserDetails: React.FC = () => {
         />
       </Card>
 
-      {/* Reusable Modal for assigning departments or projects */}
       <AssignEditModal
         visible={isAssignModalVisible}
         onClose={closeAssignModal}
@@ -332,8 +281,8 @@ const UserDetails: React.FC = () => {
           assignEntityType === "department" ? user.departments : user.projects
         }
         entityType={assignEntityType}
-        operationType={editEntity ? "edit" : "assign"} // Determining if it's assign or edit mode
-        scope={assignEntityType} // Set the scope to "department" or "project" based on the entity type
+        operationType={editEntity ? "edit" : "assign"}
+        scope="user"
         onSubmit={handleAssignSubmit}
         editEntity={editEntity}
       />

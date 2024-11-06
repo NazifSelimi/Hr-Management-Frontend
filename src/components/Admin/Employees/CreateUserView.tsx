@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Select, message, Spin } from "antd";
-import axiosInstance from "../../../services/axiosInstance";
-import { Department } from "../../types";
-import { useNavigate } from "react-router-dom";
-import Spinner from "../../Spinner";
+import React, { useState } from "react";
+import {  message  } from "antd";
+// import { useNavigate } from "react-router-dom";
 import { createEmployee } from "../../../apiService";
 import CreateUserForm from "./CreateUserForm";
 
-const { Option } = Select;
+// const { Option } = Select;
 
 const CreateUserView: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (values: any) => {

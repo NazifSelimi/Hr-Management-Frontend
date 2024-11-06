@@ -8,21 +8,23 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import AssignUsersModal from "./AssignUserModal";
-import EditModal from "../../Modal/EditModal"; // Import EditModal
+import EditModal from "../../Modal/EditModal"; 
 import { Department } from "../../types";
 import Spinner from "../../Spinner";
 import { useNavigate } from "react-router-dom";
-import CustomTable from "../../Table/CustomTable"; // Assuming this is your custom table component
+import CustomTable from "../../Table/CustomTable"; 
 import {
   fetchDepartmentsApi,
   deleteDepartmentApi,
   updateDepartmentApi,
-} from "../../../apiService"; // Add updateDepartmentApi
+} from "../../../apiService"; 
 
-const DepartmentsList: React.FC<{
-  data?: Department[];
+interface DepartmentsListProps {
+  data?: Department[]; // Accept data prop
   onClose?: () => void;
-}> = ({ data, onClose }) => {
+}
+
+const DepartmentsList: React.FC<DepartmentsListProps> = ({ data, onClose }) => {
   const [departments, setDepartments] = useState<Department[]>(data || []);
   const [loading, setLoading] = useState<boolean>(!data?.length);
   const [isEditModalVisible, setEditModalVisible] = useState<boolean>(false);
@@ -83,6 +85,11 @@ const DepartmentsList: React.FC<{
     setEditModalVisible(true);
   }, []);
 
+  const handleCancel = useCallback(() => {
+    setSelectedDepartment(null);
+    setEditModalVisible(false);
+  }, []);
+  
   const handleEditSubmit = useCallback(
     async (values: Record<string, any>) => {
       if (!selectedDepartment) return;
@@ -101,13 +108,9 @@ const DepartmentsList: React.FC<{
         message.error(error.response?.data?.message || "Failed to update department.");
       }
     },
-    [selectedDepartment]
+    [handleCancel, selectedDepartment]
   );
 
-  const handleCancel = useCallback(() => {
-    setSelectedDepartment(null);
-    setEditModalVisible(false);
-  }, []);
 
   const handleAssignUsers = useCallback((department: Department) => {
     setSelectedDepartment(department);

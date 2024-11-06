@@ -14,70 +14,46 @@ import {
   Col,
   Input,
 } from "antd";
-import axiosInstance from "../../../services/axiosInstance";
-import { User, Project } from "../../types";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchEmployeeDetails,
+  fetchProjects,
+  assignProjects,
+} from "../../../store/admin/employeeDetailsAdminSlice";
+import { RootState, AppDispatch } from "../../../store/store"
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-//NOT FINISHED COMPONENT AND NOT USING THIS COMPONENT CURRENTLY EXPERIMENTING... !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const EmployeeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [employee, setEmployee] = useState<User | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const [assignModalVisible, setAssignModalVisible] = useState<boolean>(false);
   const [form] = Form.useForm();
 
+  const { employee, projects, loading } = useSelector((state: RootState) => ({
+    employee: state.employeeDetailsAdminStore.employee,
+    projects: state.employeeDetailsAdminStore.projects,
+    loading: state.employeeDetailsAdminStore.loading,
+  }));
+
   useEffect(() => {
-    const fetchEmployee = async () => {
+    if (id) {
+      dispatch(fetchEmployeeDetails(id));
+      dispatch(fetchProjects());
+    }
+  }, [dispatch, id]);
+
+  const handleAssignProjects = async (values: { project_ids: string[]; role: string }) => {
+    if (id) {
       try {
-        const response = await axiosInstance.get<User>(`/users/${id}`);
-        setEmployee(response.data);
-        console.log(response.data);
-      } catch (error: any) {
-        console.error("Error fetching employee details:", error);
-        message.error(error.response?.data?.message || "Failed to fetch employee details.");
+        await dispatch(assignProjects({ id, values: { project_ids: values.project_ids, role: values.role } })).unwrap();
+        message.success("Projects assigned successfully.");
+        setAssignModalVisible(false);
+        form.resetFields();
+      } catch (error) {
+        message.error("Failed to assign projects. Please check your inputs and try again.");
       }
-    };
-
-    const fetchProjects = async () => {
-      try {
-        const response = await axiosInstance.get<Project[]>("/projects");
-        setProjects(response.data);
-      } catch (error: any) {
-        console.error("Error fetching projects:", error);
-        message.error(error.response?.data?.message || "Failed to fetch projects.");
-      }
-    };
-
-    fetchEmployee();
-    fetchProjects();
-  }, [id]);
-
-  const handleAssignProjects = async (values: {
-    project_ids: string[];
-    role: string;
-  }) => {
-    setLoading(true);
-    try {
-      await axiosInstance.post(`/employees/${id}/assign-projects`, values);
-      message.success("Projects assigned successfully.");
-      setAssignModalVisible(false);
-      setEmployee((prev) => ({
-        ...prev!,
-        projects: [
-          ...(prev?.projects || []),
-          ...projects.filter((project) =>
-            values.project_ids.includes(project.id)
-          ),
-        ],
-      }));
-    } catch (error: any) {
-      console.error("Error assigning projects:", error);
-      message.error(error.response?.data?.message || "Failed to assign projects. Please check your inputs and try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -121,36 +97,20 @@ const EmployeeDetails: React.FC = () => {
       <Card>
         <Typography>
           <Row>
-            <Col span={6}>
-              <Text strong>First Name:</Text>
-            </Col>
-            <Col span={18}>
-              <Text>{employee.first_name}</Text>
-            </Col>
+            <Col span={6}><Text strong>First Name:</Text></Col>
+            <Col span={18}><Text>{employee.first_name}</Text></Col>
           </Row>
           <Row>
-            <Col span={6}>
-              <Text strong>Last Name:</Text>
-            </Col>
-            <Col span={18}>
-              <Text>{employee.last_name}</Text>
-            </Col>
+            <Col span={6}><Text strong>Last Name:</Text></Col>
+            <Col span={18}><Text>{employee.last_name}</Text></Col>
           </Row>
           <Row>
-            <Col span={6}>
-              <Text strong>Email:</Text>
-            </Col>
-            <Col span={18}>
-              <Text>{employee.email}</Text>
-            </Col>
+            <Col span={6}><Text strong>Email:</Text></Col>
+            <Col span={18}><Text>{employee.email}</Text></Col>
           </Row>
           <Row>
-            <Col span={6}>
-              <Text strong>Days Off:</Text>
-            </Col>
-            <Col span={18}>
-              <Text>{employee.days_off}</Text>
-            </Col>
+            <Col span={6}><Text strong>Days Off:</Text></Col>
+            <Col span={18}><Text>{employee.days_off}</Text></Col>
           </Row>
         </Typography>
         <Button type="primary" onClick={() => setAssignModalVisible(true)}>
@@ -169,9 +129,7 @@ const EmployeeDetails: React.FC = () => {
           <Form.Item
             name="project_ids"
             label="Projects"
-            rules={[
-              { required: true, message: "Please select at least one project" },
-            ]}
+            rules={[{ required: true, message: "Please select at least one project" }]}
           >
             <Select mode="multiple" placeholder="Select projects">
               {projects.map((project) => (

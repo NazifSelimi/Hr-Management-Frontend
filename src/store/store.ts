@@ -5,6 +5,11 @@ import projectsSlice from "./employee/projectsSlice";
 import vacationsSlice from "./employee/vacationsSlice"
 import userSlice from "./employee/userSlice";
 import vacationAdminSlice from "./admin/vacationAdminSlice"
+import userAdminSlice from "./admin/userAdminSlice";
+import employeeDetailsAdminSlice from "../store/admin/employeeDetailsAdminSlice"
+import projectDetailsAdminSlice from "../store/admin/projectDetailsAdminSlice";
+import departmentsAdminSlice from "../store/admin/departmentsAdminSlice"
+
 const store = configureStore({
   reducer: {
     projectStore: projectsSlice,
@@ -12,8 +17,10 @@ const store = configureStore({
     vacationsStore: vacationsSlice,
     userStore: userSlice,
     vacationAdminStore: vacationAdminSlice,
-    // userAdminStore: userAdminSlice
-    // Add other reducers here
+    userAdminStore: userAdminSlice,
+    employeeDetailsAdminStore: employeeDetailsAdminSlice,
+    projectDetailsAdminStore: projectDetailsAdminSlice,
+    departmentsAdminStore: departmentsAdminSlice
   },
 });
 
